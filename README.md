@@ -29,9 +29,11 @@
 ## Prerequisite
 
 - create `.env` file based on your environment like,
-  - if you're running it on your local env > `.development.env`
-  - if you're running it on your staging server > `.stage.env`
-  - if you're running it on your production server > `.production.env`
+  - for development server > `.development.env`
+  - for staging server > `.stage.env`
+  - for production server > `.production.env`
+
+- For more information, refer `.example.env` file.
 - If you're running it with `docker-compose` you need to change database port to `5431`.
 ## Installation
 
@@ -91,6 +93,12 @@ $ npm run console:prod db
 - `db migrate:create <name>` - to create empty migration file.
 - `db migrate:up` - to run all migration.
 - `db migrate:down` - to run migration one down.
+
+
+### Swagger Documentation
+
+- Swagger documentation endpoint will be running at `http://host:port/docs`.
+- Create dtos payload accordingly for well maintained API documentation. 
 
 ## Support
 
