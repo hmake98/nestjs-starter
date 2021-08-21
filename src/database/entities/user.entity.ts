@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Role } from './role.entity';
-import { Post } from './post.entity';
+import { Posts } from './post.entity';
 
 @Entity('users')
 export class User {
@@ -15,10 +15,6 @@ export class User {
   @Exclude({ toPlainOnly: true })
   public password: string;
 
-  @Column({ type: 'int', nullable: true })
-  @Exclude({ toPlainOnly: true })
-  public pin: number;
-
   @Column({ type: 'varchar', nullable: true })
   public firstName: string;
 
@@ -31,11 +27,11 @@ export class User {
   @Column({ type: 'varchar', nullable: true, unique: true })
   public phone: string;
 
-  @Column({ type: 'enum', enum: Role })
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
   public role: Role;
 
-  @OneToMany(() => Post, (post) => post.author)
-  public posts: Post[];
+  @OneToMany(() => Posts, (post) => post.author)
+  public posts: Posts[];
 
   @CreateDateColumn()
   public createdAt: Date;

@@ -5,5 +5,6 @@ export class Errors {
     INVALID_ACCESS: 'Invalid Access',
     INVALID_TOKEN: 'Invalid Token',
     USER_NOT_FOUND: 'User not found',
+    USER_EXISTS: 'User already exists',
   };
 }

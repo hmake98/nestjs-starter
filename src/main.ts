@@ -26,11 +26,7 @@ export function configureApp(app): void {
 }
 
 function configureSwagger(app): void {
-  const config = new DocumentBuilder()
-    .setTitle('ShefaHealth-API')
-    .setDescription('ShefaHealth API Description')
-    .setVersion('1.0')
-    .build();
+  const config = new DocumentBuilder().setTitle('Nest-API').setDescription('API Description').setVersion('1.0').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(docsEndpoint, app, document);
 }

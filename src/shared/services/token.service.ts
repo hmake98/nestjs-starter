@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken';
 
 import { ConfigService } from 'src/config/config.service';
 import { User } from '../../database/entities';
-import { Token } from '../interfaces';
+import { AuthToken } from '../interfaces';
 import { Auth } from '../interfaces/Auth';
 
 @Injectable({ scope: Scope.DEFAULT })
@@ -18,8 +18,8 @@ export class TokenService {
     this.refreshTokenExpr = this.configService.get('refreshtokenExpr');
   }
 
-  public async generateNewTokens(user: User): Promise<Token> {
-    const tokens = new Token();
+  public async generateNewTokens(user: User): Promise<AuthToken> {
+    const tokens = new AuthToken();
     tokens.accessToken = await this.generateNewAccessToken(user);
     tokens.refreshToken = await this.generateNewRefeshToken(user);
     tokens.user = user;
@@ -27,20 +27,20 @@ export class TokenService {
   }
 
   public async generateNewRefeshToken(user: User): Promise<string> {
-    const token = new Token();
+    const token = new AuthToken();
     token.user = user;
     const refreshToken = await this.generateTokenId(token, 'refreshToken');
     return refreshToken;
   }
 
   public async generateNewAccessToken(user: User): Promise<string> {
-    const token = new Token();
+    const token = new AuthToken();
     token.user = user;
     const accessToken = await this.generateTokenId(token, 'accessToken');
     return accessToken;
   }
 
-  private async generateTokenId(token: Token, type: string): Promise<string> {
+  private async generateTokenId(token: AuthToken, type: string): Promise<string> {
     const expiresIn = type === 'accessToken' ? this.accessTokenExpr : this.refreshTokenExpr;
     return jwt.sign(
       {
