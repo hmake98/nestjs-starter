@@ -48,13 +48,13 @@ $ npm install
 $ npm run start
 
 # development
-$ npm run start:dev
+$ npm run dev
 
 # staging
-$ npm run start:stage
+$ npm run stage
 
 # production mode
-$ npm run start:prod
+$ npm run prod
 ```
 
 ## Building
