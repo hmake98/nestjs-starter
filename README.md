@@ -45,7 +45,7 @@ $ npm install
 
 ```bash
 # build
-$ npm run start
+$ npm start
 
 # development
 $ npm run dev
