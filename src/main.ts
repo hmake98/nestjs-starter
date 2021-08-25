@@ -6,13 +6,15 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ResponseInterceptor } from './interceptors';
 import { AppModule } from './app.module';
+import { LogService } from './shared/services/logger.service';
 import 'reflect-metadata';
 import * as morgan from 'morgan';
 import * as json from 'morgan-json';
 import * as express from 'express';
 import * as helmet from 'helmet';
 import * as session from 'express-session';
-import { LogService } from './shared/services/logger.service';
+import * as i18n from 'i18n-express';
+import { join } from 'path';
 
 const baseUrl = process.env.BASE_URL || '/api';
 const docsEndpoint = process.env.DOCS_ENDPOINT || '/docs';
@@ -68,6 +70,14 @@ async function bootstrap(): Promise<void> {
       saveUninitialized: false,
     }),
   );
+  app.use(
+    i18n({
+      translationsPath: join(__dirname, 'i18n'),
+      siteLangs: ['en', 'es'],
+      textsVarName: 'translation',
+    }),
+  );
+
   app.enableCors();
   await app.init();
 

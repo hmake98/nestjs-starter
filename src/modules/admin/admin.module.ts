@@ -3,7 +3,6 @@ import { ConfigModule } from 'src/config/config.module';
 import { DatabaseModule } from 'src/database/database.module';
 import { UserRepository } from 'src/shared/repository';
 import { EmailService } from 'src/shared/services/email.service';
-import { NotificationService } from 'src/shared/services/notification.service';
 import { TokenService } from 'src/shared/services/token.service';
 import { Connection } from 'typeorm';
 import { UserModule } from '../user/user.module';
@@ -18,7 +17,6 @@ import { AdminService } from './admin.service';
     AdminService,
     TokenService,
     EmailService,
-    NotificationService,
     {
       provide: UserRepository,
       useFactory: (connection: Connection) => connection.getCustomRepository(UserRepository),

@@ -27,7 +27,7 @@ export class User {
   @Column({ type: 'varchar', nullable: true, unique: true })
   public phone: string;
 
-  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  @Column({ type: 'enum', enum: Role })
   public role: Role;
 
   @OneToMany(() => Posts, (post) => post.author)

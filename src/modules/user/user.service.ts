@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { Errors } from 'src/common/errors';
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
 import { UserRepository } from '../../shared/repository';
@@ -16,10 +15,10 @@ export class UserService {
       const { email, password } = data;
       const checkUser = await this.userRepo.findUserAccountByEmail(email);
       if (!checkUser) {
-        throw new NotFoundException(Errors.ErrorMessages.USER_NOT_FOUND);
+        throw new NotFoundException();
       }
       if (checkUser.password !== password) {
-        throw new BadRequestException(Errors.ErrorMessages.INVALID_PASSWORD);
+        throw new BadRequestException();
       }
       return await this.tokenService.generateNewTokens(checkUser);
     } catch (e) {
@@ -32,7 +31,7 @@ export class UserService {
       const { email, password, firstname, lastname } = data;
       const checkUser = await this.userRepo.findUserAccountByEmail(email);
       if (checkUser) {
-        throw new BadRequestException(Errors.ErrorMessages.USER_EXISTS);
+        throw new BadRequestException();
       }
       const hashPassword = createHash(password);
       const user = await this.userRepo.create({
@@ -51,11 +50,11 @@ export class UserService {
     try {
       const match = await this.tokenService.verify(refreshToken);
       if (!match) {
-        throw new BadRequestException({ message: Errors.ErrorMessages.INVALID_TOKEN });
+        throw new BadRequestException();
       }
       const user = await this.userRepo.findOne({ id: match.id });
       if (!user) {
-        throw new BadRequestException({ message: Errors.ErrorMessages.USER_NOT_FOUND });
+        throw new BadRequestException();
       }
       return await this.tokenService.generateNewTokens(user);
     } catch (e) {

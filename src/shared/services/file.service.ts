@@ -11,7 +11,6 @@ export class FileService {
   constructor(private readonly config: ConfigService) {
     const awsConfig = config.get('aws');
     this.bucketName = this.config.get('awsBucket');
-    this.presignExpireSeconds = this.config.get('presignedUrlExpireTime');
     this.storageService = new S3({
       ...awsConfig,
       signatureVersion: 'v4',

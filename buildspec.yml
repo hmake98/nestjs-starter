@@ -16,7 +16,7 @@ phases:
       - echo Build started on `date`
       - echo Compiling the Node.js code
       - npm run build
-      - cp -r node_modules dist/
+      - cp -r node_modules build/
   post_build:
     commands:
       - echo Build completed on `date`
@@ -24,4 +24,4 @@ artifacts:
   files:
     - "**/*"
   discard-paths: no
-  base-directory: dist/
+  base-directory: build/

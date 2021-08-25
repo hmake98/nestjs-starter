@@ -12,13 +12,30 @@ import { HealthController } from './health.controller';
 import { ConsoleModule } from 'nestjs-console';
 import { UserController } from './modules/user/user.controller';
 import { PostRepository, UserRepository } from './shared/repository';
-import { NotificationService } from './shared/services/notification.service';
 import { PostModule } from './modules';
 import { PostController } from './modules/post/post.controller';
+import { I18nJsonParser, I18nModule } from 'nestjs-i18n';
+import { join } from 'path';
 
 @Module({
-  imports: [AdminModule, TerminusModule, ConfigModule, DatabaseModule, UserModule, ConsoleModule, PostModule],
+  imports: [
+    AdminModule,
+    TerminusModule,
+    ConfigModule,
+    DatabaseModule,
+    UserModule,
+    ConsoleModule,
+    PostModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      parser: I18nJsonParser,
+      parserOptions: {
+        path: join(__dirname, '/i18n/'),
+        watch: true,
+      },
+    }),
+  ],
   controllers: [AdminController, HealthController, UserController, PostController],
-  providers: [FileService, EmailService, TokenService, NotificationService, Logger, UserRepository, PostRepository],
+  providers: [FileService, EmailService, TokenService, Logger, UserRepository, PostRepository],
 })
 export class AppModule {}

@@ -38,7 +38,9 @@ export class DatabaseService {
   async create(name: string) {
     try {
       const migrationPath = path.resolve(__dirname, 'migrations');
-
+      if (!fs.existsSync(migrationPath)) {
+        fs.mkdirSync(migrationPath);
+      }
       if (!name) {
         console.log('Please specify a name for your migration in camelCase or kebab-case.');
         return;

@@ -2,20 +2,20 @@ version: '3.8'
 
 services:
     database: 
-        container_name: shefa-database
+        container_name: database
         image: postgres
         ports: 
             - 5431:5432
         environment: 
-            - POSTGRES_USER=shefa_admin
+            - POSTGRES_USER=pg_admin
             - POSTGRES_PASSWORD=master123
-            - POSTGRES_DB=shefahealth
+            - POSTGRES_DB=postgres
         volumes: 
             - ./docker-volumes/postgresql:/var/lib/postgresql
         networks: 
             - nest-network
     server:
-        container_name: shefa-backend
+        container_name: backend
         build:
             context: .
             dockerfile: ./Dockerfile

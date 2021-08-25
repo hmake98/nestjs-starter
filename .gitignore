@@ -1,5 +1,5 @@
 # compiled output
-/dist
+/build
 /node_modules
 
 # Logs
@@ -38,3 +38,5 @@ lerna-debug.log*
 .development.env
 .stage.env
 .production.env
+
+tsconfig.build.tsbuildinfo
