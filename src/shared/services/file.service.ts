@@ -1,8 +1,8 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from 'src/config/config.service';
 
-@Injectable({ scope: Scope.DEFAULT })
+@Injectable()
 export class FileService {
   bucketName: string;
   presignExpireSeconds: number;

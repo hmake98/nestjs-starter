@@ -1,6 +1,5 @@
-import { Role, User } from '../../database/entities';
+import { User } from '../../database/entities';
 import { EntityRepository, Repository } from 'typeorm';
-import { GetResponse } from '../interfaces';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {

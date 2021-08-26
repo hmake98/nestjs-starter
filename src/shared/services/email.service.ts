@@ -1,16 +1,16 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { SES } from 'aws-sdk';
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { TEMPLATES } from 'src/common/constant';
 import { ConfigService } from 'src/config/config.service';
-import { readFilePromise } from 'src/utils/utils';
-import { replaceAll } from '../../utils/utils';
+import { readFilePromise } from 'src/utils/helper';
+import * as _ from 'lodash';
 
-@Injectable({ scope: Scope.DEFAULT })
+@Injectable()
 export class EmailService {
   private emailService: SES;
   private sourceEmail: string;
+  private readonly logger = new Logger(EmailService.name);
 
   constructor(private readonly config: ConfigService) {
     const awsConfig = this.config.get('aws');
@@ -25,31 +25,31 @@ export class EmailService {
         templatePath = join(__dirname, '../templates/', `${template}.html`);
       }
       let _content = await readFilePromise(templatePath);
-      _content = replaceAll(_content, data);
-      console.log(_content);
-      // this.emailService
-      //   .sendEmail({
-      //     Source: this.sourceEmail,
-      //     Destination: {
-      //       ToAddresses: emails,
-      //     },
-      //     Message: {
-      //       Body: {
-      //         Html: {
-      //           Charset: 'UTF-8',
-      //           Data: _content,
-      //         },
-      //       },
-      //       Subject: {
-      //         Charset: 'UTF-8',
-      //         Data: subjectData,
-      //       },
-      //     },
-      //   })
-      //   .promise()
-      //   .catch((e) => console.log(e));
+      const compiled = _.template(_content);
+      _content = compiled(data);
+      this.emailService
+        .sendEmail({
+          Source: this.sourceEmail,
+          Destination: {
+            ToAddresses: emails,
+          },
+          Message: {
+            Body: {
+              Html: {
+                Charset: 'UTF-8',
+                Data: _content,
+              },
+            },
+            Subject: {
+              Charset: 'UTF-8',
+              Data: subjectData,
+            },
+          },
+        })
+        .promise()
+        .catch((e) => this.logger.error(e));
     } catch (e) {
-      throw new Error(e);
+      this.logger.error(e);
     }
   }
 }

@@ -52,7 +52,6 @@ export class DatabaseService {
 
       const baseFilename = `${date}-${kebabName}`;
       const newFilename = path.resolve(migrationPath, `${baseFilename}.ts`);
-      console.log(newFilename);
       const className = camelName + date;
 
       const template = templateGen(className, baseFilename);

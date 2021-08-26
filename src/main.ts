@@ -13,8 +13,8 @@ import * as json from 'morgan-json';
 import * as express from 'express';
 import * as helmet from 'helmet';
 import * as session from 'express-session';
-import * as i18n from 'i18n-express';
-import { join } from 'path';
+// import { fork, on, isMaster } from 'cluster';
+// import * as os from 'os';
 
 const baseUrl = process.env.BASE_URL || '/api';
 const docsEndpoint = process.env.DOCS_ENDPOINT || '/docs';
@@ -70,13 +70,6 @@ async function bootstrap(): Promise<void> {
       saveUninitialized: false,
     }),
   );
-  app.use(
-    i18n({
-      translationsPath: join(__dirname, 'i18n'),
-      siteLangs: ['en', 'es'],
-      textsVarName: 'translation',
-    }),
-  );
 
   app.enableCors();
   await app.init();
@@ -90,5 +83,21 @@ async function bootstrap(): Promise<void> {
 declare let global: any;
 
 if (require.main === module || global.PhusionPassenger) {
+  // if (isMaster) {
+  //   const totalCPUs = os.cpus().length;
+  //   console.log(`Master ${process.pid} is running`);
+
+  // Fork workers.
+  //   for (let i = 0; i < totalCPUs; i++) {
+  //     fork();
+  //   }
+
+  //   on('exit', (worker, code, signal) => {
+  //     console.log(`worker ${worker.process.pid} died`);
+  //     console.log("Let's fork another worker!");
+  //     fork();
+  //   });
+  // } else {
   bootstrap();
+  // }
 }

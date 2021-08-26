@@ -1,12 +1,11 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-
 import { ConfigService } from 'src/config/config.service';
 import { User } from '../../database/entities';
 import { AuthToken } from '../interfaces';
 import { Auth } from '../interfaces/Auth';
 
-@Injectable({ scope: Scope.DEFAULT })
+@Injectable()
 export class TokenService {
   private secretKey: string;
   private accessTokenExpr: string;

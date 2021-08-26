@@ -1,4 +1,3 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { readFile } from 'fs';
 
@@ -14,10 +13,6 @@ export const match = (hash: string, password: string): boolean => {
   return isMatch;
 };
 
-export const handleError = (e) => {
-  throw new Error(e);
-};
-
 export async function readFilePromise(filePath): Promise<string> {
   return new Promise((resolve, reject) => {
     readFile(filePath, 'utf8', (err, html) => {
@@ -28,11 +23,4 @@ export async function readFilePromise(filePath): Promise<string> {
       }
     });
   });
-}
-
-export function replaceAll(str, map) {
-  for (const key in map) {
-    str = str.replaceAll(key, map[key]);
-  }
-  return str;
 }

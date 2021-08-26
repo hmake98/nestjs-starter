@@ -1,7 +1,6 @@
 import { Body, ClassSerializerInterceptor, Controller, HttpCode, Post, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthToken } from 'src/shared/interfaces';
-import { FileService } from 'src/shared/services/file.service';
 import { TokenDto } from './dto/token.dto';
 import { UserCreateDto } from './dto/user-create.dto';
 import { UserLoginDto } from './dto/user-login.dto';
@@ -11,7 +10,7 @@ import { UserService } from './user.service';
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  public constructor(private readonly userService: UserService, private readonly fileService: FileService) {}
+  public constructor(private readonly userService: UserService) {}
 
   @HttpCode(200)
   @Post('/login')

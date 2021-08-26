@@ -1,9 +1,15 @@
-import { HttpException, HttpStatus, Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
 import { UserRepository } from '../../shared/repository';
 import { UserLoginDto } from './dto/user-login.dto';
-import { handleError, createHash } from './../../utils/utils';
+import { createHash } from '../../utils/helper';
 import { UserCreateDto } from './dto/user-create.dto';
 
 @Injectable()
@@ -15,14 +21,14 @@ export class UserService {
       const { email, password } = data;
       const checkUser = await this.userRepo.findUserAccountByEmail(email);
       if (!checkUser) {
-        throw new NotFoundException();
+        throw new HttpException('USER_NOT_FOUND', HttpStatus.BAD_REQUEST);
       }
       if (checkUser.password !== password) {
-        throw new BadRequestException();
+        throw new HttpException('INVALID_PASSWORD', HttpStatus.CONFLICT);
       }
       return await this.tokenService.generateNewTokens(checkUser);
     } catch (e) {
-      handleError(e);
+      throw new InternalServerErrorException(e);
     }
   }
 
@@ -31,7 +37,7 @@ export class UserService {
       const { email, password, firstname, lastname } = data;
       const checkUser = await this.userRepo.findUserAccountByEmail(email);
       if (checkUser) {
-        throw new BadRequestException();
+        throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
       }
       const hashPassword = createHash(password);
       const user = await this.userRepo.create({
@@ -42,7 +48,7 @@ export class UserService {
       });
       return await this.tokenService.generateNewTokens(user);
     } catch (e) {
-      handleError(e);
+      throw new InternalServerErrorException(e);
     }
   }
 

@@ -1,3 +1,4 @@
+import { TaskModule } from './shared/modules';
 import { FileService } from './shared/services/file.service';
 import { EmailService } from './shared/services/email.service';
 import { AdminModule } from './modules/admin/admin.module';
@@ -14,11 +15,14 @@ import { UserController } from './modules/user/user.controller';
 import { PostRepository, UserRepository } from './shared/repository';
 import { PostModule } from './modules';
 import { PostController } from './modules/post/post.controller';
-import { I18nJsonParser, I18nModule } from 'nestjs-i18n';
-import { join } from 'path';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './interceptors/exception.interceptor';
+import { ScheduleModule } from '@nestjs/schedule';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
+    TaskModule,
     AdminModule,
     TerminusModule,
     ConfigModule,
@@ -26,16 +30,26 @@ import { join } from 'path';
     UserModule,
     ConsoleModule,
     PostModule,
-    I18nModule.forRoot({
-      fallbackLanguage: 'en',
-      parser: I18nJsonParser,
-      parserOptions: {
-        path: join(__dirname, '/i18n/'),
-        watch: true,
+    ScheduleModule.forRoot(),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
       },
     }),
   ],
   controllers: [AdminController, HealthController, UserController, PostController],
-  providers: [FileService, EmailService, TokenService, Logger, UserRepository, PostRepository],
+  providers: [
+    FileService,
+    EmailService,
+    TokenService,
+    Logger,
+    UserRepository,
+    PostRepository,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}
