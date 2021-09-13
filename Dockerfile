@@ -2,7 +2,7 @@ FROM node:12-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache --virtual .build-deps alpine-sdk python
+RUN apk add --no-cache --virtual .build-deps alpine-sdk python make gcc g++ 
 
 COPY package*.json ./
 

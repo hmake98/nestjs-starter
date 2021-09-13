@@ -7,7 +7,8 @@ export class ClientAuthGuard implements CanActivate {
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.getArgByIndex(0);
-    const token = request.headers['authorization'];
+    const Authorization = request.headers['authorization'];
+    const token = Authorization.replace('Bearer ', '');
     const verify = await this.tokenService.verify(token);
     if (!verify) {
       throw new UnauthorizedException();

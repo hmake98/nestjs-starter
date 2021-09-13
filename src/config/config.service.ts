@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-config({ path: `.${process.env.NODE_ENV}.env` });
+config({ path: `${process.env.NODE_ENV ? '.' + process.env.NODE_ENV : '.development'}.env` });
 import { Injectable, Scope } from '@nestjs/common';
 
 @Injectable({ scope: Scope.DEFAULT })

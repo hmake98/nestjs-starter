@@ -11,6 +11,7 @@ import { UserRepository } from '../../shared/repository';
 import { UserLoginDto } from './dto/user-login.dto';
 import { createHash } from '../../utils/helper';
 import { UserCreateDto } from './dto/user-create.dto';
+import { User } from 'src/database/entities';
 
 @Injectable()
 export class UserService {
@@ -40,12 +41,12 @@ export class UserService {
         throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
       }
       const hashPassword = createHash(password);
-      const user = await this.userRepo.create({
-        email: data.email,
-        password: hashPassword,
-        firstName: firstname.trim(),
-        lastName: lastname.trim(),
-      });
+      const newUser = new User();
+      newUser.email = data.email;
+      newUser.password = hashPassword;
+      newUser.firstName = firstname.trim();
+      newUser.lastName = lastname.trim();
+      const user = await this.userRepo.save(newUser);
       return await this.tokenService.generateNewTokens(user);
     } catch (e) {
       throw new InternalServerErrorException(e);

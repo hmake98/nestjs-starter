@@ -19,7 +19,8 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.getArgByIndex(0);
-    const token = request.headers['authorization'];
+    const Authorization = request.headers['authorization'];
+    const token = Authorization.replace('Bearer ', '');
     const tokenService = new TokenService(new ConfigService());
     const verify = await tokenService.verify(token);
     if (requiredRoles.some((role) => role === verify.role)) {

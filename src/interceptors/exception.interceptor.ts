@@ -1,5 +1,5 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { I18n } from 'i18n';
 const i18n = new I18n();
 
@@ -23,8 +23,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
       status: number;
     };
 
-    const message = i18n.__(error.response);
-
-    response.status(error.status).json({ statusCode: error.status, message });
+    let message: string;
+    if (error.response) {
+      message = i18n.__(error.response);
+      response.status(error.status).json({ statusCode: error.status, message });
+    } else {
+      response.status(error['statusCode']).json({ ...error });
+    }
   }
 }

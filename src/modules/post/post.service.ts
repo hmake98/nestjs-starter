@@ -9,9 +9,9 @@ export class PostService {
 
   public async createPost(data: PostCreateDto, authUser: User): Promise<Posts> {
     const { content } = data;
-    return await this.postRepo.create({
-      content: content.trim(),
-      author: authUser,
-    });
+    const newPost = new Posts();
+    newPost.content = content.trim();
+    newPost.author = authUser;
+    return await this.postRepo.save(newPost);
   }
 }
