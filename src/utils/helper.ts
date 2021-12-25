@@ -1,7 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { readFile } from 'fs';
-
-const saltOrRounds = 10;
+import { saltOrRounds } from 'src/common/constant';
 
 export const createHash = (password: string): string => {
   const hash = bcrypt.hashSync(password, saltOrRounds);

@@ -12,6 +12,8 @@ export class ${className} implements MigrationInterface {
 `;
 };
 
+export const saltOrRounds = 10;
+
 /**
  * Status messages
  */
