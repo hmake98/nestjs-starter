@@ -13,6 +13,7 @@ import { createHash } from '../../utils/helper';
 import { UserCreateDto } from './dto/user-create.dto';
 import { User } from 'src/database/entities';
 import { match } from '../../utils/helper';
+import { Role } from '../../database/entities/role.entity';
 
 @Injectable()
 export class UserService {
@@ -47,6 +48,7 @@ export class UserService {
       newUser.password = hashPassword;
       newUser.firstName = firstname.trim();
       newUser.lastName = lastname.trim();
+      newUser.role = Role.USER;
       const user = await this.userRepo.save(newUser);
       return await this.tokenService.generateNewTokens(user);
     } catch (e) {
