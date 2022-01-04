@@ -26,6 +26,10 @@ export class ConfigService {
       secretAccessKey: process.env.AWS_SECRET_KEY,
       region: process.env.AWS_REGION,
     };
+    this.config.facebook = {
+      appId: process.env.FB_APP_ID,
+      appSecret: process.env.FB_SECRET,
+    };
   }
 
   public get(key: string): any {

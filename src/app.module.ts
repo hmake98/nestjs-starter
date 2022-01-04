@@ -19,6 +19,9 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
+import { FacebookModule } from './modules/facebook-login/facebook.module';
+import { FacebookController } from './modules/facebook-login/facebook.controller';
+import { FacebookService } from './modules/facebook-login/facebook.service';
 
 @Module({
   imports: [
@@ -30,6 +33,7 @@ import { BullModule } from '@nestjs/bull';
     UserModule,
     ConsoleModule,
     PostModule,
+    FacebookModule,
     ScheduleModule.forRoot(),
     BullModule.forRoot({
       redis: {
@@ -38,11 +42,12 @@ import { BullModule } from '@nestjs/bull';
       },
     }),
   ],
-  controllers: [AdminController, HealthController, UserController, PostController],
+  controllers: [AdminController, HealthController, UserController, PostController, FacebookController],
   providers: [
     FileService,
     EmailService,
     TokenService,
+    FacebookService,
     Logger,
     UserRepository,
     PostRepository,
