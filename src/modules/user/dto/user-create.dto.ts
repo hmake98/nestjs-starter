@@ -15,10 +15,10 @@ export class UserCreateDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty({ message: 'No firstname provided' })
-  public firstname: string;
+  public firstName: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty({ message: 'No lastname provided' })
-  public lastname: string;
+  public lastName: string;
 }

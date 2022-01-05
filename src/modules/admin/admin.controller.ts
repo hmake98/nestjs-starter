@@ -1,9 +1,21 @@
-import { Body, ClassSerializerInterceptor, Controller, Post, UseInterceptors, HttpCode } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Post,
+  UseInterceptors,
+  HttpCode,
+  Put,
+  Param,
+  Delete,
+  Get,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { AuthToken } from 'src/shared/interfaces';
-import { AdminCreateDto } from '../admin/dto/admin-create.dto';
-import { AdminLoginDto } from '../admin/dto/admin-login.dto';
+import { User } from 'src/database/entities';
+import { AdminCreateDto, AdminLoginDto, AdminUpdateDto, ListUsersDto } from './dto';
 
 @ApiBearerAuth()
 @Controller('admin')
@@ -21,5 +33,23 @@ export class AdminController {
   @Post('/login')
   public async login(@Body() data: AdminLoginDto): Promise<AuthToken> {
     return this.adminService.login(data);
+  }
+
+  @HttpCode(200)
+  @Put('users/update/:id')
+  public async update(@Param('id') id: number, @Body() data: AdminUpdateDto): Promise<User> {
+    return this.adminService.update(id, data);
+  }
+
+  @HttpCode(200)
+  @Delete('users/delete/:id')
+  public async delete(@Param('id') id: number): Promise<any> {
+    return this.adminService.delete(id);
+  }
+
+  @HttpCode(200)
+  @Get('users/list')
+  public async list(@Query() query: ListUsersDto): Promise<User[]> {
+    return this.adminService.list(query);
   }
 }
