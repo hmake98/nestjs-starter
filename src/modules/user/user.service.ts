@@ -1,4 +1,4 @@
-import { ILike } from 'typeorm';
+import { ILike, FindOperator } from 'typeorm';
 import { ConfigService } from 'src/config/config.service';
 import {
   HttpException,
@@ -99,7 +99,17 @@ export class UserService {
   public async list(query: ListUsersDto): Promise<User[]> {
     try {
       const { limit, sort, search, field, page } = query;
-      const searchQuery: any = {};
+      type searchQuery = {
+        order: {
+          [field: string]: string;
+        };
+        take: number;
+        skip: number;
+        where: {
+          email: FindOperator<string>;
+        };
+      };
+      const searchQuery = {} as searchQuery;
       searchQuery.order = sort ? { [field]: `${sort.toUpperCase()}` } : null || { id: 'DESC' };
       searchQuery.take = limit || this.limit;
       searchQuery.skip = (page - 1) * searchQuery.take || this.skip;
