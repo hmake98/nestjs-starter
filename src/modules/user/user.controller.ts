@@ -1,3 +1,4 @@
+import { DeleteResult } from 'typeorm';
 import { User } from 'src/database/entities';
 import {
   Body,
@@ -49,7 +50,7 @@ export class UserController {
 
   @HttpCode(200)
   @Delete('delete/:id')
-  public async delete(@Param('id') id: number): Promise<any> {
+  public async delete(@Param('id') id: number): Promise<DeleteResult> {
     return this.userService.delete(id);
   }
 

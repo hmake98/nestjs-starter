@@ -1,4 +1,4 @@
-import { ILike, FindOperator } from 'typeorm';
+import { ILike, FindOperator, DeleteResult } from 'typeorm';
 import { ConfigService } from 'src/config/config.service';
 import {
   HttpException,
@@ -50,14 +50,14 @@ export class UserService {
       if (checkUser) {
         throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
       }
+      const newUser = {} as UserCreateDto;
       const hashPassword = createHash(password);
-      const newUser = new User();
       newUser.email = data.email;
       newUser.password = hashPassword;
       newUser.firstName = firstName.trim();
       newUser.lastName = lastName.trim();
       newUser.role = Role.USER;
-      const user = await this.userRepo.save(newUser);
+      const user = await this.userRepo.createUser(newUser);
       return await this.tokenService.generateNewTokens(user);
     } catch (e) {
       throw new InternalServerErrorException(e);
@@ -88,7 +88,7 @@ export class UserService {
     }
   }
 
-  public async delete(id: number): Promise<any> {
+  public async delete(id: number): Promise<DeleteResult> {
     try {
       return await this.userRepo.deleteUserById(id);
     } catch (e) {
@@ -106,18 +106,15 @@ export class UserService {
         take: number;
         skip: number;
         where: {
-          email: FindOperator<string>;
+          role: Role;
+          email?: FindOperator<string>;
         };
       };
       const searchQuery = {} as searchQuery;
       searchQuery.order = sort ? { [field]: `${sort.toUpperCase()}` } : null || { id: 'DESC' };
       searchQuery.take = limit || this.limit;
       searchQuery.skip = (page - 1) * searchQuery.take || this.skip;
-      if (search) {
-        searchQuery.where = {
-          email: ILike(`%${search}%`),
-        };
-      }
+      searchQuery.where = search ? { email: ILike(`%${search}%`), role: Role.USER } : null || { role: Role.USER };
       return await this.userRepo.getAllUsers(searchQuery);
     } catch (e) {
       throw new InternalServerErrorException(e);
