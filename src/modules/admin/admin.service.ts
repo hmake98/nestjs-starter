@@ -5,19 +5,19 @@ import {
   InternalServerErrorException,
   BadRequestException,
 } from '@nestjs/common';
+import { ILike, FindOperator } from 'typeorm';
 import { ConfigService } from 'src/config/config.service';
-import { UserRepository } from '../../shared/repository/user.repository';
-import { AdminCreateDto } from './dto/admin-create.dto';
-import { AdminLoginDto } from './dto/admin-login.dto';
+import { UserRepository } from '../../shared/repository';
+import { AdminCreateDto, AdminLoginDto, AdminUpdateDto, ListUsersDto } from './dto';
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
 import { createHash, match } from 'src/utils/helper';
-import { User } from 'src/database/entities/user.entity';
-import { Role } from 'src/database/entities';
+import { Role, User } from 'src/database/entities';
 
 @Injectable()
 export class AdminService {
-  public limit: number;
+  private limit: number;
+  private skip: number;
 
   constructor(
     private readonly configService: ConfigService,
@@ -25,6 +25,7 @@ export class AdminService {
     private readonly tokenService: TokenService,
   ) {
     this.limit = this.configService.get('limit');
+    this.skip = this.configService.get('skip');
   }
 
   public async login(data: AdminLoginDto): Promise<AuthToken> {
@@ -45,7 +46,7 @@ export class AdminService {
 
   public async signup(data: AdminCreateDto): Promise<AuthToken> {
     try {
-      const { email, password, firstname, lastname } = data;
+      const { email, password, firstName, lastName } = data;
       const checkUser = await this.userRepo.findUserAccountByEmail(email);
       if (checkUser) {
         throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
@@ -54,8 +55,8 @@ export class AdminService {
       const newUser = new User();
       newUser.email = data.email;
       newUser.password = hashPassword;
-      newUser.firstName = firstname.trim();
-      newUser.lastName = lastname.trim();
+      newUser.firstName = firstName.trim();
+      newUser.lastName = lastName.trim();
       newUser.role = Role.ADMIN;
       const user = await this.userRepo.save(newUser);
       return await this.tokenService.generateNewTokens(user);
@@ -77,6 +78,50 @@ export class AdminService {
       return await this.tokenService.generateNewTokens(user);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.PARTIAL_CONTENT);
+    }
+  }
+
+  public async update(id: number, data: AdminUpdateDto): Promise<User> {
+    try {
+      return await this.userRepo.updateUserById(id, data);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  public async delete(id: number): Promise<any> {
+    try {
+      return await this.userRepo.deleteUserById(id);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  public async list(query: ListUsersDto): Promise<User[]> {
+    try {
+      const { limit, sort, search, field, page } = query;
+      type searchQuery = {
+        order: {
+          [field: string]: string;
+        };
+        take: number;
+        skip: number;
+        where: {
+          email: FindOperator<string>;
+        };
+      };
+      const searchQuery = {} as searchQuery;
+      searchQuery.order = sort ? { [field]: `${sort.toUpperCase()}` } : null || { id: 'DESC' };
+      searchQuery.take = limit || this.limit;
+      searchQuery.skip = (page - 1) * searchQuery.take || this.skip;
+      if (search) {
+        searchQuery.where = {
+          email: ILike(`%${search}%`),
+        };
+      }
+      return await this.userRepo.getAllUsers(searchQuery);
+    } catch (e) {
+      throw new InternalServerErrorException(e);
     }
   }
 }

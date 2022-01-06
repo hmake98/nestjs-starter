@@ -13,6 +13,7 @@ export class ConfigService {
     this.config.sourceEmail = process.env.SOURCE_EMAIL;
     this.config.awsBucket = process.env.AWS_BUCKET;
     this.config.limit = process.env.LIMIT;
+    this.config.skip = process.env.SKIP;
     this.config.database = {
       DB_TYPE: 'postgres',
       DB_HOST: process.env.DB_HOST,
