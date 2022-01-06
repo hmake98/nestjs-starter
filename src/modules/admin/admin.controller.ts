@@ -16,6 +16,7 @@ import { AdminService } from './admin.service';
 import { AuthToken } from 'src/shared/interfaces';
 import { User } from 'src/database/entities';
 import { AdminCreateDto, AdminLoginDto, AdminUpdateDto, ListUsersDto } from './dto';
+import { DeleteResult } from 'typeorm';
 
 @ApiBearerAuth()
 @Controller('admin')
@@ -43,7 +44,7 @@ export class AdminController {
 
   @HttpCode(200)
   @Delete('users/delete/:id')
-  public async delete(@Param('id') id: number): Promise<any> {
+  public async delete(@Param('id') id: number): Promise<DeleteResult> {
     return this.adminService.delete(id);
   }
 
