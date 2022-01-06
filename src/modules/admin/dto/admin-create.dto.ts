@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { Role } from 'src/database/entities';
 
 export class AdminCreateDto {
   @ApiProperty()
@@ -21,4 +22,8 @@ export class AdminCreateDto {
   @IsString()
   @IsNotEmpty({ message: 'No lastname provided' })
   public lastName: string;
+
+  @IsEnum(Role)
+  @IsOptional()
+  public role: Role;
 }

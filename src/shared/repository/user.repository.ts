@@ -1,9 +1,13 @@
 import { User } from '../../database/entities';
-import { EntityRepository, Repository } from 'typeorm';
-import { UserUpdateDto } from 'src/modules/user/dto';
+import { DeleteResult, EntityRepository, Repository } from 'typeorm';
+import { UserUpdateDto, UserCreateDto } from 'src/modules/user/dto';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
+  public async createUser(data: UserCreateDto): Promise<User> {
+    return await this.save(data);
+  }
+
   public async findUserAccountByEmail(email: string): Promise<User> {
     return await this.findOne({ email });
   }
@@ -15,7 +19,7 @@ export class UserRepository extends Repository<User> {
     });
   }
 
-  public async deleteUserById(id: number): Promise<any> {
+  public async deleteUserById(id: number): Promise<DeleteResult> {
     return await this.delete({ id });
   }
 
