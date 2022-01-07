@@ -27,6 +27,10 @@ export class ConfigService {
       secretAccessKey: process.env.AWS_SECRET_KEY,
       region: process.env.AWS_REGION,
     };
+    this.config.google = {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    };
   }
 
   public get(key: string): any {

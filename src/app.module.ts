@@ -19,6 +19,9 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
+import { GoogleModule } from './modules/google-login/google.module';
+import { GoogleService } from './modules/google-login/google.service';
+import { GoogleController } from './modules/google-login/google.controller';
 
 @Module({
   imports: [
@@ -26,6 +29,7 @@ import { BullModule } from '@nestjs/bull';
     AdminModule,
     TerminusModule,
     ConfigModule,
+    GoogleModule,
     DatabaseModule,
     UserModule,
     ConsoleModule,
@@ -38,10 +42,11 @@ import { BullModule } from '@nestjs/bull';
       },
     }),
   ],
-  controllers: [AdminController, HealthController, UserController, PostController],
+  controllers: [AdminController, HealthController, UserController, PostController, GoogleController],
   providers: [
     FileService,
     EmailService,
+    GoogleService,
     TokenService,
     Logger,
     UserRepository,

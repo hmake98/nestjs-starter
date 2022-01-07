@@ -1,3 +1,4 @@
+import { ISearchQuery } from 'src/shared/interfaces/ISearchQuery';
 import { ILike, FindOperator, DeleteResult } from 'typeorm';
 import { ConfigService } from 'src/config/config.service';
 import {
@@ -110,7 +111,7 @@ export class UserService {
           email?: FindOperator<string>;
         };
       };
-      const searchQuery = {} as searchQuery;
+      const searchQuery: ISearchQuery = {} as ISearchQuery;
       searchQuery.order = sort ? { [field]: `${sort.toUpperCase()}` } : null || { id: 'DESC' };
       searchQuery.take = limit || this.limit;
       searchQuery.skip = (page - 1) * searchQuery.take || this.skip;
