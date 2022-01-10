@@ -22,6 +22,9 @@ import { BullModule } from '@nestjs/bull';
 import { GoogleModule } from './modules/google-login/google.module';
 import { GoogleService } from './modules/google-login/google.service';
 import { GoogleController } from './modules/google-login/google.controller';
+import { FacebookModule } from './modules/facebook-login/facebook.module';
+import { FacebookController } from './modules/facebook-login/facebook.controller';
+import { FacebookService } from './modules/facebook-login/facebook.service';
 
 @Module({
   imports: [
@@ -34,6 +37,7 @@ import { GoogleController } from './modules/google-login/google.controller';
     UserModule,
     ConsoleModule,
     PostModule,
+    FacebookModule,
     ScheduleModule.forRoot(),
     BullModule.forRoot({
       redis: {
@@ -42,12 +46,20 @@ import { GoogleController } from './modules/google-login/google.controller';
       },
     }),
   ],
-  controllers: [AdminController, HealthController, UserController, PostController, GoogleController],
+  controllers: [
+    AdminController,
+    HealthController,
+    UserController,
+    PostController,
+    FacebookController,
+    GoogleController,
+  ],
   providers: [
     FileService,
     EmailService,
     GoogleService,
     TokenService,
+    FacebookService,
     Logger,
     UserRepository,
     PostRepository,
