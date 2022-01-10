@@ -1,5 +1,5 @@
 import { IPreSignedUrlBody, IPreSignedUrlParams } from './../interfaces/index';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { PutObjectRequest } from 'aws-sdk/clients/s3';
 import { ConfigService } from 'src/config/config.service';
@@ -19,6 +19,7 @@ export class FileService {
   private readonly bucketName: string;
   private readonly storageService: S3;
   private readonly Expires: number;
+  private readonly logger = new Logger(FileService.name);
 
   constructor(private readonly configService: ConfigService) {
     const awsConfig = this.configService.get('aws');
@@ -34,27 +35,37 @@ export class FileService {
    method to upload image to s3 bucket using multer middleware
    */
   public async uploadToS3(file: Express.Multer.File): Promise<string> {
-    const uploadParams: PutObjectRequest = {
-      Bucket: this.bucketName,
-      Key: file.originalname,
-      Body: file.buffer,
-      // ACL: 'public-read',
-      ContentType: file.mimetype,
-    };
-    const url = await this.storageService.upload(uploadParams).promise();
-    return url.Location;
+    try {
+      const uploadParams: PutObjectRequest = {
+        Bucket: this.bucketName,
+        Key: file.originalname,
+        Body: file.buffer,
+        // ACL: 'public-read',
+        ContentType: file.mimetype,
+      };
+      const url = await this.storageService.upload(uploadParams).promise();
+      return url.Location;
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(e);
+    }
   }
 
   /*
     method to get presigned url for image upload and download
   */
   public async generatePresignedUrl(operationType: OperationType, data: IPreSignedUrlBody): Promise<string> {
-    const params: IPreSignedUrlParams = {
-      Bucket: this.bucketName,
-      Key: data.key,
-      Expires: this.Expires,
-    };
-    data.mime ? (params.ContentType = data.mime) : null;
-    return await this.storageService.getSignedUrlPromise(operationType, params);
+    try {
+      const params: IPreSignedUrlParams = {
+        Bucket: this.bucketName,
+        Key: data.key,
+        Expires: this.Expires,
+      };
+      data.mime ? (params.ContentType = data.mime) : null;
+      return await this.storageService.getSignedUrlPromise(operationType, params);
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(e);
+    }
   }
 }
