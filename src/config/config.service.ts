@@ -29,6 +29,10 @@ export class ConfigService {
     };
     this.config.awsBucket = process.env.AWS_BUCKET;
     this.config.expires = process.env.EXPIRES;
+    this.config.facebook = {
+      appId: process.env.FB_APP_ID,
+      appSecret: process.env.FB_SECRET,
+    };
   }
 
   public get(key: string): any {
