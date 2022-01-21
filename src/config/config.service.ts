@@ -29,6 +29,10 @@ export class ConfigService {
     };
     this.config.awsBucket = process.env.AWS_BUCKET;
     this.config.expires = process.env.EXPIRES;
+    this.config.google = {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    };
     this.config.facebook = {
       appId: process.env.FB_APP_ID,
       appSecret: process.env.FB_SECRET,

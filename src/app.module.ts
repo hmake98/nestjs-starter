@@ -19,6 +19,9 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
+import { GoogleModule } from './modules/google-login/google.module';
+import { GoogleService } from './modules/google-login/google.service';
+import { GoogleController } from './modules/google-login/google.controller';
 import { FacebookModule } from './modules/facebook-login/facebook.module';
 import { FacebookController } from './modules/facebook-login/facebook.controller';
 import { FacebookService } from './modules/facebook-login/facebook.service';
@@ -29,6 +32,7 @@ import { FacebookService } from './modules/facebook-login/facebook.service';
     AdminModule,
     TerminusModule,
     ConfigModule,
+    GoogleModule,
     DatabaseModule,
     UserModule,
     ConsoleModule,
@@ -42,10 +46,18 @@ import { FacebookService } from './modules/facebook-login/facebook.service';
       },
     }),
   ],
-  controllers: [AdminController, HealthController, UserController, PostController, FacebookController],
+  controllers: [
+    AdminController,
+    HealthController,
+    UserController,
+    PostController,
+    FacebookController,
+    GoogleController,
+  ],
   providers: [
     FileService,
     EmailService,
+    GoogleService,
     TokenService,
     FacebookService,
     Logger,
