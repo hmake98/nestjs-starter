@@ -27,6 +27,11 @@ export class ConfigService {
       secretAccessKey: process.env.AWS_SECRET_KEY,
       region: process.env.AWS_REGION,
     };
+    this.config.bull = {
+      host: process.env.QUEUE_REDIS_HOST,
+      port: process.env.QUEUE_REDIS_PORT,
+      queueName: process.env.QUEUE_NAME,
+    };
   }
 
   public get(key: string): any {

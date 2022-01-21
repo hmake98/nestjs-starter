@@ -18,12 +18,16 @@ import { PostController } from './modules/post/post.controller';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
+import { QueueModule } from './shared/modules/bull/bull.module';
+import { QueueProducerService } from './shared/modules/bull/bull.service';
 import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
     TaskModule,
+    BullModule,
     AdminModule,
+    QueueModule,
     TerminusModule,
     ConfigModule,
     DatabaseModule,
@@ -31,18 +35,13 @@ import { BullModule } from '@nestjs/bull';
     ConsoleModule,
     PostModule,
     ScheduleModule.forRoot(),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      },
-    }),
   ],
   controllers: [AdminController, HealthController, UserController, PostController],
   providers: [
     FileService,
     EmailService,
     TokenService,
+    QueueProducerService,
     Logger,
     UserRepository,
     PostRepository,
@@ -52,4 +51,4 @@ import { BullModule } from '@nestjs/bull';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
