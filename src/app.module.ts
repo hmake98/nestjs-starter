@@ -21,6 +21,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { QueueModule } from './shared/modules/bull/bull.module';
 import { QueueProducerService } from './shared/modules/bull/bull.service';
 import { BullModule } from '@nestjs/bull';
+import { GoogleModule } from './modules/google-login/google.module';
+import { GoogleService } from './modules/google-login/google.service';
+import { GoogleController } from './modules/google-login/google.controller';
+import { FacebookModule } from './modules/facebook-login/facebook.module';
+import { FacebookController } from './modules/facebook-login/facebook.controller';
+import { FacebookService } from './modules/facebook-login/facebook.service';
 
 @Module({
   imports: [
@@ -30,18 +36,29 @@ import { BullModule } from '@nestjs/bull';
     QueueModule,
     TerminusModule,
     ConfigModule,
+    GoogleModule,
     DatabaseModule,
     UserModule,
     ConsoleModule,
     PostModule,
+    FacebookModule,
     ScheduleModule.forRoot(),
   ],
-  controllers: [AdminController, HealthController, UserController, PostController],
+  controllers: [
+    AdminController,
+    HealthController,
+    UserController,
+    PostController,
+    FacebookController,
+    GoogleController,
+  ],
   providers: [
     FileService,
     EmailService,
+    GoogleService,
     TokenService,
     QueueProducerService,
+    FacebookService,
     Logger,
     UserRepository,
     PostRepository,
