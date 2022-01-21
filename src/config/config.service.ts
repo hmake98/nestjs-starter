@@ -12,6 +12,7 @@ export class ConfigService {
     this.config.refreshtokenExpr = process.env.REFRESH_EXP;
     this.config.sourceEmail = process.env.SOURCE_EMAIL;
     this.config.awsBucket = process.env.AWS_BUCKET;
+    this.config.expires = process.env.EXPIRES;
     this.config.limit = process.env.LIMIT;
     this.config.skip = process.env.SKIP;
     this.config.database = {
