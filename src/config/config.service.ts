@@ -27,6 +27,11 @@ export class ConfigService {
       secretAccessKey: process.env.AWS_SECRET_KEY,
       region: process.env.AWS_REGION,
     };
+    this.config.bull = {
+      host: process.env.QUEUE_REDIS_HOST,
+      port: process.env.QUEUE_REDIS_PORT,
+      queueName: process.env.QUEUE_NAME,
+    };
     this.config.google = {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,

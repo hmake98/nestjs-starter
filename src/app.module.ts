@@ -18,6 +18,8 @@ import { PostController } from './modules/post/post.controller';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
+import { QueueModule } from './shared/modules/bull/bull.module';
+import { QueueProducerService } from './shared/modules/bull/bull.service';
 import { BullModule } from '@nestjs/bull';
 import { GoogleModule } from './modules/google-login/google.module';
 import { GoogleService } from './modules/google-login/google.service';
@@ -29,7 +31,9 @@ import { FacebookService } from './modules/facebook-login/facebook.service';
 @Module({
   imports: [
     TaskModule,
+    BullModule,
     AdminModule,
+    QueueModule,
     TerminusModule,
     ConfigModule,
     GoogleModule,
@@ -39,12 +43,6 @@ import { FacebookService } from './modules/facebook-login/facebook.service';
     PostModule,
     FacebookModule,
     ScheduleModule.forRoot(),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
-      },
-    }),
   ],
   controllers: [
     AdminController,
@@ -59,6 +57,7 @@ import { FacebookService } from './modules/facebook-login/facebook.service';
     EmailService,
     GoogleService,
     TokenService,
+    QueueProducerService,
     FacebookService,
     Logger,
     UserRepository,
@@ -69,4 +68,4 @@ import { FacebookService } from './modules/facebook-login/facebook.service';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
