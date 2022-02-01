@@ -1,31 +1,16 @@
 import { PostService } from './post.service';
 import { PostController } from './post.controller';
 import { Module } from '@nestjs/common';
-import { Connection } from 'typeorm';
-import { PostRepository, UserRepository } from '../../shared/repository';
 import { TokenService } from 'src/shared/services/token.service';
 import { ConfigModule } from 'src/config/config.module';
-import { DatabaseModule } from 'src/database/database.module';
 import { FileService } from 'src/shared/services/file.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Posts, PostSchema } from 'src/database/schemas/post.schema';
 
 @Module({
-  imports: [ConfigModule, DatabaseModule],
+  imports: [ConfigModule, MongooseModule.forFeature([{ name: Posts.name, schema: PostSchema }])],
   controllers: [PostController],
   exports: [PostService],
-  providers: [
-    PostService,
-    TokenService,
-    FileService,
-    {
-      provide: PostRepository,
-      useFactory: (connection: Connection) => connection.getCustomRepository(PostRepository),
-      inject: [Connection],
-    },
-    {
-      provide: UserRepository,
-      useFactory: (connection: Connection) => connection.getCustomRepository(UserRepository),
-      inject: [Connection],
-    },
-  ],
+  providers: [PostService, TokenService, FileService],
 })
 export class PostModule {}

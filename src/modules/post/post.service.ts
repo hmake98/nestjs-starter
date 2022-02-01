@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { Posts, User } from 'src/database/entities';
-import { PostRepository } from '../../shared/repository';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User } from 'src/database/schemas';
+import { Posts, PostDocument } from 'src/database/schemas/post.schema';
 import { PostCreateDto } from './dto/post-create.dto';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly postRepo: PostRepository) {}
+  constructor(@InjectModel(Posts.name) private readonly postModel: Model<PostDocument>) {}
 
   public async createPost(data: PostCreateDto, authUser: User): Promise<Posts> {
     const { content } = data;
     const newPost = new Posts();
     newPost.content = content.trim();
     newPost.author = authUser;
-    return await this.postRepo.save(newPost);
+    return await this.postModel.create(newPost);
   }
 }

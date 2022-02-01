@@ -1,4 +1,4 @@
-import { User } from '../../database/entities';
+import { User } from '../../database/schemas/user.schema';
 import { DeleteResult, EntityRepository, Repository } from 'typeorm';
 import { UserUpdateDto, UserCreateDto } from 'src/modules/user/dto';
 

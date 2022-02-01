@@ -14,9 +14,9 @@ import {
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { AuthToken } from 'src/shared/interfaces';
-import { User } from 'src/database/entities';
+import { User } from 'src/database/schemas/user.schema';
 import { AdminCreateDto, AdminLoginDto, AdminUpdateDto, ListUsersDto } from './dto';
-import { DeleteResult } from 'typeorm';
+import { Schema } from 'mongoose';
 
 @ApiBearerAuth()
 @Controller('admin')
@@ -38,13 +38,13 @@ export class AdminController {
 
   @HttpCode(200)
   @Put('users/update/:id')
-  public async update(@Param('id') id: number, @Body() data: AdminUpdateDto): Promise<User> {
+  public async update(@Param('id') id: Schema.Types.ObjectId, @Body() data: AdminUpdateDto): Promise<User> {
     return this.adminService.update(id, data);
   }
 
   @HttpCode(200)
   @Delete('users/delete/:id')
-  public async delete(@Param('id') id: number): Promise<DeleteResult> {
+  public async delete(@Param('id') id: Schema.Types.ObjectId): Promise<any> {
     return this.adminService.delete(id);
   }
 

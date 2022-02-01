@@ -1,5 +1,4 @@
-import { DeleteResult } from 'typeorm';
-import { User } from 'src/database/entities';
+import { User } from 'src/database/schemas/user.schema';
 import {
   Body,
   ClassSerializerInterceptor,
@@ -17,6 +16,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthToken } from 'src/shared/interfaces';
 import { UserCreateDto, UserLoginDto, UserUpdateDto, ListUsersDto, TokenDto } from './dto';
 import { UserService } from './user.service';
+import { Schema } from 'mongoose';
 
 @ApiBearerAuth()
 @Controller('user')
@@ -44,13 +44,13 @@ export class UserController {
 
   @HttpCode(200)
   @Put('update/:id')
-  public async update(@Param('id') id: number, @Body() data: UserUpdateDto): Promise<User> {
+  public async update(@Param('id') id: Schema.Types.ObjectId, @Body() data: UserUpdateDto): Promise<User> {
     return this.userService.update(id, data);
   }
 
   @HttpCode(200)
   @Delete('delete/:id')
-  public async delete(@Param('id') id: number): Promise<DeleteResult> {
+  public async delete(@Param('id') id: Schema.Types.ObjectId): Promise<any> {
     return this.userService.delete(id);
   }
 

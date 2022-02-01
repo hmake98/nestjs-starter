@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector, ModuleRef } from '@nestjs/core';
 import { ConfigService } from 'src/config/config.service';
-import { Role } from 'src/database/entities';
+import { Role } from 'src/database/schemas/role.schema';
 import { ROLES_KEY } from 'src/decorators';
 import { TokenService } from 'src/shared/services/token.service';
 

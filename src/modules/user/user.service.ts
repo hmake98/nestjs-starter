@@ -1,4 +1,3 @@
-import { ILike, FindOperator, DeleteResult } from 'typeorm';
 import { ConfigService } from 'src/config/config.service';
 import {
   HttpException,
@@ -9,44 +8,53 @@ import {
 } from '@nestjs/common';
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
-import { UserRepository } from '../../shared/repository';
 import { createHash, match } from '../../utils/helper';
 import { UserCreateDto, UserUpdateDto, UserLoginDto, ListUsersDto } from './dto';
-import { User, Role } from 'src/database/entities';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from 'src/database/schemas/user.schema';
+import { Model, Schema } from 'mongoose';
+import { Role } from 'src/database/schemas/role.schema';
 
 @Injectable()
 export class UserService {
   private limit: number;
   private skip: number;
   constructor(
-    private readonly userRepo: UserRepository,
     private readonly tokenService: TokenService,
     private readonly configService: ConfigService,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {
     this.limit = this.configService.get('limit');
     this.skip = this.configService.get('skip');
   }
 
-  public async login(data: UserLoginDto): Promise<AuthToken> {
+  public async login(data: UserLoginDto): Promise<any> {
     try {
       const { email, password } = data;
-      const checkUser = await this.userRepo.findUserAccountByEmail(email);
+      const checkUser = await this.userModel.findOne({ email }).exec();
       if (!checkUser) {
         throw new HttpException('USER_NOT_FOUND', HttpStatus.BAD_REQUEST);
       }
       if (!match(checkUser.password, password)) {
         throw new HttpException('INVALID_PASSWORD', HttpStatus.CONFLICT);
       }
-      return await this.tokenService.generateNewTokens(checkUser);
+      const payload = {
+        _id: checkUser._id.toString(),
+        email: checkUser.email,
+        firstName: checkUser.firstName,
+        lastName: checkUser.lastName,
+        role: checkUser.role,
+      };
+      return await this.tokenService.generateNewTokens(payload);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
   }
 
-  public async signup(data: UserCreateDto): Promise<AuthToken> {
+  public async signup(data: UserCreateDto): Promise<any> {
     try {
       const { email, password, firstName, lastName } = data;
-      const checkUser = await this.userRepo.findUserAccountByEmail(email);
+      const checkUser = await this.userModel.findOne({ email });
       if (checkUser) {
         throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
       }
@@ -57,9 +65,17 @@ export class UserService {
       newUser.firstName = firstName.trim();
       newUser.lastName = lastName.trim();
       newUser.role = Role.USER;
-      const user = await this.userRepo.createUser(newUser);
-      return await this.tokenService.generateNewTokens(user);
+      const user = await this.userModel.create(newUser);
+      const payload = {
+        _id: user._id.toString(),
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      };
+      return await this.tokenService.generateNewTokens(payload);
     } catch (e) {
+      console.log(e);
       throw new InternalServerErrorException(e);
     }
   }
@@ -70,27 +86,34 @@ export class UserService {
       if (!match) {
         throw new BadRequestException();
       }
-      const user = await this.userRepo.findOne({ id: match.id });
+      const user = await this.userModel.findOne({ email: match.email });
       if (!user) {
         throw new BadRequestException();
       }
-      return await this.tokenService.generateNewTokens(user);
+      const payload = {
+        _id: user._id.toString(),
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      };
+      return await this.tokenService.generateNewTokens(payload);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.PARTIAL_CONTENT);
     }
   }
 
-  public async update(id: number, data: UserUpdateDto): Promise<User> {
+  public async update(id: Schema.Types.ObjectId, data: UserUpdateDto): Promise<User> {
     try {
-      return await this.userRepo.updateUserById(id, data);
+      return await this.userModel.findByIdAndUpdate(id, data, { new: true });
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
   }
 
-  public async delete(id: number): Promise<DeleteResult> {
+  public async delete(id: Schema.Types.ObjectId): Promise<any> {
     try {
-      return await this.userRepo.deleteUserById(id);
+      return await this.userModel.deleteOne({ _id: id });
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -99,23 +122,17 @@ export class UserService {
   public async list(query: ListUsersDto): Promise<User[]> {
     try {
       const { limit, sort, search, field, page } = query;
-      type searchQuery = {
-        order: {
-          [field: string]: string;
-        };
-        take: number;
-        skip: number;
-        where: {
-          role: Role;
-          email?: FindOperator<string>;
-        };
-      };
-      const searchQuery = {} as searchQuery;
-      searchQuery.order = sort ? { [field]: `${sort.toUpperCase()}` } : null || { id: 'DESC' };
-      searchQuery.take = limit || this.limit;
-      searchQuery.skip = (page - 1) * searchQuery.take || this.skip;
-      searchQuery.where = search ? { email: ILike(`%${search}%`), role: Role.USER } : null || { role: Role.USER };
-      return await this.userRepo.getAllUsers(searchQuery);
+
+      const take = limit ? limit : this.limit;
+      const skip = (page - 1) * take || this.skip;
+      let orderMethod = [];
+      if (field == 'email') {
+        orderMethod = [['email', sort.toLowerCase() === 'asc' ? 1 : -1]];
+      } else {
+        orderMethod = [['createdAt', -1]];
+      }
+
+      return await this.userModel.find({ role: Role.USER }).sort(orderMethod).limit(take).skip(skip).exec();
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

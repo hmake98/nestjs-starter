@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString, IsOptional } from 'class-validator';
-import { Role } from 'src/database/entities';
+import { Role } from 'src/database/schemas/role.schema';
 
 export class AdminCreateDto {
   @ApiProperty()

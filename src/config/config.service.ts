@@ -27,6 +27,7 @@ export class ConfigService {
       secretAccessKey: process.env.AWS_SECRET_KEY,
       region: process.env.AWS_REGION,
     };
+    this.config.MONGODB_URI = process.env.MONGO_DB_URI;
   }
 
   public get(key: string): any {

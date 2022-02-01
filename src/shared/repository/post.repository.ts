@@ -1,4 +1,4 @@
-import { Posts } from '../../database/entities';
+import { Posts } from '../../database/schemas/post.schema';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Posts)
