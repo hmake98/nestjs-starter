@@ -21,6 +21,7 @@
     "console:stage": "cross-env NODE_ENV=stage node build/console.js",
     "console:prod": "cross-env NODE_ENV=production node build/console.js",
     "test": "jest",
+    "pre-commit": "lint-staged",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
