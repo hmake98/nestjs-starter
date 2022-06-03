@@ -3,7 +3,7 @@ import { SES } from 'aws-sdk';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { ConfigService } from 'src/config/config.service';
-import { readFilePromise } from 'src/utils/helper';
+import { helpers } from 'src/utils/helper';
 import * as _ from 'lodash';
 
 @Injectable()
@@ -18,13 +18,10 @@ export class EmailService {
     this.emailService = new SES(awsConfig);
   }
 
-  public async sendEmail(template: string, emails: string[], data: any, subjectData: string) {
+  public async processEmail(template: string, emails: string[], data: any, subjectData: string) {
     try {
-      let templatePath = join(__dirname, '../../templates/', `${template}.html`);
-      if (!existsSync(templatePath)) {
-        templatePath = join(__dirname, '../templates/', `${template}.html`);
-      }
-      let _content = await readFilePromise(templatePath);
+      let templatePath = join(__dirname, '..', 'templates', `${template}.html`);
+      let _content = await helpers.readFilePromise(templatePath);
       const compiled = _.template(_content);
       _content = compiled(data);
       this.emailService

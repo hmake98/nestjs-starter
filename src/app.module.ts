@@ -16,49 +16,29 @@ import { PostRepository, UserRepository } from './shared/repository';
 import { PostModule } from './modules';
 import { PostController } from './modules/post/post.controller';
 import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from './interceptors/exception.interceptor';
+import { AllExceptionsFilter } from './core/interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
-import { QueueModule } from './shared/modules/bull/bull.module';
+import { QueueModule } from './shared/modules';
 import { QueueProducerService } from './shared/modules/bull/bull.service';
-import { BullModule } from '@nestjs/bull';
-import { GoogleModule } from './modules/google-login/google.module';
-import { GoogleService } from './modules/google-login/google.service';
-import { GoogleController } from './modules/google-login/google.controller';
-import { FacebookModule } from './modules/facebook-login/facebook.module';
-import { FacebookController } from './modules/facebook-login/facebook.controller';
-import { FacebookService } from './modules/facebook-login/facebook.service';
-
 @Module({
   imports: [
     TaskModule,
-    BullModule,
     AdminModule,
     QueueModule,
     TerminusModule,
     ConfigModule,
-    GoogleModule,
     DatabaseModule,
     UserModule,
     ConsoleModule,
     PostModule,
-    FacebookModule,
     ScheduleModule.forRoot(),
   ],
-  controllers: [
-    AdminController,
-    HealthController,
-    UserController,
-    PostController,
-    FacebookController,
-    GoogleController,
-  ],
+  controllers: [AdminController, HealthController, UserController, PostController],
   providers: [
     FileService,
     EmailService,
-    GoogleService,
     TokenService,
     QueueProducerService,
-    FacebookService,
     Logger,
     UserRepository,
     PostRepository,
@@ -68,4 +48,4 @@ import { FacebookService } from './modules/facebook-login/facebook.service';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -4,7 +4,7 @@ import * as dateFns from 'date-fns';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import * as path from 'path';
-import { templateGen } from 'src/common/constant';
+import { templateGen } from '../shared/common/constant';
 
 @Console({
   name: 'db',

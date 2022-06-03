@@ -1,6 +1,3 @@
-/*
- * interface for s3 method parameters
- */
 export interface IPreSignedUrlParams {
   Bucket?: string;
   Key: string;
@@ -8,10 +5,13 @@ export interface IPreSignedUrlParams {
   ContentType?: string;
 }
 
-/*
- * interface for request body
- */
 export interface IPreSignedUrlBody {
   key: string;
   mime: string;
+}
+
+export interface IFile {
+  originalname: string;
+  buffer: Buffer;
+  mimetype: string;
 }

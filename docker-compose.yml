@@ -2,33 +2,49 @@ version: '3.8'
 
 services:
   database:
-    container_name: nest-database
-    image: postgres
+    container_name: postgres
+    image: postgres:latest
     ports:
-      - 5431:5432
+      - '5431:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=master123
       - POSTGRES_DB=postgres
     volumes:
-      - ./docker-volumes/postgresql:/var/lib/postgresql
+      - pg_data:/var/lib/postgresql
     networks:
-      - nest-network
-  server:
-    container_name: nest-backend
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    networks:
-      - nest-network
-    depends_on:
-      - database
-    ports:
-      - 3000:3000
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - backend
+  cache:
+    container_name: redis
+    image: redis:6.2-alpine
     restart: always
+    ports:
+      - '6378:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    # server:
+    #   restart: on-error
+    #   container_name: server
+    #   build:
+    #     context: .
+    #     dockerfile: ./Dockerfile
+    #   networks:
+    #     - backend
+    #   depends_on:
+    #     - database
+    #   ports:
+    #     - 3000:3000
+    #   volumes:
+    #     - .:/usr/src/app
+    #     - /usr/src/app/node_modules
 networks:
-  nest-network:
-    external: true
+  backend:
+    driver: bridge
+volumes:
+  pg_data:
+    driver: local
+  redis_data:
+    driver: local

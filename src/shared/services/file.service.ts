@@ -1,4 +1,4 @@
-import { IPreSignedUrlBody, IPreSignedUrlParams } from './../interfaces/index';
+import { IFile, IPreSignedUrlBody, IPreSignedUrlParams } from './../interfaces/index';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { PutObjectRequest } from 'aws-sdk/clients/s3';
@@ -18,7 +18,7 @@ export enum OperationType {
 export class FileService {
   private readonly bucketName: string;
   private readonly storageService: S3;
-  private readonly Expires: number;
+  private readonly linkExp: number;
   private readonly logger = new Logger(FileService.name);
 
   constructor(private readonly configService: ConfigService) {
@@ -28,13 +28,13 @@ export class FileService {
       ...awsConfig,
       signatureVersion: 'v4',
     });
-    this.Expires = this.configService.get('expires');
+    this.linkExp = this.configService.get('linkExpires');
   }
 
   /*
    method to upload image to s3 bucket using multer middleware
    */
-  public async uploadToS3(file: Express.Multer.File): Promise<string> {
+  public async uploadToS3(file: IFile): Promise<string> {
     try {
       const uploadParams: PutObjectRequest = {
         Bucket: this.bucketName,
@@ -59,7 +59,7 @@ export class FileService {
       const params: IPreSignedUrlParams = {
         Bucket: this.bucketName,
         Key: data.key,
-        Expires: this.Expires,
+        Expires: this.linkExp,
       };
       data.mime ? (params.ContentType = data.mime) : null;
       return await this.storageService.getSignedUrlPromise(operationType, params);

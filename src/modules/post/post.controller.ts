@@ -1,9 +1,9 @@
 import { Body, ClassSerializerInterceptor, Controller, UseGuards, UseInterceptors, Post } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Posts, Role, User } from 'src/database/entities';
-import { Roles } from 'src/decorators';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
-import { ClientAuthGuard, RolesGuard } from 'src/guards';
+import { Roles } from 'src/core/decorators';
+import { CurrentUser } from 'src/core/decorators/current-user.decorator';
+import { ClientAuthGuard, RolesGuard } from 'src/core/guards';
 import { PostCreateDto } from './dto/post-create.dto';
 import { PostService } from './post.service';
 

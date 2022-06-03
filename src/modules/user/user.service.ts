@@ -11,9 +11,9 @@ import {
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
 import { UserRepository } from '../../shared/repository';
-import { createHash, match } from '../../utils/helper';
 import { UserCreateDto, UserUpdateDto, UserLoginDto, ListUsersDto } from './dto';
 import { User, Role } from 'src/database/entities';
+import { helpers } from 'src/utils/helper';
 
 @Injectable()
 export class UserService {
@@ -35,7 +35,7 @@ export class UserService {
       if (!checkUser) {
         throw new HttpException('USER_NOT_FOUND', HttpStatus.BAD_REQUEST);
       }
-      if (!match(checkUser.password, password)) {
+      if (!helpers.match(checkUser.password, password)) {
         throw new HttpException('INVALID_PASSWORD', HttpStatus.CONFLICT);
       }
       return await this.tokenService.generateNewTokens(checkUser);
@@ -52,7 +52,7 @@ export class UserService {
         throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
       }
       const newUser = {} as UserCreateDto;
-      const hashPassword = createHash(password);
+      const hashPassword = helpers.createHash(password);
       newUser.email = data.email;
       newUser.password = hashPassword;
       newUser.firstName = firstName.trim();

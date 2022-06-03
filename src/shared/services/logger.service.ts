@@ -13,10 +13,6 @@ export class LogService implements LoggerService {
           level: 'info',
           stream: process.stdout,
         },
-        {
-          level: 'error',
-          path: 'error.log',
-        },
       ],
     });
   }

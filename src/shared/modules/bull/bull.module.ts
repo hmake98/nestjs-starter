@@ -23,6 +23,6 @@ dotenv.config();
       name: process.env.QUEUE_NAME,
     }),
   ],
-  exports: [BullModule, QueueConsumerService],
+  exports: [BullModule, QueueConsumerService, QueueProducerService],
 })
 export class QueueModule {}

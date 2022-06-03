@@ -1,14 +1,12 @@
 import { InjectQueue, OnQueueError, Process, Processor } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
 import { Queue, Job } from 'bull';
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 @Injectable()
 export class QueueProducerService {
   private readonly logger = new Logger(QueueProducerService.name);
 
-  constructor(@InjectQueue('email') private readonly queue: Queue) {}
+  constructor(@InjectQueue('demo') private readonly queue: Queue) {}
 
   public async addToQueue(message: string): Promise<string> {
     try {
@@ -27,10 +25,10 @@ export class QueueConsumerService {
   private readonly logger = new Logger(QueueConsumerService.name);
 
   @Process('messages')
-  public async messages(job: Job): Promise<string> {
+  public async messages(job: Job): Promise<boolean> {
     try {
       console.log(job.data);
-      return 'done';
+      return true;
     } catch (e) {
       this.logger.error(e);
     }

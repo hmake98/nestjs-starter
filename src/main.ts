@@ -4,7 +4,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ResponseInterceptor } from './interceptors';
+import { ResponseInterceptor } from './core/interceptors';
 import { AppModule } from './app.module';
 import { LogService } from './shared/services/logger.service';
 import 'reflect-metadata';
@@ -13,8 +13,8 @@ import * as json from 'morgan-json';
 import * as express from 'express';
 import * as helmet from 'helmet';
 import * as session from 'express-session';
-import { fork, on, isMaster } from 'cluster';
-import * as os from 'os';
+// import { fork, on, isMaster } from 'cluster';
+// import * as os from 'os';
 
 const baseUrl = process.env.BASE_URL || '/api';
 const docsEndpoint = process.env.DOCS_ENDPOINT || '/docs';
@@ -70,12 +70,10 @@ async function bootstrap(): Promise<void> {
       saveUninitialized: false,
     }),
   );
-
   app.enableCors();
+
   await app.init();
-
   const port = process.env.PORT || 3000;
-
   await app.listen(port);
   logger.log(`Listening on ${port}`);
 }
@@ -83,18 +81,20 @@ async function bootstrap(): Promise<void> {
 declare let global: any;
 
 // if (require.main === module || global.PhusionPassenger) {
-// if (isMaster) {
-//   const totalCPUs = os.cpus().length;
-//   console.log(`Master ${process.pid} is running`);
-//   for (let i = 0; i < totalCPUs; i++) {
-//     fork();
+//   if (isMaster) {
+//     const totalCPUs = os.cpus().length;
+//     console.log(`Master ${process.pid} is running`);
+//     for (let i = 0; i < totalCPUs; i++) {
+//       fork();
+//     }
+//     on('exit', (worker, code, signal) => {
+//       console.log(`worker ${worker.process.pid} died`);
+//       console.log("Let's fork another worker!");
+//       fork();
+//     });
+//   } else {
+//     bootstrap();
 //   }
-//   on('exit', (worker, code, signal) => {
-//     console.log(`worker ${worker.process.pid} died`);
-//     console.log("Let's fork another worker!");
-//     fork();
-//   });
-// } else {
+// }
+
 bootstrap();
-// }
-// }

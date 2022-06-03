@@ -2,4 +2,4 @@ export * from './Token';
 export * from './Auth';
 export * from './GetResponse';
 export * from './Success';
-export * from './IFileService';
+export * from './IFile';

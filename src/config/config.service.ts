@@ -12,7 +12,7 @@ export class ConfigService {
     this.config.refreshtokenExpr = process.env.REFRESH_EXP;
     this.config.sourceEmail = process.env.SOURCE_EMAIL;
     this.config.awsBucket = process.env.AWS_BUCKET;
-    this.config.expires = process.env.EXPIRES;
+    this.config.linkExpires = process.env.EXPIRES;
     this.config.limit = process.env.LIMIT;
     this.config.skip = process.env.SKIP;
     this.config.database = {
@@ -29,17 +29,9 @@ export class ConfigService {
       region: process.env.AWS_REGION,
     };
     this.config.bull = {
-      host: process.env.QUEUE_REDIS_HOST,
-      port: process.env.QUEUE_REDIS_PORT,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
       queueName: process.env.QUEUE_NAME,
-    };
-    this.config.google = {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    };
-    this.config.facebook = {
-      appId: process.env.FB_APP_ID,
-      appSecret: process.env.FB_SECRET,
     };
   }
 

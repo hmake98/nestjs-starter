@@ -1,7 +1,7 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { of } from 'rxjs';
-import { statusMessages } from 'src/common/constant';
+import { statusMessages } from 'src/shared/common/constant';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {

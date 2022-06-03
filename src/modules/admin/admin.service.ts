@@ -11,8 +11,8 @@ import { UserRepository } from '../../shared/repository';
 import { AdminCreateDto, AdminLoginDto, AdminUpdateDto, ListUsersDto } from './dto';
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
-import { createHash, match } from 'src/utils/helper';
 import { Role, User } from 'src/database/entities';
+import { helpers } from 'src/utils/helper';
 
 @Injectable()
 export class AdminService {
@@ -35,7 +35,7 @@ export class AdminService {
       if (!checkUser) {
         throw new HttpException('USER_NOT_FOUND', HttpStatus.BAD_REQUEST);
       }
-      if (!match(checkUser.password, password)) {
+      if (!helpers.match(checkUser.password, password)) {
         throw new HttpException('INVALID_PASSWORD', HttpStatus.CONFLICT);
       }
       return await this.tokenService.generateNewTokens(checkUser);
@@ -52,7 +52,7 @@ export class AdminService {
         throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
       }
       const newUser = {} as AdminCreateDto;
-      const hashPassword = createHash(password);
+      const hashPassword = helpers.createHash(password);
       newUser.email = data.email;
       newUser.password = hashPassword;
       newUser.firstName = firstName.trim();
