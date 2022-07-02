@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-config({ path: `${process.env.NODE_ENV ? '.' + process.env.NODE_ENV : '.development'}.env` });
+config({ path: `.env${process.env.NODE_ENV !== 'development' ? '.' + process.env.NODE_ENV : ''}` });
 import { Injectable, Scope } from '@nestjs/common';
 
 @Injectable({ scope: Scope.DEFAULT })
@@ -31,7 +31,7 @@ export class ConfigService {
     this.config.bull = {
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
-      queueName: process.env.QUEUE_NAME,
+      queue_name: process.env.QUEUE_NAME,
     };
   }
 

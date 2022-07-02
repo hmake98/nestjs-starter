@@ -5,93 +5,56 @@ import {
   InternalServerErrorException,
   BadRequestException,
 } from '@nestjs/common';
-import { ILike, FindOperator, DeleteResult } from 'typeorm';
 import { ConfigService } from 'src/config/config.service';
-import { UserRepository } from '../../shared/repository';
-import { AdminCreateDto, AdminLoginDto, AdminUpdateDto, ListUsersDto } from './dto';
+import { ListUsersDto } from './dto';
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
-import { Role, User } from 'src/database/entities';
+import { Role, User } from '@prisma/client';
 import { helpers } from 'src/utils/helper';
+import { PrismaService, SuccessResponse } from 'src/shared';
 
 @Injectable()
 export class AdminService {
-  private limit: number;
-  private skip: number;
+  public limit: number;
+  public skip: number;
 
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly userRepo: UserRepository,
-    private readonly tokenService: TokenService,
-  ) {
+  constructor(private readonly configService: ConfigService, private readonly prisma: PrismaService) {
     this.limit = this.configService.get('limit');
     this.skip = this.configService.get('skip');
   }
 
-  public async login(data: AdminLoginDto): Promise<AuthToken> {
+  public async delete(id: number): Promise<SuccessResponse> {
     try {
-      const { email, password } = data;
-      const checkUser = await this.userRepo.findUserAccountByEmail(email);
-      if (!checkUser) {
-        throw new HttpException('USER_NOT_FOUND', HttpStatus.BAD_REQUEST);
-      }
-      if (!helpers.match(checkUser.password, password)) {
-        throw new HttpException('INVALID_PASSWORD', HttpStatus.CONFLICT);
-      }
-      return await this.tokenService.generateNewTokens(checkUser);
+      const response = await this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          deleted: true,
+          deletedAt: new Date(),
+        },
+      });
+      return { message: 'User deleted succesfully.' };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
   }
 
-  public async signup(data: AdminCreateDto): Promise<AuthToken> {
+  public async deleteMultiple(data: { ids: number[] }): Promise<SuccessResponse> {
     try {
-      const { email, password, firstName, lastName } = data;
-      const checkUser = await this.userRepo.findUserAccountByEmail(email);
-      if (checkUser) {
-        throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
-      }
-      const newUser = {} as AdminCreateDto;
-      const hashPassword = helpers.createHash(password);
-      newUser.email = data.email;
-      newUser.password = hashPassword;
-      newUser.firstName = firstName.trim();
-      newUser.lastName = lastName.trim();
-      newUser.role = Role.ADMIN;
-      const user = await this.userRepo.createUser(newUser);
-      return await this.tokenService.generateNewTokens(user);
-    } catch (e) {
-      throw new InternalServerErrorException(e);
-    }
-  }
-
-  public async getToken(refreshToken: string): Promise<AuthToken> {
-    try {
-      const match = await this.tokenService.verify(refreshToken);
-      if (!match) {
-        throw new BadRequestException();
-      }
-      const user = await this.userRepo.findOne({ id: match.id });
-      if (!user) {
-        throw new BadRequestException();
-      }
-      return await this.tokenService.generateNewTokens(user);
-    } catch (e) {
-      throw new HttpException(e.message, HttpStatus.PARTIAL_CONTENT);
-    }
-  }
-
-  public async update(id: number, data: AdminUpdateDto): Promise<User> {
-    try {
-      return await this.userRepo.updateUserById(id, data);
-    } catch (e) {
-      throw new InternalServerErrorException(e);
-    }
-  }
-
-  public async delete(id: number): Promise<DeleteResult> {
-    try {
-      return await this.userRepo.deleteUserById(id);
+      const { ids } = data;
+      const response = await this.prisma.user.updateMany({
+        where: {
+          id: {
+            in: ids,
+          },
+        },
+        data: {
+          deleted: true,
+          deletedAt: new Date(),
+        },
+      });
+      return { message: 'Users are deleted succesfully.' };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -100,23 +63,27 @@ export class AdminService {
   public async list(query: ListUsersDto): Promise<User[]> {
     try {
       const { limit, sort, search, field, page } = query;
-      type searchQuery = {
-        order: {
-          [field: string]: string;
-        };
-        take: number;
-        skip: number;
+      return this.prisma.user.findMany({
         where: {
-          role: Role;
-          email?: FindOperator<string>;
-        };
-      };
-      const searchQuery = {} as searchQuery;
-      searchQuery.order = sort ? { [field]: `${sort.toUpperCase()}` } : null || { id: 'DESC' };
-      searchQuery.take = limit || this.limit;
-      searchQuery.skip = (page - 1) * searchQuery.take || this.skip;
-      searchQuery.where = search ? { email: ILike(`%${search}%`), role: Role.USER } : null || { role: Role.USER };
-      return await this.userRepo.getAllUsers(searchQuery);
+          firstName: {
+            contains: search,
+            mode: 'insensitive',
+          },
+          lastName: {
+            contains: search,
+            mode: 'insensitive',
+          },
+          email: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: {
+          [field]: sort,
+        },
+      });
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

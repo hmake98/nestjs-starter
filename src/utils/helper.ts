@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { readFile } from 'fs';
-import { saltOrRounds } from 'src/shared/common/constant';
+import { saltOrRounds } from '../shared';
 
 export const helpers = {
   createHash: (password: string): string => {
@@ -13,11 +13,11 @@ export const helpers = {
   },
   readFilePromise: async (filePath): Promise<string> => {
     return new Promise((resolve, reject) => {
-      readFile(filePath, 'utf8', (err, html) => {
-        if (!err) {
+      readFile(filePath, 'utf8', (e, html) => {
+        if (!e) {
           resolve(html);
         } else {
-          reject(err);
+          reject(e);
         }
       });
     });

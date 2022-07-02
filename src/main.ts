@@ -1,12 +1,11 @@
 import { config } from 'dotenv';
-config({ path: `.${process.env.NODE_ENV}.env` });
+config({ path: `.env${process.env.NODE_ENV !== 'development' ? '.' + process.env.NODE_ENV : ''}` });
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ResponseInterceptor } from './core/interceptors';
 import { AppModule } from './app.module';
-import { LogService } from './shared/services/logger.service';
 import 'reflect-metadata';
 import * as morgan from 'morgan';
 import * as json from 'morgan-json';
@@ -39,7 +38,7 @@ async function bootstrap(): Promise<void> {
   const expressServer = express();
 
   // configure logging
-  const logger = isDevelopment ? new Logger() : new LogService();
+  const logger = new Logger();
   if (!isDevelopment) {
     const format = json(':remote-addr :method :url :status :res[content-length] :referrer :user-agent');
     expressServer.use(

@@ -1,6 +1,6 @@
 import { Body, ClassSerializerInterceptor, Controller, UseGuards, UseInterceptors, Post } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { Posts, Role, User } from 'src/database/entities';
+import { Posts, Role, User } from '@prisma/client';
 import { Roles } from 'src/core/decorators';
 import { CurrentUser } from 'src/core/decorators/current-user.decorator';
 import { ClientAuthGuard, RolesGuard } from 'src/core/guards';

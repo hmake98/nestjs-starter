@@ -1,26 +1,21 @@
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { Module } from '@nestjs/common';
-import { Connection } from 'typeorm';
-import { UserRepository } from '../../shared/repository';
 import { TokenService } from 'src/shared/services/token.service';
 import { ConfigModule } from 'src/config/config.module';
-import { DatabaseModule } from 'src/database/database.module';
 import { FileService } from 'src/shared/services/file.service';
+import { NotificationConsumer, PrismaService } from 'src/shared';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
-  imports: [ConfigModule, DatabaseModule],
-  controllers: [UserController],
-  exports: [UserService],
-  providers: [
-    UserService,
-    TokenService,
-    FileService,
-    {
-      provide: UserRepository,
-      useFactory: (connection: Connection) => connection.getCustomRepository(UserRepository),
-      inject: [Connection],
-    },
+  imports: [
+    ConfigModule,
+    BullModule.registerQueue({
+      name: 'notification',
+    }),
   ],
+  controllers: [UserController],
+  providers: [UserService, TokenService, FileService, PrismaService, NotificationConsumer],
+  exports: [UserService],
 })
 export class UserModule {}

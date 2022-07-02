@@ -1,4 +1,3 @@
-import { TaskModule } from './shared/modules';
 import { FileService } from './shared/services/file.service';
 import { EmailService } from './shared/services/email.service';
 import { AdminModule } from './modules/admin/admin.module';
@@ -6,42 +5,46 @@ import { AdminController } from './modules/admin/admin.controller';
 import { TokenService } from './shared/services/token.service';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule } from './config/config.module';
-import { DatabaseModule } from './database/database.module';
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
-import { ConsoleModule } from 'nestjs-console';
 import { UserController } from './modules/user/user.controller';
-import { PostRepository, UserRepository } from './shared/repository';
 import { PostModule } from './modules';
 import { PostController } from './modules/post/post.controller';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './core/interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
-import { QueueModule } from './shared/modules';
-import { QueueProducerService } from './shared/modules/bull/bull.service';
+import { NotificationConsumer, PrismaService } from './shared';
+import { ConfigService } from './config/config.service';
+import { BullModule } from '@nestjs/bull';
+import { AdminService } from './modules/admin/admin.service';
+import { UserService } from './modules/user/user.service';
+import { PostService } from './modules/post/post.service';
 @Module({
   imports: [
-    TaskModule,
-    AdminModule,
-    QueueModule,
-    TerminusModule,
     ConfigModule,
-    DatabaseModule,
+    AdminModule,
     UserModule,
-    ConsoleModule,
     PostModule,
+    TerminusModule,
     ScheduleModule.forRoot(),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('bull').host,
+          port: configService.get('bull').port,
+        },
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AdminController, HealthController, UserController, PostController],
   providers: [
     FileService,
     EmailService,
     TokenService,
-    QueueProducerService,
-    Logger,
-    UserRepository,
-    PostRepository,
+    PrismaService,
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,

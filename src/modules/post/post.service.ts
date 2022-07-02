@@ -1,17 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { Posts, User } from 'src/database/entities';
-import { PostRepository } from '../../shared/repository';
+import { Posts, User } from '@prisma/client';
+import { PrismaService } from 'src/shared';
 import { PostCreateDto } from './dto/post-create.dto';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly postRepo: PostRepository) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   public async createPost(data: PostCreateDto, authUser: User): Promise<Posts> {
-    const { content } = data;
-    const newPost = new Posts();
+    const { content, title } = data;
+    const newPost = {} as Posts;
     newPost.content = content.trim();
-    newPost.author = authUser;
-    return await this.postRepo.save(newPost);
+    return await this.prisma.posts.create({
+      data: {
+        content,
+        title,
+        auther: {
+          connect: {
+            id: authUser.id,
+          },
+        },
+      },
+    });
   }
 }

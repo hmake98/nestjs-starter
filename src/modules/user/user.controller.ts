@@ -1,5 +1,4 @@
-import { DeleteResult } from 'typeorm';
-import { User } from 'src/database/entities';
+import { User } from '@prisma/client';
 import {
   Body,
   ClassSerializerInterceptor,
@@ -15,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthToken } from 'src/shared/interfaces';
-import { UserCreateDto, UserLoginDto, UserUpdateDto, ListUsersDto, TokenDto } from './dto';
+import { UserCreateDto, UserLoginDto, UserUpdateDto, TokenDto } from './dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
@@ -46,17 +45,5 @@ export class UserController {
   @Put('update/:id')
   public async update(@Param('id') id: number, @Body() data: UserUpdateDto): Promise<User> {
     return this.userService.update(id, data);
-  }
-
-  @HttpCode(200)
-  @Delete('delete/:id')
-  public async delete(@Param('id') id: number): Promise<DeleteResult> {
-    return this.userService.delete(id);
-  }
-
-  @HttpCode(200)
-  @Get('list')
-  public async list(@Query() query: ListUsersDto): Promise<User[]> {
-    return this.userService.list(query);
   }
 }

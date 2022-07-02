@@ -1,4 +1,4 @@
-import { User } from 'src/database/entities/user.entity';
+import { User } from '@prisma/client';
 
 export class AuthToken {
   accessToken: string;

@@ -1,5 +1,3 @@
-import { ISearchQuery } from 'src/shared/interfaces/ISearchQuery';
-import { ILike, FindOperator, DeleteResult } from 'typeorm';
 import { ConfigService } from 'src/config/config.service';
 import {
   HttpException,
@@ -7,31 +5,33 @@ import {
   Injectable,
   BadRequestException,
   InternalServerErrorException,
+  Inject,
 } from '@nestjs/common';
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
-import { UserRepository } from '../../shared/repository';
-import { UserCreateDto, UserUpdateDto, UserLoginDto, ListUsersDto } from './dto';
-import { User, Role } from 'src/database/entities';
+import { UserCreateDto, UserUpdateDto, UserLoginDto } from './dto';
 import { helpers } from 'src/utils/helper';
+import { PrismaService } from 'src/shared';
+import { Role, User } from '@prisma/client';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class UserService {
-  private limit: number;
-  private skip: number;
   constructor(
-    private readonly userRepo: UserRepository,
     private readonly tokenService: TokenService,
-    private readonly configService: ConfigService,
-  ) {
-    this.limit = this.configService.get('limit');
-    this.skip = this.configService.get('skip');
-  }
+    private readonly prisma: PrismaService,
+    @InjectQueue('notification') private notificationQueue: Queue,
+  ) {}
 
   public async login(data: UserLoginDto): Promise<AuthToken> {
     try {
       const { email, password } = data;
-      const checkUser = await this.userRepo.findUserAccountByEmail(email);
+      const checkUser = await this.prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
       if (!checkUser) {
         throw new HttpException('USER_NOT_FOUND', HttpStatus.BAD_REQUEST);
       }
@@ -47,18 +47,25 @@ export class UserService {
   public async signup(data: UserCreateDto): Promise<AuthToken> {
     try {
       const { email, password, firstName, lastName } = data;
-      const checkUser = await this.userRepo.findUserAccountByEmail(email);
+      const checkUser = await this.prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
       if (checkUser) {
         throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
       }
-      const newUser = {} as UserCreateDto;
+      const newUser = {} as User;
       const hashPassword = helpers.createHash(password);
       newUser.email = data.email;
       newUser.password = hashPassword;
       newUser.firstName = firstName.trim();
       newUser.lastName = lastName.trim();
       newUser.role = Role.USER;
-      const user = await this.userRepo.createUser(newUser);
+      const user = await this.prisma.user.create({
+        data: newUser,
+      });
+      this.notificationQueue.add({ message: 'Welcome!' });
       return await this.tokenService.generateNewTokens(user);
     } catch (e) {
       throw new InternalServerErrorException(e);
@@ -71,7 +78,7 @@ export class UserService {
       if (!match) {
         throw new BadRequestException();
       }
-      const user = await this.userRepo.findOne({ id: match.id });
+      const user = await this.prisma.user.findUnique({ where: { id: match.id } });
       if (!user) {
         throw new BadRequestException();
       }
@@ -83,40 +90,19 @@ export class UserService {
 
   public async update(id: number, data: UserUpdateDto): Promise<User> {
     try {
-      return await this.userRepo.updateUserById(id, data);
-    } catch (e) {
-      throw new InternalServerErrorException(e);
-    }
-  }
-
-  public async delete(id: number): Promise<DeleteResult> {
-    try {
-      return await this.userRepo.deleteUserById(id);
-    } catch (e) {
-      throw new InternalServerErrorException(e);
-    }
-  }
-
-  public async list(query: ListUsersDto): Promise<User[]> {
-    try {
-      const { limit, sort, search, field, page } = query;
-      type searchQuery = {
-        order: {
-          [field: string]: string;
-        };
-        take: number;
-        skip: number;
+      const { email, firstName, lastName, phone, userProfile } = data;
+      return await this.prisma.user.update({
+        data: {
+          email,
+          firstName,
+          lastName,
+          phone,
+          userProfile,
+        },
         where: {
-          role: Role;
-          email?: FindOperator<string>;
-        };
-      };
-      const searchQuery: ISearchQuery = {} as ISearchQuery;
-      searchQuery.order = sort ? { [field]: `${sort.toUpperCase()}` } : null || { id: 'DESC' };
-      searchQuery.take = limit || this.limit;
-      searchQuery.skip = (page - 1) * searchQuery.take || this.skip;
-      searchQuery.where = search ? { email: ILike(`%${search}%`), role: Role.USER } : null || { role: Role.USER };
-      return await this.userRepo.getAllUsers(searchQuery);
+          id,
+        },
+      });
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

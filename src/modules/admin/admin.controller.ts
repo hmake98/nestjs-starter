@@ -10,13 +10,14 @@ import {
   Delete,
   Get,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
-import { AuthToken } from 'src/shared/interfaces';
-import { User } from 'src/database/entities';
-import { AdminCreateDto, AdminLoginDto, AdminUpdateDto, ListUsersDto } from './dto';
-import { DeleteResult } from 'typeorm';
+import { SuccessResponse } from 'src/shared';
+import { User } from '@prisma/client';
+import { ListUsersDto } from './dto';
+import { Roles } from 'src/core';
 
 @ApiBearerAuth()
 @Controller('admin')
@@ -24,33 +25,21 @@ import { DeleteResult } from 'typeorm';
 export class AdminController {
   public constructor(private readonly adminService: AdminService) {}
 
-  @HttpCode(200)
-  @Post('/signup')
-  public async signup(@Body() data: AdminCreateDto): Promise<AuthToken> {
-    return this.adminService.signup(data);
-  }
-
-  @HttpCode(200)
-  @Post('/login')
-  public async login(@Body() data: AdminLoginDto): Promise<AuthToken> {
-    return this.adminService.login(data);
-  }
-
-  @HttpCode(200)
-  @Put('users/update/:id')
-  public async update(@Param('id') id: number, @Body() data: AdminUpdateDto): Promise<User> {
-    return this.adminService.update(id, data);
-  }
-
-  @HttpCode(200)
-  @Delete('users/delete/:id')
-  public async delete(@Param('id') id: number): Promise<DeleteResult> {
-    return this.adminService.delete(id);
-  }
-
-  @HttpCode(200)
+  @Roles('ADMIN')
   @Get('users/list')
   public async list(@Query() query: ListUsersDto): Promise<User[]> {
     return this.adminService.list(query);
+  }
+
+  @Roles('ADMIN')
+  @Delete('users/delete')
+  public async deleteUsers(@Body() data: { ids: number[] }): Promise<SuccessResponse> {
+    return this.adminService.deleteMultiple(data);
+  }
+
+  @Roles('ADMIN')
+  @Delete('users/delete/:id')
+  public async delete(@Param('id') id: number): Promise<SuccessResponse> {
+    return this.adminService.delete(id);
   }
 }

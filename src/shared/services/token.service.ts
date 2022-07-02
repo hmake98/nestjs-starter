@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from 'src/config/config.service';
-import { User } from '../../database/entities';
 import { AuthToken } from '../interfaces';
-import { Auth } from '../interfaces/Auth';
+import { Auth } from '../interfaces/IAuth';
 
 @Injectable()
 export class TokenService {
