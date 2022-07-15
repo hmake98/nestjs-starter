@@ -1,11 +1,12 @@
-version: '3.8'
+version: '3.3'
 
 services:
-  database:
+  db:
+    hostname: database
     container_name: postgres
     image: postgres:latest
     ports:
-      - '5431:5432'
+      - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=master123
@@ -15,11 +16,12 @@ services:
     networks:
       - backend
   cache:
+    hostname: cache
     container_name: redis
-    image: redis:6.2-alpine
+    image: redis:latest
     restart: always
     ports:
-      - '6378:6379'
+      - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - redis_data:/data

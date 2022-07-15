@@ -10,10 +10,9 @@
     "prebuild": "rimraf build",
     "postinstall": "npx typesync",
     "build": "nest build && copyfiles Procfile build/",
-    "start": "node build/main.js",
-    "dev": "cross-env NODE_ENV=development nest start --watch",
     "stage": "cross-env NODE_ENV=stage node build/main",
     "prod": "cross-env NODE_ENV=production node build/main",
+    "dev": "cross-env NODE_ENV=development nest start --watch",
     "debug": "cross-env NODE_ENV=development nest start --debug --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -26,7 +25,7 @@
     "prepare": "husky install"
   },
   "engines": {
-    "node": "16.15.1"
+    "node": "16.16.0"
   },
   "dependencies": {
     "@nestjs/bull": "^0.4.2",

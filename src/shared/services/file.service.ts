@@ -1,8 +1,7 @@
-import { IFile, IPreSignedUrlBody, IPreSignedUrlParams } from './../interfaces/index';
+import { IPreSignedUrlBody, IPreSignedUrlParams } from './../interfaces';
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
-import { PutObjectRequest } from 'aws-sdk/clients/s3';
-import { ConfigService } from 'src/config/config.service';
+import { ConfigService } from '../../config/config.service';
 
 /*
  * created enum for presigned url types.
@@ -31,29 +30,9 @@ export class FileService {
     this.linkExp = this.configService.get('linkExpires');
   }
 
-  /*
-   method to upload image to s3 bucket using multer middleware
+  /**
+   * method to get presigned url for post image on s3
    */
-  public async uploadToS3(file: IFile): Promise<string> {
-    try {
-      const uploadParams: PutObjectRequest = {
-        Bucket: this.bucketName,
-        Key: file.originalname,
-        Body: file.buffer,
-        // ACL: 'public-read',
-        ContentType: file.mimetype,
-      };
-      const url = await this.storageService.upload(uploadParams).promise();
-      return url.Location;
-    } catch (e) {
-      this.logger.error(e);
-      throw new InternalServerErrorException(e);
-    }
-  }
-
-  /*
-    method to get presigned url for image upload and download
-  */
   public async generatePresignedUrl(operationType: OperationType, data: IPreSignedUrlBody): Promise<string> {
     try {
       const params: IPreSignedUrlParams = {
@@ -62,7 +41,7 @@ export class FileService {
         Expires: this.linkExp,
       };
       data.mime ? (params.ContentType = data.mime) : null;
-      return await this.storageService.getSignedUrlPromise(operationType, params);
+      return this.storageService.getSignedUrlPromise(operationType, params);
     } catch (e) {
       this.logger.error(e);
       throw new InternalServerErrorException(e);

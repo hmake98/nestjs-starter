@@ -17,7 +17,6 @@ import * as session from 'express-session';
 
 const baseUrl = process.env.BASE_URL || '/api';
 const docsEndpoint = process.env.DOCS_ENDPOINT || '/docs';
-
 export function configureApp(app): void {
   app.setGlobalPrefix(baseUrl);
   const moduleRef = app.select(AppModule);
@@ -27,7 +26,7 @@ export function configureApp(app): void {
 }
 
 function configureSwagger(app): void {
-  const config = new DocumentBuilder().setTitle('Nest-API').setDescription('API Description').setVersion('1.0').build();
+  const config = new DocumentBuilder().setTitle('Nest-Starter').setDescription('demo description').setVersion('1.0').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(docsEndpoint, app, document);
 }
@@ -74,10 +73,15 @@ async function bootstrap(): Promise<void> {
   await app.init();
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  logger.log(`Listening on ${port}`);
+  logger.log(`🚀 Server is listening on port ${port}`);
 }
 
-declare let global: any;
+// declare let global: any;
+
+// configuration of new cluster. 
+// adv of cluster is if you're using multi-core cpus in ec2 instance, 
+// without clustering the server will only able to use single core.
+// with clustering the server will able to use multiple cores of the instance.
 
 // if (require.main === module || global.PhusionPassenger) {
 //   if (isMaster) {

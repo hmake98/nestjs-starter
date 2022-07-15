@@ -14,12 +14,10 @@ import { PostController } from './modules/post/post.controller';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './core/interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
-import { NotificationConsumer, PrismaService } from './shared';
+import { PrismaService } from './shared';
 import { ConfigService } from './config/config.service';
 import { BullModule } from '@nestjs/bull';
-import { AdminService } from './modules/admin/admin.service';
-import { UserService } from './modules/user/user.service';
-import { PostService } from './modules/post/post.service';
+
 @Module({
   imports: [
     ConfigModule,
@@ -32,8 +30,8 @@ import { PostService } from './modules/post/post.service';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         redis: {
-          host: configService.get('bull').host,
-          port: configService.get('bull').port,
+          host: configService.get('redis').host,
+          port: configService.get('redis').port,
         },
       }),
       inject: [ConfigService],
@@ -51,4 +49,4 @@ import { PostService } from './modules/post/post.service';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

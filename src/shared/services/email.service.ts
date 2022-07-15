@@ -18,6 +18,9 @@ export class EmailService {
     this.emailService = new SES(awsConfig);
   }
 
+  /**
+   * Process email: write send email function, here I have used simple email service.
+   */
   public async processEmail(template: string, emails: string[], data: any, subjectData: string) {
     try {
       let templatePath = join(__dirname, '..', 'templates', `${template}.html`);

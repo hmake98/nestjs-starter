@@ -9,9 +9,3 @@ export interface IPreSignedUrlBody {
   key: string;
   mime: string;
 }
-
-export interface IFile {
-  originalname: string;
-  buffer: Buffer;
-  mimetype: string;
-}
