@@ -17,6 +17,8 @@ import * as session from 'express-session';
 
 const baseUrl = process.env.BASE_URL || '/api';
 const docsEndpoint = process.env.DOCS_ENDPOINT || '/docs';
+const port = process.env.PORT || 3000;
+
 export function configureApp(app): void {
   app.setGlobalPrefix(baseUrl);
   const moduleRef = app.select(AppModule);
@@ -71,7 +73,6 @@ async function bootstrap(): Promise<void> {
   app.enableCors();
 
   await app.init();
-  const port = process.env.PORT || 3000;
   await app.listen(port);
   logger.log(`🚀 Server is listening on port ${port}`);
 }

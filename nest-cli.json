@@ -2,6 +2,6 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": ["templates/**/*"]
+    "assets": ["templates/**/*", "i18n/**/*"]
   }
 }

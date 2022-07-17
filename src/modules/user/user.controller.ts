@@ -6,11 +6,8 @@ import {
   HttpCode,
   Post,
   Put,
-  Get,
   UseInterceptors,
   Param,
-  Query,
-  Delete,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthToken } from 'src/shared/interfaces';
@@ -21,7 +18,7 @@ import { UserService } from './user.service';
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  public constructor(private readonly userService: UserService) {}
+  public constructor(private readonly userService: UserService) { }
 
   @HttpCode(200)
   @Post('login')
@@ -42,7 +39,7 @@ export class UserController {
   }
 
   @HttpCode(200)
-  @Put('update/:id')
+  @Put('update-profile/:id')
   public async update(@Param('id') id: number, @Body() data: UserUpdateDto): Promise<User> {
     return this.userService.update(id, data);
   }

@@ -11,15 +11,28 @@ import { HealthController } from './health.controller';
 import { UserController } from './modules/user/user.controller';
 import { PostModule } from './modules';
 import { PostController } from './modules/post/post.controller';
-import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from './core/interceptors/exception.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaService } from './shared';
 import { ConfigService } from './config/config.service';
 import { BullModule } from '@nestjs/bull';
+import { I18nModule, QueryResolver, AcceptLanguageResolver } from 'nestjs-i18n';
+import { HttpExceptionFilter } from './core/interceptors';
+import { APP_FILTER } from '@nestjs/core';
+import * as path from 'path'
 
 @Module({
   imports: [
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
+      ],
+    }),
     ConfigModule,
     AdminModule,
     UserModule,
@@ -45,7 +58,7 @@ import { BullModule } from '@nestjs/bull';
     PrismaService,
     {
       provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
+      useClass: HttpExceptionFilter,
     },
   ],
 })

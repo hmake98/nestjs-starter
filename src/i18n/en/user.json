@@ -1,0 +1,5 @@
+{
+    "user_not_found": "User not found.",
+    "user_exists": "User already exists.",
+    "invalid_password": "Password is invalid."
+}

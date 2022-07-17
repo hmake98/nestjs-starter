@@ -34,7 +34,7 @@ export class AdminService {
           deletedAt: new Date(),
         },
       });
-      return { message: 'User deleted succesfully.' };
+      return { message: 'User deleted' }
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -54,7 +54,7 @@ export class AdminService {
           deletedAt: new Date(),
         },
       });
-      return { message: 'Users are deleted succesfully.' };
+      return { message: 'Users are deleted' };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

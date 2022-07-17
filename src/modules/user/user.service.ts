@@ -1,11 +1,9 @@
-import { ConfigService } from 'src/config/config.service';
 import {
   HttpException,
   HttpStatus,
   Injectable,
   BadRequestException,
   InternalServerErrorException,
-  Inject,
 } from '@nestjs/common';
 import { AuthToken } from 'src/shared/interfaces';
 import { TokenService } from 'src/shared/services/token.service';
@@ -22,7 +20,7 @@ export class UserService {
     private readonly tokenService: TokenService,
     private readonly prisma: PrismaService,
     @InjectQueue('notification') private notificationQueue: Queue,
-  ) {}
+  ) { }
 
   public async login(data: UserLoginDto): Promise<AuthToken> {
     try {
@@ -33,12 +31,12 @@ export class UserService {
         },
       });
       if (!checkUser) {
-        throw new HttpException('USER_NOT_FOUND', HttpStatus.BAD_REQUEST);
+        throw new HttpException('user.user_not_found', HttpStatus.NOT_FOUND);
       }
       if (!helpers.match(checkUser.password, password)) {
-        throw new HttpException('INVALID_PASSWORD', HttpStatus.CONFLICT);
+        throw new HttpException('user.invalid_password', HttpStatus.BAD_REQUEST);
       }
-      return await this.tokenService.generateNewTokens(checkUser);
+      return this.tokenService.generateNewTokens(checkUser);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -53,7 +51,7 @@ export class UserService {
         },
       });
       if (checkUser) {
-        throw new HttpException('USER_EXISTS', HttpStatus.CONFLICT);
+        throw new HttpException('user.user_exists', HttpStatus.CONFLICT);
       }
       const newUser = {} as User;
       const hashPassword = helpers.createHash(password);
@@ -66,7 +64,7 @@ export class UserService {
         data: newUser,
       });
       this.notificationQueue.add({ message: 'Welcome!' });
-      return await this.tokenService.generateNewTokens(user);
+      return this.tokenService.generateNewTokens(user);
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -82,16 +80,16 @@ export class UserService {
       if (!user) {
         throw new BadRequestException();
       }
-      return await this.tokenService.generateNewTokens(user);
+      return this.tokenService.generateNewTokens(user);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.PARTIAL_CONTENT);
+      throw new InternalServerErrorException(e);
     }
   }
 
   public async update(id: number, data: UserUpdateDto): Promise<User> {
     try {
       const { email, firstName, lastName, phone, userProfile } = data;
-      return await this.prisma.user.update({
+      return this.prisma.user.update({
         data: {
           email,
           firstName,

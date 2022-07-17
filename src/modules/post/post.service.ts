@@ -5,15 +5,13 @@ import { PostCreateDto } from './dto/post-create.dto';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   public async createPost(data: PostCreateDto, authUser: User): Promise<Posts> {
     const { content, title } = data;
-    const newPost = {} as Posts;
-    newPost.content = content.trim();
     return await this.prisma.posts.create({
       data: {
-        content,
+        content: content.trim(),
         title,
         auther: {
           connect: {
