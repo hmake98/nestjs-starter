@@ -8,7 +8,7 @@ export class PostService {
   constructor(private readonly prisma: PrismaService) { }
 
   public async createPost(data: PostCreateDto, authUser: User): Promise<Posts> {
-    const { content, title } = data;
+    const { content, title, photoId } = data;
     return await this.prisma.posts.create({
       data: {
         content: content.trim(),
@@ -18,6 +18,11 @@ export class PostService {
             id: authUser.id,
           },
         },
+        photos: {
+          connect: {
+            id: photoId
+          }
+        }
       },
     });
   }

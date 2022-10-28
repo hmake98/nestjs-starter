@@ -31,10 +31,10 @@ export class UserService {
         },
       });
       if (!checkUser) {
-        throw new HttpException('user.user_not_found', HttpStatus.NOT_FOUND);
+        throw new HttpException('auth.user_not_found', HttpStatus.NOT_FOUND);
       }
       if (!helpers.match(checkUser.password, password)) {
-        throw new HttpException('user.invalid_password', HttpStatus.BAD_REQUEST);
+        throw new HttpException('auth.invalid_password', HttpStatus.BAD_REQUEST);
       }
       return this.tokenService.generateNewTokens(checkUser);
     } catch (e) {
@@ -51,7 +51,7 @@ export class UserService {
         },
       });
       if (checkUser) {
-        throw new HttpException('user.user_exists', HttpStatus.CONFLICT);
+        throw new HttpException('auth.user_exists', HttpStatus.CONFLICT);
       }
       const newUser = {} as User;
       const hashPassword = helpers.createHash(password);
@@ -72,13 +72,13 @@ export class UserService {
 
   public async getToken(refreshToken: string): Promise<AuthToken> {
     try {
-      const match = await this.tokenService.verify(refreshToken);
+      const match = this.tokenService.verify(refreshToken);
       if (!match) {
-        throw new BadRequestException();
+        throw new BadRequestException('auth.invalid_token');
       }
       const user = await this.prisma.user.findUnique({ where: { id: match.id } });
       if (!user) {
-        throw new BadRequestException();
+        throw new BadRequestException('auth.user_not_found');
       }
       return this.tokenService.generateNewTokens(user);
     } catch (e) {
@@ -88,14 +88,18 @@ export class UserService {
 
   public async update(id: number, data: UserUpdateDto): Promise<User> {
     try {
-      const { email, firstName, lastName, phone, userProfile } = data;
+      const { email, firstName, lastName, phone, photoId } = data;
       return this.prisma.user.update({
         data: {
           email,
           firstName,
           lastName,
           phone,
-          userProfile,
+          userProfile: {
+            connect: {
+              id: photoId,
+            }
+          }
         },
         where: {
           id,

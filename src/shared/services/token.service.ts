@@ -53,13 +53,7 @@ export class TokenService {
     );
   }
 
-  public async verify(token: string): Promise<Auth> {
-    let tokenClaim;
-    try {
-      tokenClaim = jwt.verify(token, this.secretKey);
-    } catch (error) {
-      return null;
-    }
-    return { ...tokenClaim };
+  public verify(token: string): Auth {
+    return jwt.verify(token, this.secretKey) as Auth;
   }
 }

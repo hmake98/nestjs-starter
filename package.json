@@ -1,7 +1,7 @@
 {
   "name": "nestjs-starter",
   "version": "0.0.1",
-  "description": "NestJS starter pack with TypeScript, Postgres with Prisma, Swagger, JWT, and more",
+  "description": "NestJS starter pack with TypeScript, Prisma, Swagger, JWT, Queues, Firebase.",
   "author": "hmake98",
   "private": true,
   "license": "MIT",
@@ -10,22 +10,22 @@
     "prebuild": "rimraf build",
     "postinstall": "npx typesync",
     "build": "nest build && copyfiles Procfile build/",
-    "stage": "cross-env NODE_ENV=stage node build/main",
-    "prod": "cross-env NODE_ENV=production node build/main",
-    "dev": "cross-env NODE_ENV=development nest start --watch",
+    "stage": "dotenv -e .env.stage node build/main",
+    "prod": "dotenv -e .env.production node build/main",
+    "start": "dotenv -e .env.development nest start --watch",
     "debug": "cross-env NODE_ENV=development nest start --debug --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "prisma": "prisma",
-    "pre-commit": "pretty-quick --staged",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "pre-commit": "lint-staged"
   },
   "engines": {
-    "node": "16.16.0"
+    "node": "14.16.0"
   },
   "dependencies": {
     "@nestjs/bull": "^0.4.2",
@@ -39,7 +39,6 @@
     "aws-sdk": "^2.942.0",
     "bcrypt": "^5.0.1",
     "bull": "^3.29.3",
-    "bunyan": "^1.8.15",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "date-fns": "^2.21.3",
@@ -50,10 +49,11 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
-    "morgan": "^1.10.0",
-    "morgan-json": "^1.1.0",
     "nanoid": "^3.1.23",
     "nestjs-i18n": "^9.1.5",
+    "nestjs-pino": "^3.1.1",
+    "pino-http": "^8.2.1",
+    "pino-pretty": "^9.1.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.6",
@@ -65,7 +65,6 @@
     "@nestjs/testing": "^9.0.3",
     "@types/bcrypt": "^10.0.28-alpha",
     "@types/bull": "^3.15.7",
-    "@types/bunyan": "^1.8.6",
     "@types/copyfiles": "^2.4.0",
     "@types/eslint": "^7.2.10",
     "@types/eslint-plugin-prettier": "^3.1.0",
@@ -74,7 +73,6 @@
     "@types/jest": "^26.0.22",
     "@types/jsonwebtoken": "^8.5.1",
     "@types/lodash": "^4.14.169",
-    "@types/morgan": "^1.9.2",
     "@types/node": "^14.18.21",
     "@types/prettier": "^2.2.3",
     "@types/rimraf": "^3.0.0",
@@ -116,5 +114,12 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,js}": [
+      "npm run lint",
+      "npm run format",
+      "git add"
+    ]
   }
 }

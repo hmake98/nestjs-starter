@@ -1,16 +1,19 @@
 import { Controller, Get } from '@nestjs/common';
+import { AllowUnauthorizedRequest } from './core/decorators/allow.decorator';
 import { PrismaService } from './shared';
 
-@Controller()
+@Controller('health')
 export class HealthController {
   constructor(private readonly prisma: PrismaService) { }
-  @Get('/health')
+  
+  @AllowUnauthorizedRequest()
+  @Get('/')
   public async getHealth() {
     try {
-      const connection = await this.prisma.$connect();
-      return { status: true };
+      await this.prisma.$connect();
+      return { connected: true };
     } catch (e) {
-      return { status: false, error: e };
+      return { connected: false, e };
     }
   }
 }

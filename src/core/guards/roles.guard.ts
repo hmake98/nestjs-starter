@@ -1,15 +1,18 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ConfigService } from 'src/config/config.service';
 import { Role } from '@prisma/client';
 import { ROLES_KEY } from 'src/core/decorators';
-import { TokenService } from 'src/shared/services/token.service';
+import { TokenService } from '../../shared';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  public constructor(private readonly reflector: Reflector) {}
+  public constructor(private readonly reflector: Reflector, private tokenService: TokenService) {}
 
-  public async canActivate(context: ExecutionContext): Promise<boolean> {
+  public canActivate(context: ExecutionContext): boolean {
+    const allowUnauthorizedRequest = this.reflector.get<boolean>('allowUnauthorizedRequest', context.getHandler());
+    if (allowUnauthorizedRequest) {
+      return true;
+    }
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -20,8 +23,7 @@ export class RolesGuard implements CanActivate {
     const request = context.getArgByIndex(0);
     const Authorization = request.headers['authorization'];
     const token = Authorization.replace('Bearer ', '');
-    const tokenService = new TokenService(new ConfigService());
-    const verify = await tokenService.verify(token);
+    const verify = this.tokenService.verify(token);
     if (requiredRoles.some((role) => role === verify.role)) {
       return true;
     }

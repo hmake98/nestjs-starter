@@ -1,16 +1,10 @@
 import {
   Injectable,
-  HttpException,
-  HttpStatus,
   InternalServerErrorException,
-  BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from 'src/config/config.service';
 import { ListUsersDto } from './dto';
-import { AuthToken } from 'src/shared/interfaces';
-import { TokenService } from 'src/shared/services/token.service';
-import { Role, User } from '@prisma/client';
-import { helpers } from 'src/utils/helper';
+import { User } from '@prisma/client';
 import { PrismaService, SuccessResponse } from 'src/shared';
 
 @Injectable()
@@ -34,7 +28,7 @@ export class AdminService {
           deletedAt: new Date(),
         },
       });
-      return { message: 'User deleted' }
+      return { message: '' }
     } catch (e) {
       throw new InternalServerErrorException(e);
     }
@@ -43,7 +37,7 @@ export class AdminService {
   public async deleteMultiple(data: { ids: number[] }): Promise<SuccessResponse> {
     try {
       const { ids } = data;
-      const response = await this.prisma.user.updateMany({
+      await this.prisma.user.updateMany({
         where: {
           id: {
             in: ids,
@@ -54,7 +48,7 @@ export class AdminService {
           deletedAt: new Date(),
         },
       });
-      return { message: 'Users are deleted' };
+      return { message: '' };
     } catch (e) {
       throw new InternalServerErrorException(e);
     }

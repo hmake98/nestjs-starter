@@ -18,23 +18,38 @@ model User {
   password    String
   phone       String?
   role        Role
-  userProfile String?
+  userProfile Photos    @relation(fields: [photosId], references: [id])
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   deleted     Boolean   @default(false)
   deletedAt   DateTime?
   posts       Posts[]
+  photosId    Int
 }
 
 model Posts {
   id        Int       @id @default(autoincrement())
   title     String
   content   String
+  photos    Photos[]
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   auther    User      @relation(fields: [userId], references: [id])
   userId    Int
+}
+
+model Photos {
+  id        Int       @id @default(autoincrement())
+  name      String
+  key       String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  post      Posts?    @relation(fields: [postsId], references: [id])
+  postsId   Int?
+  isDeleted Boolean?
+  user      User[]
 }
 
 enum Role {

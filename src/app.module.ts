@@ -6,6 +6,7 @@ import { TokenService } from './shared/services/token.service';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule } from './config/config.module';
 import { Module } from '@nestjs/common';
+import { LoggerModule } from 'nestjs-pino';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 import { UserController } from './modules/user/user.controller';
@@ -16,12 +17,25 @@ import { PrismaService } from './shared';
 import { ConfigService } from './config/config.service';
 import { BullModule } from '@nestjs/bull';
 import { I18nModule, QueryResolver, AcceptLanguageResolver } from 'nestjs-i18n';
-import { HttpExceptionFilter } from './core/interceptors';
+import { ErrorExceptionsFilter } from './core/interceptors';
 import { APP_FILTER } from '@nestjs/core';
 import * as path from 'path'
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+        transport: process.env.NODE_ENV === 'development'
+          ? { target: 'pino-pretty', options: { singleLine: true } }
+          : undefined,
+        formatters: {
+          level: (label) => {
+            return { level: label };
+          },
+        },
+      },
+    }),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
@@ -58,7 +72,7 @@ import * as path from 'path'
     PrismaService,
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: ErrorExceptionsFilter,
     },
   ],
 })

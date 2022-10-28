@@ -17,7 +17,7 @@ export class UserUpdateDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  public userProfile: string;
+  public photoId: number;
 
   @ApiProperty({ required: false })
   @IsOptional()

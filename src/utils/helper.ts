@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { readFile } from 'fs';
-import { saltOrRounds } from '../shared';
+import { saltOrRounds } from './common';
 
 /**
  * helpers wrapper for utils

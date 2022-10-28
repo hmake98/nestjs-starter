@@ -1,67 +1,39 @@
 import { config } from 'dotenv';
 config({ path: `.env${process.env.NODE_ENV !== 'development' ? '.' + process.env.NODE_ENV : ''}` });
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger as NestLogger,ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ResponseInterceptor } from './core/interceptors';
 import { AppModule } from './app.module';
 import 'reflect-metadata';
-import * as morgan from 'morgan';
-import * as json from 'morgan-json';
 import * as express from 'express';
 import * as helmet from 'helmet';
 import * as session from 'express-session';
+import { Logger } from 'nestjs-pino';
 // import { fork, on, isMaster } from 'cluster';
 // import * as os from 'os';
 
-const baseUrl = process.env.BASE_URL || '/api';
+const baseUrl = '/api';
 const docsEndpoint = process.env.DOCS_ENDPOINT || '/docs';
 const port = process.env.PORT || 3000;
-
-export function configureApp(app): void {
-  app.setGlobalPrefix(baseUrl);
-  const moduleRef = app.select(AppModule);
-  const reflector = moduleRef.get(Reflector);
-  app.useGlobalInterceptors(new ResponseInterceptor(reflector));
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
-}
+const logger = new NestLogger();
 
 function configureSwagger(app): void {
-  const config = new DocumentBuilder().setTitle('Nest-Starter').setDescription('demo description').setVersion('1.0').build();
+  const config = new DocumentBuilder().setTitle('Nest-Starter').setDescription('description').setVersion('1.0').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(docsEndpoint, app, document);
 }
 
 async function bootstrap(): Promise<void> {
-  const env = process.env.NODE_ENV || 'development';
-  const isDevelopment = env === 'development';
   const expressServer = express();
-
-  // configure logging
-  const logger = new Logger();
-  if (!isDevelopment) {
-    const format = json(':remote-addr :method :url :status :res[content-length] :referrer :user-agent');
-    expressServer.use(
-      morgan(format, {
-        stream: {
-          write: (objString: string) => {
-            // Yes, the JSON.parse() is terrible.
-            // But morgan concatenates the obj with "\n" before calling write().
-            logger.log({ ...JSON.parse(objString), tag: 'request' });
-          },
-        },
-      }),
-    );
-  } else {
-    expressServer.use(morgan('dev'));
-  }
-
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressServer), { logger });
-
-  configureApp(app);
-  configureSwagger(app);
-
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressServer), { bufferLogs: true });
+  app.useLogger(app.get(Logger));
+  app.setGlobalPrefix(baseUrl);
+  const moduleRef = app.select(AppModule);
+  const reflector = moduleRef.get(Reflector);
+  app.useGlobalInterceptors(new ResponseInterceptor(reflector));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
   app.use(helmet());
   app.use(
     session({
@@ -71,10 +43,10 @@ async function bootstrap(): Promise<void> {
     }),
   );
   app.enableCors();
-
+  configureSwagger(app);
   await app.init();
   await app.listen(port);
-  logger.log(`🚀 Server is listening on port ${port}`);
+  logger.log(`Server is listening on port ${port}`);
 }
 
 // declare let global: any;

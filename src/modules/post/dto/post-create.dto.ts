@@ -1,14 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 
 export class PostCreateDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsString()
   @IsNotEmpty({ message: 'No content provided' })
   public content: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsString()
   @IsNotEmpty({ message: 'No title provided' })
   public title: string;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  public photoId: number;
 }
