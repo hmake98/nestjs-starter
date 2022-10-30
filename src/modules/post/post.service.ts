@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { Posts, User } from '@prisma/client';
-import { PrismaService } from 'src/shared';
-import { PostCreateDto } from './dto/post-create.dto';
+import { Injectable } from "@nestjs/common";
+import { Posts, User } from "@prisma/client";
+import { PrismaService } from "src/shared";
+import { PostCreateDto } from "./dto/post-create.dto";
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   public async createPost(data: PostCreateDto, authUser: User): Promise<Posts> {
     const { content, title, photoId } = data;
@@ -20,9 +20,9 @@ export class PostService {
         },
         photos: {
           connect: {
-            id: photoId
-          }
-        }
+            id: photoId,
+          },
+        },
       },
     });
   }

@@ -1,6 +1,6 @@
-import { Injectable, Scope } from '@nestjs/common';
-import { config } from 'dotenv';
-config({ path: `.env${process.env.NODE_ENV !== 'development' ? '.' + process.env.NODE_ENV : ''}` });
+import { Injectable, Scope } from "@nestjs/common";
+import { config } from "dotenv";
+config({ path: `.env${process.env.NODE_ENV !== "development" ? "." + process.env.NODE_ENV : ""}` });
 
 @Injectable({ scope: Scope.DEFAULT })
 export class ConfigService {

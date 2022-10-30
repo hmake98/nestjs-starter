@@ -1,6 +1,3 @@
+import { CustomDecorator, SetMetadata } from "@nestjs/common";
 
-
-import { SetMetadata } from '@nestjs/common';
-
-export const AllowUnauthorizedRequest = () =>
-  SetMetadata('allowUnauthorizedRequest', true);
+export const AllowUnauthorizedRequest = (): CustomDecorator => SetMetadata("allowUnauthorizedRequest", true);

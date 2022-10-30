@@ -1,26 +1,16 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
-import { AuthToken } from 'src/shared/interfaces';
-import { TokenService } from 'src/shared/services/token.service';
-import { UserCreateDto, UserUpdateDto, UserLoginDto } from './dto';
-import { helpers } from 'src/utils/helper';
-import { PrismaService } from 'src/shared';
-import { Role, User } from '@prisma/client';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+import { HttpException, HttpStatus, Injectable, BadRequestException, InternalServerErrorException } from "@nestjs/common";
+import { AuthToken } from "src/shared/interfaces";
+import { TokenService } from "src/shared/services/token.service";
+import { UserCreateDto, UserUpdateDto, UserLoginDto } from "./dto";
+import { helpers } from "src/utils/helper";
+import { PrismaService } from "src/shared";
+import { Role, User } from "@prisma/client";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly tokenService: TokenService,
-    private readonly prisma: PrismaService,
-    @InjectQueue('notification') private notificationQueue: Queue,
-  ) { }
+  constructor(private readonly tokenService: TokenService, private readonly prisma: PrismaService, @InjectQueue("notification") private notificationQueue: Queue) {}
 
   public async login(data: UserLoginDto): Promise<AuthToken> {
     try {
@@ -31,10 +21,10 @@ export class UserService {
         },
       });
       if (!checkUser) {
-        throw new HttpException('auth.user_not_found', HttpStatus.NOT_FOUND);
+        throw new HttpException("auth.user_not_found", HttpStatus.NOT_FOUND);
       }
       if (!helpers.match(checkUser.password, password)) {
-        throw new HttpException('auth.invalid_password', HttpStatus.BAD_REQUEST);
+        throw new HttpException("auth.invalid_password", HttpStatus.BAD_REQUEST);
       }
       return this.tokenService.generateNewTokens(checkUser);
     } catch (e) {
@@ -51,7 +41,7 @@ export class UserService {
         },
       });
       if (checkUser) {
-        throw new HttpException('auth.user_exists', HttpStatus.CONFLICT);
+        throw new HttpException("auth.user_exists", HttpStatus.CONFLICT);
       }
       const newUser = {} as User;
       const hashPassword = helpers.createHash(password);
@@ -63,7 +53,7 @@ export class UserService {
       const user = await this.prisma.user.create({
         data: newUser,
       });
-      this.notificationQueue.add({ message: 'Welcome!' });
+      this.notificationQueue.add({ message: "Welcome!" });
       return this.tokenService.generateNewTokens(user);
     } catch (e) {
       throw new InternalServerErrorException(e);
@@ -74,11 +64,11 @@ export class UserService {
     try {
       const match = this.tokenService.verify(refreshToken);
       if (!match) {
-        throw new BadRequestException('auth.invalid_token');
+        throw new BadRequestException("auth.invalid_token");
       }
       const user = await this.prisma.user.findUnique({ where: { id: match.id } });
       if (!user) {
-        throw new BadRequestException('auth.user_not_found');
+        throw new BadRequestException("auth.user_not_found");
       }
       return this.tokenService.generateNewTokens(user);
     } catch (e) {
@@ -87,26 +77,22 @@ export class UserService {
   }
 
   public async update(id: number, data: UserUpdateDto): Promise<User> {
-    try {
-      const { email, firstName, lastName, phone, photoId } = data;
-      return this.prisma.user.update({
-        data: {
-          email,
-          firstName,
-          lastName,
-          phone,
-          userProfile: {
-            connect: {
-              id: photoId,
-            }
-          }
+    const { email, firstName, lastName, phone, photoId } = data;
+    return this.prisma.user.update({
+      data: {
+        email,
+        firstName,
+        lastName,
+        phone,
+        userProfile: {
+          connect: {
+            id: photoId,
+          },
         },
-        where: {
-          id,
-        },
-      });
-    } catch (e) {
-      throw new InternalServerErrorException(e);
-    }
+      },
+      where: {
+        id,
+      },
+    });
   }
 }

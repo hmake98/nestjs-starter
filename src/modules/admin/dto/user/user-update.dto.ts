@@ -1,30 +1,33 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsOptional, IsString } from "class-validator";
-import { Role } from "@prisma/client";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
-export class UserUpdateDto {
+export class UpdateUsersDto {
+  @ApiProperty({ required: true })
+  @IsNumber()
+  public id: number;
+
   @ApiProperty({ required: false })
   @IsOptional()
-  public email: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
+  @IsString()
   public firstName: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsString()
   public lastName: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  public photoId: number;
+  @IsString()
+  public email: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsString()
   public phone: string;
 
   @ApiProperty({ required: false })
-  @IsEnum(Role)
   @IsOptional()
-  public role: Role;
+  @IsNumber()
+  public photoId: number;
 }

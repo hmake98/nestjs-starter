@@ -1,8 +1,8 @@
-import { Processor, Process } from '@nestjs/bull';
-import { Job } from 'bull';
+import { Processor, Process } from "@nestjs/bull";
+import { Job } from "bull";
 
-@Processor('notification')
+@Processor("notification")
 export class NotificationConsumer {
-  @Process()
-  async sendNotification(job: Job<unknown>) {}
+  // @Process()
+  // sendNotification(job: Job<unknown>): void {}
 }

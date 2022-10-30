@@ -17,14 +17,14 @@ model User {
   email       String    @unique
   password    String
   phone       String?
-  role        Role
-  userProfile Photos    @relation(fields: [photosId], references: [id])
+  role        Role      @default(USER)
+  userProfile Photos?   @relation(fields: [photosId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deleted     Boolean   @default(false)
   deletedAt   DateTime?
   posts       Posts[]
-  photosId    Int
+  photosId    Int?
 }
 
 model Posts {
@@ -40,13 +40,14 @@ model Posts {
 }
 
 model Photos {
-  id        Int       @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   name      String
   key       String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  type      StorageType 
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   deletedAt DateTime?
-  post      Posts?    @relation(fields: [postsId], references: [id])
+  post      Posts?      @relation(fields: [postsId], references: [id])
   postsId   Int?
   isDeleted Boolean?
   user      User[]
@@ -55,4 +56,9 @@ model Photos {
 enum Role {
   ADMIN
   USER
+}
+
+enum StorageType {
+  PROFILES
+  POSTS
 }

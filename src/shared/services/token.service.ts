@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import * as jwt from 'jsonwebtoken';
-import { ConfigService } from 'src/config/config.service';
-import { AuthToken } from '../interfaces';
-import { Auth } from '../interfaces/IAuth';
+import { Injectable } from "@nestjs/common";
+import { User } from "@prisma/client";
+import * as jwt from "jsonwebtoken";
+import { ConfigService } from "src/config/config.service";
+import { AuthToken } from "../interfaces";
+import { Auth } from "../interfaces/IAuth";
 
 @Injectable()
 export class TokenService {
@@ -12,9 +12,9 @@ export class TokenService {
   private refreshTokenExpr: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.secretKey = this.configService.get('authKey');
-    this.accessTokenExpr = this.configService.get('accesstokenExpr');
-    this.refreshTokenExpr = this.configService.get('refreshtokenExpr');
+    this.secretKey = this.configService.get("authKey");
+    this.accessTokenExpr = this.configService.get("accesstokenExpr");
+    this.refreshTokenExpr = this.configService.get("refreshtokenExpr");
   }
 
   public async generateNewTokens(user: User): Promise<AuthToken> {
@@ -28,19 +28,19 @@ export class TokenService {
   public async generateNewRefeshToken(user: User): Promise<string> {
     const token = new AuthToken();
     token.user = user;
-    const refreshToken = await this.generateTokenId(token, 'refreshToken');
+    const refreshToken = await this.generateTokenId(token, "refreshToken");
     return refreshToken;
   }
 
   public async generateNewAccessToken(user: User): Promise<string> {
     const token = new AuthToken();
     token.user = user;
-    const accessToken = await this.generateTokenId(token, 'accessToken');
+    const accessToken = await this.generateTokenId(token, "accessToken");
     return accessToken;
   }
 
   private async generateTokenId(token: AuthToken, type: string): Promise<string> {
-    const expiresIn = type === 'accessToken' ? this.accessTokenExpr : this.refreshTokenExpr;
+    const expiresIn = type === "accessToken" ? this.accessTokenExpr : this.refreshTokenExpr;
     return jwt.sign(
       {
         ...token.user,

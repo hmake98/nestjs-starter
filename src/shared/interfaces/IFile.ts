@@ -6,6 +6,12 @@ export interface IPreSignedUrlParams {
 }
 
 export interface IPreSignedUrlBody {
-  key: string;
-  mime: string;
+  name: string;
+  userId: number;
+  type: keyof typeof IStorageType;
+}
+
+enum IStorageType {
+  PROFILES,
+  POSTS,
 }

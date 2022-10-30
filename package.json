@@ -15,8 +15,9 @@
     "start": "dotenv -e .env.development nest start --watch",
     "debug": "cross-env NODE_ENV=development nest start --debug --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "format": "prettier 'src/**/*.ts' --write",
     "test": "jest",
-    "prisma": "prisma",
+    "prisma": "dotenv -e .env.development prisma",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -85,6 +86,7 @@
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.31.10",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
     "lint-staged": "^12.3.4",
@@ -118,8 +120,7 @@
   "lint-staged": {
     "src/**/*.{ts,js}": [
       "npm run lint",
-      "npm run format",
-      "git add"
+      "npm run format"
     ]
   }
 }

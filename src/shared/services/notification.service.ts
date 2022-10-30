@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from 'src/config/config.service';
-import * as firebase from 'firebase-admin';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "src/config/config.service";
+import * as firebase from "firebase-admin";
 
 @Injectable()
 export class NotificationService {
   constructor(private readonly configService: ConfigService) {
     if (!firebase.apps.length) {
       firebase.initializeApp({
-        credential: firebase.credential.cert(this.configService.get('firebase')),
+        credential: firebase.credential.cert(this.configService.get("firebase")),
       });
     }
   }
@@ -22,11 +22,7 @@ export class NotificationService {
     });
   }
 
-  public async multiCastMessage(
-    tokens: [],
-    message?: string,
-    payload?: any,
-  ): Promise<firebase.messaging.BatchResponse> {
+  public async multiCastMessage(tokens: [], message?: string, payload?: any): Promise<firebase.messaging.BatchResponse> {
     return firebase.messaging().sendMulticast({
       tokens,
       notification: {

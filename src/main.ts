@@ -1,26 +1,26 @@
-import { config } from 'dotenv';
-config({ path: `.env${process.env.NODE_ENV !== 'development' ? '.' + process.env.NODE_ENV : ''}` });
-import { Logger as NestLogger,ValidationPipe } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ResponseInterceptor } from './core/interceptors';
-import { AppModule } from './app.module';
-import 'reflect-metadata';
-import * as express from 'express';
-import * as helmet from 'helmet';
-import * as session from 'express-session';
-import { Logger } from 'nestjs-pino';
+import { config } from "dotenv";
+config({ path: `.env${process.env.NODE_ENV !== "development" ? "." + process.env.NODE_ENV : ""}` });
+import { Logger as NestLogger, ValidationPipe } from "@nestjs/common";
+import { NestFactory, Reflector } from "@nestjs/core";
+import { ExpressAdapter } from "@nestjs/platform-express";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { ResponseInterceptor } from "./core/interceptors";
+import { AppModule } from "./app.module";
+import "reflect-metadata";
+import * as express from "express";
+import * as helmet from "helmet";
+import * as session from "express-session";
+import { Logger } from "nestjs-pino";
 // import { fork, on, isMaster } from 'cluster';
 // import * as os from 'os';
 
-const baseUrl = '/api';
-const docsEndpoint = process.env.DOCS_ENDPOINT || '/docs';
+const baseUrl = "/api";
+const docsEndpoint = process.env.DOCS_ENDPOINT || "/docs";
 const port = process.env.PORT || 3000;
 const logger = new NestLogger();
 
 function configureSwagger(app): void {
-  const config = new DocumentBuilder().setTitle('Nest-Starter').setDescription('description').setVersion('1.0').build();
+  const config = new DocumentBuilder().setTitle("Nest-Starter").setDescription("description").setVersion("1.0").build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(docsEndpoint, app, document);
 }
@@ -51,8 +51,8 @@ async function bootstrap(): Promise<void> {
 
 // declare let global: any;
 
-// configuration of new cluster. 
-// adv of cluster is if you're using multi-core cpus in ec2 instance, 
+// configuration of new cluster.
+// adv of cluster is if you're using multi-core cpus in ec2 instance,
 // without clustering the server will only able to use single core.
 // with clustering the server will able to use multiple cores of the instance.
 

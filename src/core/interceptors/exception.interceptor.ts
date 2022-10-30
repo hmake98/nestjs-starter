@@ -1,6 +1,6 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
-import { Response, Request } from 'express';
-import { getI18nContextFromRequest } from 'nestjs-i18n';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from "@nestjs/common";
+import { Response, Request } from "express";
+import { getI18nContextFromRequest } from "nestjs-i18n";
 
 @Catch(HttpException)
 export class ErrorExceptionsFilter implements ExceptionFilter {
@@ -17,7 +17,7 @@ export class ErrorExceptionsFilter implements ExceptionFilter {
     const message = await i18n.translate(`auth.${exception.message}`, { lang: i18n.lang });
     response.status(statusCode).json({
       statusCode,
-      message: message || 'Internal server error',
+      message: message || "Internal server error",
     });
   }
 }
