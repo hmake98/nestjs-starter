@@ -14,7 +14,7 @@ export class ErrorExceptionsFilter implements ExceptionFilter {
     if (statusCode >= 500) {
       this.logger.error({ request, response });
     }
-    const message = await i18n.translate(`auth.${exception.message}`, { lang: i18n.lang });
+    const message = await i18n.translate(`${exception.message}`, { lang: i18n.lang });
     response.status(statusCode).json({
       statusCode,
       message: message || "Internal server error",

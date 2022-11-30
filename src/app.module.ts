@@ -18,8 +18,9 @@ import { ConfigService } from "./config/config.service";
 import { BullModule } from "@nestjs/bull";
 import { I18nModule, QueryResolver, AcceptLanguageResolver } from "nestjs-i18n";
 import { ErrorExceptionsFilter } from "./core/interceptors";
-import { APP_FILTER } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import * as path from "path";
+import { ClientAuthGuard, RolesGuard } from "./core";
 
 @Module({
   imports: [
@@ -68,6 +69,14 @@ import * as path from "path";
     {
       provide: APP_FILTER,
       useClass: ErrorExceptionsFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ClientAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

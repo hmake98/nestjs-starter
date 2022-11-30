@@ -7,6 +7,7 @@ import { PrismaService } from "src/shared";
 import { Role, User } from "@prisma/client";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 
 @Injectable()
 export class UserService {
@@ -28,21 +29,13 @@ export class UserService {
       }
       return this.tokenService.generateNewTokens(checkUser);
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      throw e instanceof HttpException ? e : new InternalServerErrorException(e);
     }
   }
 
   public async signup(data: UserCreateDto): Promise<AuthToken> {
     try {
-      const { email, password, firstName, lastName } = data;
-      const checkUser = await this.prisma.user.findUnique({
-        where: {
-          email,
-        },
-      });
-      if (checkUser) {
-        throw new HttpException("auth.user_exists", HttpStatus.CONFLICT);
-      }
+      const { password, firstName, lastName } = data;
       const newUser = {} as User;
       const hashPassword = helpers.createHash(password);
       newUser.email = data.email;
@@ -56,7 +49,11 @@ export class UserService {
       this.notificationQueue.add({ message: "Welcome!" });
       return this.tokenService.generateNewTokens(user);
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
+        throw new HttpException("auth.user_exists", HttpStatus.CONFLICT);
+      } else {
+        throw new InternalServerErrorException(e);
+      }
     }
   }
 
@@ -72,7 +69,7 @@ export class UserService {
       }
       return this.tokenService.generateNewTokens(user);
     } catch (e) {
-      throw new InternalServerErrorException(e);
+      throw e instanceof HttpException ? e : new InternalServerErrorException(e);
     }
   }
 

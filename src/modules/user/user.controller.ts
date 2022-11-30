@@ -4,6 +4,7 @@ import { ApiBearerAuth } from "@nestjs/swagger";
 import { AuthToken } from "src/shared/interfaces";
 import { UserCreateDto, UserLoginDto, UserUpdateDto, TokenDto } from "./dto";
 import { UserService } from "./user.service";
+import { AllowUnauthorizedRequest } from "src/core/decorators/allow.decorator";
 
 @ApiBearerAuth()
 @Controller("user")
@@ -11,18 +12,21 @@ import { UserService } from "./user.service";
 export class UserController {
   public constructor(private readonly userService: UserService) {}
 
+  @AllowUnauthorizedRequest()
   @HttpCode(200)
   @Post("login")
   public async login(@Body() data: UserLoginDto): Promise<AuthToken> {
     return this.userService.login(data);
   }
 
+  @AllowUnauthorizedRequest()
   @HttpCode(200)
   @Post("signup")
   public async signup(@Body() data: UserCreateDto): Promise<AuthToken> {
     return this.userService.signup(data);
   }
 
+  @AllowUnauthorizedRequest()
   @HttpCode(200)
   @Post("refresh-token")
   public async getAccessToken(@Body() data: TokenDto): Promise<AuthToken> {

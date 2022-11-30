@@ -22,6 +22,7 @@ export class TokenService {
     tokens.accessToken = await this.generateNewAccessToken(user);
     tokens.refreshToken = await this.generateNewRefeshToken(user);
     tokens.user = user;
+    delete tokens.user.password;
     return tokens;
   }
 
