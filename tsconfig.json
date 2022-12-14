@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -12,5 +14,8 @@
     "baseUrl": "./",
     "incremental": true
   },
-  "exclude": ["node_modules", "build"]
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
 }

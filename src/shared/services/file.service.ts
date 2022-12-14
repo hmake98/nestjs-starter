@@ -1,14 +1,8 @@
 import { IPreSignedUrlBody, IPreSignedUrlParams } from "./../interfaces";
 import { Injectable } from "@nestjs/common";
 import { S3 } from "aws-sdk";
-import { ConfigService } from "../../config/config.service";
-import { PrismaService } from "./prisma.service";
+import { ConfigService } from "./config.service";
 
-/*
- * created enum for presigned url types.
- * How to use it ?
- * use one of the enum property as first argument in the getPresignedUrl method.
- */
 export enum OperationType {
   putObject = "putObject",
   getObject = "getObject",
@@ -20,7 +14,7 @@ export class FileService {
   private readonly storageService: S3;
   private readonly linkExp: number;
 
-  constructor(private readonly configService: ConfigService, private prisma: PrismaService) {
+  constructor(private readonly configService: ConfigService) {
     const awsConfig = this.configService.get("aws");
     this.storageService = new S3({
       accessKeyId: awsConfig.accessKeyId,
@@ -39,20 +33,13 @@ export class FileService {
     try {
       const { name, type } = data;
       const key = `${Date.now()}_${name}`;
-      const photo = await this.prisma.photos.create({
-        data: {
-          key,
-          name,
-          type,
-        },
-      });
       const params: IPreSignedUrlParams = {
         Bucket: this.bucketName,
         Key: `${type}/${key}`,
         Expires: this.linkExp,
       };
       const url = await this.storageService.getSignedUrlPromise(operationType, params);
-      return { url, ...photo };
+      return { url };
     } catch (e) {
       return e;
     }

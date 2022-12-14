@@ -1,13 +1,9 @@
 import * as bcrypt from "bcrypt";
 import { readFile } from "fs";
-import { saltOrRounds } from "./common";
 
-/**
- * helpers wrapper for utils
- */
 export const helpers = {
   createHash: (password: string): string => {
-    const hash = bcrypt.hashSync(password, saltOrRounds);
+    const hash = bcrypt.hashSync(password, 10);
     return hash;
   },
   match: (hash: string, password: string): boolean => {

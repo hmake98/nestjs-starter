@@ -1,5 +1,22 @@
 {
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+      "source.fixAll.eslint": true
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[typescript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[dotenv]": {
+      "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[prisma]": {
+      "editor.defaultFormatter": "Prisma.prisma"
+    },
+    "[shellscript]": {
+      "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
-}
+  }
+  

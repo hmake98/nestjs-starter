@@ -13,25 +13,25 @@ export class UserController {
 
   @HttpCode(200)
   @Post("login")
-  public async login(@Body() data: UserLoginDto): Promise<AuthToken> {
+  public async login(@Body() data: UserLoginDto): Promise<void> {
     return this.userService.login(data);
   }
 
   @HttpCode(200)
   @Post("signup")
-  public async signup(@Body() data: UserCreateDto): Promise<AuthToken> {
+  public async signup(@Body() data: UserCreateDto): Promise<void> {
     return this.userService.signup(data);
   }
 
   @HttpCode(200)
   @Post("refresh-token")
-  public async getAccessToken(@Body() data: TokenDto): Promise<AuthToken> {
+  public async getAccessToken(@Body() data: TokenDto): Promise<void> {
     return this.userService.getToken(data.refreshToken);
   }
 
   @HttpCode(200)
   @Put("update-profile/:id")
-  public async update(@Param("id") id: number, @Body() data: UserUpdateDto): Promise<User> {
+  public async update(@Param("id") id: number, @Body() data: UserUpdateDto): Promise<void> {
     return this.userService.update(id, data);
   }
 }

@@ -3,10 +3,11 @@ export * from "./IAuth";
 export * from "./IFile";
 
 export interface GetResponse<T> {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  [key: string]: T[] | number | {};
+  count: number;
+  data: T[];
 }
 
 export interface SuccessResponse {
+  status: boolean;
   message: string;
 }

@@ -1,23 +1,20 @@
 version: '3.3'
 
 services:
-  db:
-    hostname: database
-    container_name: postgres
-    image: postgres:latest
+  database:
+    image: kartoza/postgis:latest
     ports:
       - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=master123
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=postgres 
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis
     volumes:
       - pg_data:/var/lib/postgresql
     networks:
       - backend
   cache:
-    hostname: cache
-    container_name: redis
     image: redis:latest
     restart: always
     ports:

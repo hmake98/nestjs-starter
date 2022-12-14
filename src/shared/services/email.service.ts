@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { SES } from "aws-sdk";
 import { join } from "path";
-import { ConfigService } from "src/config/config.service";
-import { helpers } from "src/utils/helper";
+import { ConfigService } from "src/shared/services/config.service";
+import { helpers } from "../../utils/helpers";
 import * as _ from "lodash";
 
 @Injectable()
@@ -18,7 +18,7 @@ export class EmailService {
   }
 
   public async processEmail(template: string, emails: string[], data: any, subjectData: string) {
-    const templatePath = join(__dirname, "..", "templates", `${template}.html`);
+    const templatePath = join(__dirname, '..', 'templates', `${template}.html`);
     let _content = await helpers.readFilePromise(templatePath);
     const compiled = _.template(_content);
     _content = compiled(data);

@@ -4,7 +4,6 @@ import { AdminModule } from "./modules/admin/admin.module";
 import { AdminController } from "./modules/admin/admin.controller";
 import { TokenService } from "./shared/services/token.service";
 import { UserModule } from "./modules/user/user.module";
-import { ConfigModule } from "./config/config.module";
 import { Module } from "@nestjs/common";
 import { LoggerModule } from "nestjs-pino";
 import { TerminusModule } from "@nestjs/terminus";
@@ -13,8 +12,7 @@ import { UserController } from "./modules/user/user.controller";
 import { PostModule } from "./modules";
 import { PostController } from "./modules/post/post.controller";
 import { ScheduleModule } from "@nestjs/schedule";
-import { PrismaService } from "./shared";
-import { ConfigService } from "./config/config.service";
+import { ConfigService } from "./shared/services/config.service";
 import { BullModule } from "@nestjs/bull";
 import { I18nModule, QueryResolver, AcceptLanguageResolver } from "nestjs-i18n";
 import { ErrorExceptionsFilter } from "./core/interceptors";
@@ -42,14 +40,12 @@ import * as path from "path";
       },
       resolvers: [{ use: QueryResolver, options: ["lang"] }, AcceptLanguageResolver],
     }),
-    ConfigModule,
     AdminModule,
     UserModule,
     PostModule,
     TerminusModule,
     ScheduleModule.forRoot(),
     BullModule.forRootAsync({
-      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         redis: {
           host: configService.get("redis").host,
@@ -64,7 +60,6 @@ import * as path from "path";
     FileService,
     EmailService,
     TokenService,
-    PrismaService,
     {
       provide: APP_FILTER,
       useClass: ErrorExceptionsFilter,

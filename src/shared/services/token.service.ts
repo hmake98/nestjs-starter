@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as jwt from "jsonwebtoken";
-import { ConfigService } from "src/config/config.service";
+import { ConfigService } from "src/shared/services/config.service";
 import { AuthToken } from "../interfaces";
 import { Auth } from "../interfaces/IAuth";
 

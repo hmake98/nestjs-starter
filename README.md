@@ -45,12 +45,6 @@ $ npm install
 ```bash
 # development
 $ npm run dev
-
-# staging
-$ npm run stage
-
-# production 
-$ npm run prod
 ```
 
 ## Building

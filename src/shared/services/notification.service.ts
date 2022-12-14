@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "src/config/config.service";
+import { ConfigService } from "src/shared/services/config.service";
 import * as firebase from "firebase-admin";
 
 @Injectable()

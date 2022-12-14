@@ -11,9 +11,6 @@ export class ErrorExceptionsFilter implements ExceptionFilter {
     const response = context.getResponse<Response>();
     const i18n = getI18nContextFromRequest(request);
     const statusCode = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    if (statusCode >= 500) {
-      this.logger.error({ request, response });
-    }
     const message = await i18n.translate(`auth.${exception.message}`, { lang: i18n.lang });
     response.status(statusCode).json({
       statusCode,
