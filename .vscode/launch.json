@@ -19,7 +19,6 @@
             "envFile": "${workspaceFolder}/.development.env",
             "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
-            "protocol": "inspector"
         }
     ]
 }

@@ -1,37 +1,31 @@
-import { User } from "@prisma/client";
-import { Body, ClassSerializerInterceptor, Controller, HttpCode, Post, Put, UseInterceptors, Param } from "@nestjs/common";
-import { ApiBearerAuth } from "@nestjs/swagger";
-import { AuthToken } from "src/shared/interfaces";
-import { UserCreateDto, UserLoginDto, UserUpdateDto, TokenDto } from "./dto";
-import { UserService } from "./user.service";
+import { Body, Controller, HttpCode, Param, Post, Put } from '@nestjs/common';
+import { User } from 'src/database/models';
+import { AuthResponse } from 'src/shared';
+import { UserCreateDto, UserLoginDto, UserUpdateDto } from './dto';
+import { UserService } from './user.service';
 
-@ApiBearerAuth()
-@Controller("user")
-@UseInterceptors(ClassSerializerInterceptor)
+@Controller('user')
 export class UserController {
-  public constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   @HttpCode(200)
-  @Post("login")
-  public async login(@Body() data: UserLoginDto): Promise<void> {
+  @Post('login')
+  public async login(@Body() data: UserLoginDto): Promise<AuthResponse> {
     return this.userService.login(data);
   }
 
   @HttpCode(200)
-  @Post("signup")
-  public async signup(@Body() data: UserCreateDto): Promise<void> {
+  @Post('signup')
+  public async signup(@Body() data: UserCreateDto): Promise<AuthResponse> {
     return this.userService.signup(data);
   }
 
   @HttpCode(200)
-  @Post("refresh-token")
-  public async getAccessToken(@Body() data: TokenDto): Promise<void> {
-    return this.userService.getToken(data.refreshToken);
-  }
-
-  @HttpCode(200)
-  @Put("update-profile/:id")
-  public async update(@Param("id") id: number, @Body() data: UserUpdateDto): Promise<void> {
+  @Put('update/:id')
+  public async update(
+    @Param('id') id: number,
+    @Body() data: UserUpdateDto,
+  ): Promise<User> {
     return this.userService.update(id, data);
   }
 }

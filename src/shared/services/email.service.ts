@@ -1,9 +1,9 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { SES } from "aws-sdk";
-import { join } from "path";
-import { ConfigService } from "src/shared/services/config.service";
-import { helpers } from "../../utils/helpers";
-import * as _ from "lodash";
+import { Injectable, Logger } from '@nestjs/common';
+import { SES } from 'aws-sdk';
+import { join } from 'path';
+import { helpers } from '../../utils/helpers';
+import * as _ from 'lodash';
+import { awsConfig } from 'src/utils/common';
 
 @Injectable()
 export class EmailService {
@@ -11,13 +11,21 @@ export class EmailService {
   private sourceEmail: string;
   private readonly logger = new Logger(EmailService.name);
 
-  constructor(private readonly config: ConfigService) {
-    const awsConfig = this.config.get("aws");
+  constructor() {
     this.sourceEmail = awsConfig.sourceEmail;
-    this.emailService = new SES(awsConfig);
+    this.emailService = new SES({
+      accessKeyId: awsConfig.accessKeyId,
+      secretAccessKey: awsConfig.secretAccessKey,
+      region: awsConfig.region,
+    });
   }
 
-  public async processEmail(template: string, emails: string[], data: any, subjectData: string) {
+  public async processEmail(
+    template: string,
+    emails: string[],
+    data: any,
+    subjectData: string,
+  ) {
     const templatePath = join(__dirname, '..', 'templates', `${template}.html`);
     let _content = await helpers.readFilePromise(templatePath);
     const compiled = _.template(_content);
@@ -31,17 +39,17 @@ export class EmailService {
         Message: {
           Body: {
             Html: {
-              Charset: "UTF-8",
+              Charset: 'UTF-8',
               Data: _content,
             },
           },
           Subject: {
-            Charset: "UTF-8",
+            Charset: 'UTF-8',
             Data: subjectData,
           },
         },
       })
       .promise()
-      .catch(e => this.logger.error(e));
+      .catch((e) => this.logger.error(e));
   }
 }

@@ -1,5 +1,5 @@
-import * as bcrypt from "bcrypt";
-import { readFile } from "fs";
+import * as bcrypt from 'bcrypt';
+import { readFile } from 'fs';
 
 export const helpers = {
   createHash: (password: string): string => {
@@ -12,7 +12,7 @@ export const helpers = {
   },
   readFilePromise: async (filePath: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-      readFile(filePath, "utf8", (e, html) => {
+      readFile(filePath, 'utf8', (e, html) => {
         if (!e) {
           resolve(html);
         } else {

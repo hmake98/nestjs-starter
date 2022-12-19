@@ -24,21 +24,6 @@ services:
       - redis_data:/data
     networks:
       - backend
-  # server:
-  #   restart: on-error
-  #   container_name: server
-  #   build:
-  #     context: .
-  #     dockerfile: ./Dockerfile
-  #   networks:
-  #     - backend
-  #   depends_on:
-  #     - database
-  #   ports:
-  #     - '3000:3000'
-  #   volumes:
-  #     - .:/usr/src/app
-  #     - /usr/src/app/node_modules
 networks:
   backend:
     driver: bridge

@@ -1,19 +1,19 @@
-import { UserService } from "./user.service";
-import { UserController } from "./user.controller";
-import { Module } from "@nestjs/common";
-import { TokenService } from "src/shared/services/token.service";
-import { FileService } from "src/shared/services/file.service";
-import { NotificationConsumer } from "src/shared";
-import { BullModule } from "@nestjs/bull";
+import { Module } from '@nestjs/common';
+import { DatabaseModule } from 'src/database/database.module';
+import { UserService } from './user.service';
+import { UserController } from './user.controller';
+import { TokenService } from 'src/shared';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
+    DatabaseModule,
     BullModule.registerQueue({
-      name: "notification",
+      name: 'notification',
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, TokenService, FileService, NotificationConsumer],
+  providers: [UserService, TokenService],
   exports: [UserService],
 })
 export class UserModule {}

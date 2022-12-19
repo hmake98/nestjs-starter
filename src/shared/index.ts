@@ -1,4 +1,3 @@
-export * from "./interfaces/index";
-export * from "./pipes/index";
-export * from "./services/index";
-export * from "./workers/index";
+export * from './types';
+export * from './services';
+export * from './workers';

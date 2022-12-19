@@ -1,59 +1,40 @@
-import { Injectable } from "@nestjs/common";
-import { User } from "@prisma/client";
-import * as jwt from "jsonwebtoken";
-import { ConfigService } from "src/shared/services/config.service";
-import { AuthToken } from "../interfaces";
-import { Auth } from "../interfaces/IAuth";
+import { Injectable } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
+import { AuthResponse } from '../types';
+import { appConfig } from '../../utils/common';
+import { User } from '../../database/models';
 
 @Injectable()
 export class TokenService {
   private secretKey: string;
   private accessTokenExpr: string;
-  private refreshTokenExpr: string;
 
-  constructor(private readonly configService: ConfigService) {
-    this.secretKey = this.configService.get("authKey");
-    this.accessTokenExpr = this.configService.get("accesstokenExpr");
-    this.refreshTokenExpr = this.configService.get("refreshtokenExpr");
+  constructor() {
+    this.secretKey = appConfig.authKey;
+    this.accessTokenExpr = appConfig.accesstokenExpr;
   }
 
-  public async generateNewTokens(user: User): Promise<AuthToken> {
-    const tokens = new AuthToken();
-    tokens.accessToken = await this.generateNewAccessToken(user);
-    tokens.refreshToken = await this.generateNewRefeshToken(user);
+  public async generateResponse(user: User): Promise<AuthResponse> {
+    const tokens = new AuthResponse();
+    delete user.dataValues.password;
+    tokens.accessToken = await this.generateNewAccessToken({
+      userId: user.id,
+      role: user.role,
+    });
     tokens.user = user;
     return tokens;
   }
 
-  public async generateNewRefeshToken(user: User): Promise<string> {
-    const token = new AuthToken();
-    token.user = user;
-    const refreshToken = await this.generateTokenId(token, "refreshToken");
-    return refreshToken;
+  public async generateNewAccessToken(payload: {
+    userId: number;
+    role: string;
+  }): Promise<string> {
+    return jwt.sign(payload, this.secretKey, {
+      expiresIn: this.accessTokenExpr,
+    });
   }
 
-  public async generateNewAccessToken(user: User): Promise<string> {
-    const token = new AuthToken();
-    token.user = user;
-    const accessToken = await this.generateTokenId(token, "accessToken");
-    return accessToken;
-  }
-
-  private async generateTokenId(token: AuthToken, type: string): Promise<string> {
-    const expiresIn = type === "accessToken" ? this.accessTokenExpr : this.refreshTokenExpr;
-    return jwt.sign(
-      {
-        ...token.user,
-        type,
-      },
-      this.secretKey,
-      {
-        expiresIn,
-      },
-    );
-  }
-
-  public verify(token: string): Auth {
-    return jwt.verify(token, this.secretKey) as Auth;
+  public verify(token: string): string | jwt.JwtPayload {
+    return jwt.verify(token, this.secretKey);
   }
 }

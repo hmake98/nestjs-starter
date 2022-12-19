@@ -1,9 +1,8 @@
-import { Injectable, Scope } from "@nestjs/common";
+import { Injectable, Scope } from '@nestjs/common';
 // import { Cron } from '@nestjs/schedule';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class TaskService {
-  constructor() {}
   /**
    * Cron run at every 45 seconds
    */
