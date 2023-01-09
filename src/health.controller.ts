@@ -1,18 +1,24 @@
-import { Controller, Get, Inject } from '@nestjs/common';
-import { Sequelize } from 'sequelize-typescript';
-import { AllowUnauthorizedRequest } from './core/decorators/allow.decorator';
+import { Controller, Get } from '@nestjs/common';
+import { Public } from './core/decorators/allow.decorator';
+import {
+  HealthCheck,
+  HealthCheckService,
+  TypeOrmHealthIndicator,
+} from '@nestjs/terminus';
 
 @Controller('health')
 export class HealthController {
-  constructor(@Inject('SEQUELIZE') private sequelize: Sequelize) {}
-  @AllowUnauthorizedRequest()
-  @Get('/')
+  constructor(
+    private ormIndicator: TypeOrmHealthIndicator,
+    private healthCheckService: HealthCheckService,
+  ) {}
+
+  @Get()
+  @HealthCheck()
+  @Public()
   public async getHealth() {
-    try {
-      await this.sequelize.authenticate();
-      return { status: true };
-    } catch (e) {
-      return { status: false };
-    }
+    return this.healthCheckService.check([
+      () => this.ormIndicator.pingCheck('database', { timeout: 1500 }),
+    ]);
   }
 }

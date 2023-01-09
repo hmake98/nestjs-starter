@@ -1,35 +1,22 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { TokenService } from '../../shared';
+import { AuthGuard } from '@nestjs/passport';
+import { IS_PUBLIC_KEY } from '../../core/decorators';
 
 @Injectable()
-export class ClientAuthGuard implements CanActivate {
-  public constructor(
-    private readonly tokenService: TokenService,
-    private reflector: Reflector,
-  ) {}
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(private reflector: Reflector) {
+    super();
+  }
 
-  public canActivate(context: ExecutionContext): boolean {
-    const request = context.getArgByIndex(0);
-    const allowUnauthorizedRequest = this.reflector.get<boolean>(
-      'allowUnauthorizedRequest',
+  canActivate(context: ExecutionContext) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
-    );
-    if (allowUnauthorizedRequest) {
+      context.getClass(),
+    ]);
+    if (isPublic) {
       return true;
     }
-    const Authorization = request.headers['authorization'];
-    const token = Authorization.replace('Bearer ', '');
-    const verify = this.tokenService.verify(token);
-    if (!verify) {
-      throw new UnauthorizedException();
-    }
-    request.user = verify;
-    return true;
+    return super.canActivate(context);
   }
 }

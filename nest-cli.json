@@ -1,7 +1,17 @@
 {
+  "language": "ts",
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": ["templates/**/*", "i18n/**/*"]
+    "assets": [
+      {
+        "include": "i18n",
+        "outDir": "dist"
+      },
+      {
+        "include": "templates",
+        "outDir": "dist"
+      }
+    ]
   }
 }

@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from 'src/database/database.module';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { TokenService } from 'src/shared';
 import { BullModule } from '@nestjs/bull';
+import { User } from '../../database/entities';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    DatabaseModule,
+    TypeOrmModule.forFeature([User]),
     BullModule.registerQueue({
       name: 'notification',
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, TokenService],
+  providers: [UserService],
   exports: [UserService],
 })
 export class UserModule {}

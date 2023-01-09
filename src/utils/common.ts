@@ -1,15 +1,4 @@
-export const appConfig = {
-  env: process.env.NODE_ENV,
-  authKey: process.env.AUTH_SECRET,
-  accesstokenExpr: process.env.ACCESS_EXP,
-  refreshtokenExpr: process.env.REFRESH_EXP,
-  limit: process.env.LIMIT,
-};
-
-export const TEMPLATES = {
-  FORGOT_PASSWORD: 'forgot-password',
-  WELCOME: 'welcome',
-};
+export const isDev = process.env.NODE_ENV === 'development' ? true : false;
 
 export const statusMessages = {
   200: 'OK',
@@ -21,7 +10,17 @@ export const statusMessages = {
   206: 'PartialContent',
 };
 
-export const isDev = process.env.NODE_ENV === 'development' ? true : false;
+export const appConfig = {
+  env: process.env.NODE_ENV,
+  authKey: process.env.AUTH_SECRET,
+  accesstokenExpr: process.env.ACCESS_EXP,
+  limit: process.env.LIMIT,
+};
+
+export const TEMPLATES = {
+  FORGOT_PASSWORD: 'forgot-password',
+  WELCOME: 'welcome',
+};
 
 export const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY,

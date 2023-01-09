@@ -1,4 +1,4 @@
-import { User } from 'src/database/models';
+import { User } from '../database/entities';
 
 export interface GetResponse<T> {
   count: number;
@@ -10,13 +10,13 @@ export interface SuccessResponse {
   message: string;
 }
 
-export class AuthResponse {
+export interface AuthResponse {
   accessToken: string;
   user: User;
 }
 
 export interface IPreSignedUrlParams {
-  Bucket?: string;
+  Bucket: string;
   Key: string;
   Expires?: number;
   ContentType?: string;
@@ -29,20 +29,23 @@ export interface IPreSignedUrlBody {
 }
 
 export interface AuthPayload {
-  id: number;
-  email: string;
-  type: string;
+  email?: string;
   role: string;
-  iat: number;
-  exp: number;
+  sub: number;
 }
 
-export enum Role {
-  User = 'user',
-  Admin = 'admin',
-}
-
-enum IStorage {
+export enum IStorage {
   PROFILES,
   POSTS,
+}
+
+export enum UserRole {
+  ADMIN = 'admin',
+  EDITOR = 'editor',
+  USER = 'user',
+}
+
+export enum TokenStatus {
+  ACTIVE = 'active',
+  ARCHIVE = 'archive',
 }

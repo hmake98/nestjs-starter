@@ -1,22 +1,25 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "module": "commonjs",
-    "types": [
-      "jest",
-      "node"
-    ],
-    "declaration": true,
+    "declaration": false,
     "removeComments": true,
+    "noLib": false,
+    "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2017",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "lib": ["esnext"],
     "sourceMap": true,
-    "outDir": "./build",
-    "baseUrl": "./",
-    "incremental": true
-  },
-  "exclude": [
-    "node_modules",
-    "build"
-  ]
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  }
 }
