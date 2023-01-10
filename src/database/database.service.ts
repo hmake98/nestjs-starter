@@ -24,24 +24,7 @@ export class DatabaseService {
         process.exit(0);
       }
       console.log(stdout, stderr);
-    });
-  }
-
-  @Command({
-    command: 'migrate:gen <name>',
-    description: 'generate new migration',
-  })
-  async generateMigration(name: string) {
-    const command = `ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate ${path.join(
-      __dirname,
-      'migrations',
-    )}/${name} -d ${path.join(__dirname, 'ormconfig.ts')}`;
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(error);
-        process.exit(0);
-      }
-      console.log(stdout, stderr);
+      process.exit(0);
     });
   }
 
@@ -51,6 +34,34 @@ export class DatabaseService {
   })
   async migrateUp() {
     await this.dataSource.runMigrations();
+    process.exit(0);
+  }
+
+  @Command({
+    command: 'sync',
+    description: 'Run sync',
+  })
+  async sync() {
+    await this.dataSource.synchronize();
+    process.exit(0);
+  }
+
+  @Command({
+    command: 'drop',
+    description: 'Run schema drop',
+  })
+  async drop() {
+    exec(
+      `ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop`,
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(error);
+          process.exit(0);
+        }
+        console.log(stdout, stderr);
+        process.exit(0);
+      },
+    );
     process.exit(0);
   }
 

@@ -48,7 +48,6 @@ export class AuthService {
       last_name: lastName.trim(),
       role: UserRole.USER,
     });
-    console.log(create);
     const accessToken = this.jwt.generateToken({
       role: create.role,
       sub: create.id,
@@ -57,5 +56,11 @@ export class AuthService {
       accessToken,
       user: create,
     };
+  }
+
+  public async me(id: number): Promise<User> {
+    return this.userRepository.findOneBy({
+      id,
+    });
   }
 }

@@ -3,10 +3,17 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module';
+import { nanoid } from 'nanoid';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let accessToken: string;
+  const userData = {
+    firstName: 'John',
+    lastName: 'Smith',
+    email: `john_${nanoid()}@smith.com`,
+    password: 'password',
+  };
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
@@ -17,27 +24,23 @@ describe('AuthController (e2e)', () => {
     await app.init();
   });
 
-  it('/auth/register (POST)', () =>
-    request(app.getHttpServer())
-      .post('/auth/register')
-      .send({
-        firstName: 'John',
-        lastName: 'Smith',
-        email: 'john@smith.com',
-        password: 'password',
-      })
-      .expect(200));
+  it('/auth/signup (POST)', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/signup')
+      .send(userData)
+      .expect(201);
+  });
 
   it('/auth/login (POST)', async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: 'john@smith.com',
-        password: 'password',
+        email: userData.email,
+        password: userData.password,
       })
-      .expect(200);
+      .expect(201);
 
-    accessToken = response.body.token.accessToken;
+    accessToken = response.body.accessToken;
   });
 
   it('/auth/me (GET)', () =>
@@ -46,5 +49,7 @@ describe('AuthController (e2e)', () => {
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(200));
 
-  afterAll(() => app.close());
+  afterAll(() => {
+    app.close();
+  });
 });

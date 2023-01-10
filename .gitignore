@@ -7,4 +7,5 @@ junit.xml
 .env.development
 .env.stage
 .env.prod
+.env.test
 .env

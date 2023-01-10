@@ -34,6 +34,11 @@ export interface AuthPayload {
   sub: number;
 }
 
+export type MockType<T> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  [P in keyof T]?: jest.Mock<{}>;
+};
+
 export enum IStorage {
   PROFILES,
   POSTS,

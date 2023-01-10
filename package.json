@@ -7,15 +7,17 @@
   "scripts": {
     "prebuild": "rimraf build",
     "build": "rimraf dist && nest build && copyfiles Procfile dist/",
-    "start:prod": "node build/main",
+    "start:prod": "node dist/main",
     "start": "dotenv -e .env.development -- ts-node-dev src/main.ts",
     "debug": "cross-env TS_NODE_CACHE=false ts-node-dev --inspect --ignore '/^src/.*\\.spec\\.ts$/' src/main.ts",
     "console:dev": "dotenv -e .env.development -- ts-node -r tsconfig-paths/register src/console.ts",
+    "console:test": "dotenv -e .env.development -- ts-node -r tsconfig-paths/register src/console.ts",
     "console": "ts-node -r tsconfig-paths/register src/console.ts",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "test": "jest",
     "test:local": "dotenv -e .env.test -- jest",
+    "test:local-e2e": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
@@ -123,7 +125,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": "./",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"

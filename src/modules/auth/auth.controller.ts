@@ -1,7 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserCreateDto, UserLoginDto } from './dto';
 import { AuthService } from './auth.service';
-import { Public } from '../../core';
+import { CurrentUser, Public } from '../../core';
 
 @Controller('auth')
 export class AuthController {
@@ -17,5 +17,10 @@ export class AuthController {
   @Post('signup')
   public signup(@Body() payload: UserCreateDto) {
     return this.authService.signup(payload);
+  }
+
+  @Get('me')
+  public me(@CurrentUser() userId: number) {
+    return this.authService.me(userId);
   }
 }
