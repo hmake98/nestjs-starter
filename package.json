@@ -42,7 +42,7 @@
     "bcrypt": "^5.0.1",
     "bull": "^3.29.3",
     "class-transformer": "^0.4.0",
-    "class-validator": "^0.13.1",
+    "class-validator": "^0.14.0",
     "date-fns": "^2.21.3",
     "dotenv": "^9.0.2",
     "express-rate-limit": "^6.7.0",
