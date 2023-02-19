@@ -1,15 +1,21 @@
-FROM node:16-alpine
+FROM node:14 AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache --virtual .build-deps alpine-sdk python make gcc g++ 
-
 COPY package*.json ./
 
-RUN npm install --frozen-lockfile
+RUN npm install
 
 COPY . .
 
+# RUN npm run build
+
+# FROM node:14
+
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/package*.json ./
+# COPY --from=builder /app/dist ./dist
+
 EXPOSE 3000
 
-CMD npm start
+CMD [ "npm", "start" ]

@@ -15,6 +15,12 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface ErrorResponse {
+  status: boolean;
+  message: string;
+  error: any;
+}
+
 export interface IPreSignedUrlParams {
   Bucket: string;
   Key: string;
@@ -29,19 +35,13 @@ export interface IPreSignedUrlBody {
 }
 
 export interface AuthPayload {
-  email?: string;
+  userId: number;
   role: string;
-  sub: number;
 }
 
-export type MockType<T> = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  [P in keyof T]?: jest.Mock<{}>;
-};
-
 export enum IStorage {
-  PROFILES,
-  POSTS,
+  PROFILES = 'profiles',
+  POSTS = 'posts',
 }
 
 export enum UserRole {
@@ -54,3 +54,25 @@ export enum TokenStatus {
   ACTIVE = 'active',
   ARCHIVE = 'archive',
 }
+
+export type AppConfig = {
+  node_env: string;
+  port: string;
+  auth_secret: string;
+  token_exp: string;
+  database_name: string;
+  database_user: string;
+  database_password: string;
+  database_port: string;
+  database_host: string;
+  aws_access_key: string;
+  aws_secret_key: string;
+  aws_region: string;
+  aws_bucket: string;
+  aws_link_exp: string;
+  aws_source_email: string;
+  redis_host: string;
+  redis_port: string;
+  notification_queue: string;
+  email_queue: string;
+};

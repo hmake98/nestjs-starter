@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 
-import { nanoid } from 'nanoid';
 import { AppModule } from '../../app.module';
 import { TypeOrmModule, getDataSourceToken } from '@nestjs/typeorm';
 import { Post, User } from '../../database/entities';

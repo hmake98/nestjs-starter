@@ -1,22 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '../../config/config.service';
 import { SES } from 'aws-sdk';
 import { join } from 'path';
 import * as _ from 'lodash';
-import { awsConfig } from '../../utils/common';
 import { readFileSync } from 'fs';
 
 @Injectable()
 export class EmailService {
+  private logger = new Logger(EmailService.name);
   private emailService: SES;
   private sourceEmail: string;
-  private readonly logger = new Logger(EmailService.name);
 
-  constructor() {
-    this.sourceEmail = String(awsConfig.sourceEmail);
+  constructor(private configService: ConfigService) {
+    this.sourceEmail = this.configService.get('aws_source_email');
     this.emailService = new SES({
-      accessKeyId: awsConfig.accessKeyId,
-      secretAccessKey: awsConfig.secretAccessKey,
-      region: awsConfig.region,
+      accessKeyId: this.configService.get('aws_access_key'),
+      secretAccessKey: this.configService.get('aws_secret_key'),
+      region: this.configService.get('aws_region'),
     });
   }
 

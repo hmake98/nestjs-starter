@@ -4,7 +4,7 @@ import { createCipheriv, randomBytes, createDecipheriv } from 'crypto';
 const iv = randomBytes(16);
 const key = randomBytes(32);
 
-export const utils = {
+export const helpers = {
   createHash: (password: string): string => {
     const salt = bcrypt.genSaltSync();
     return bcrypt.hashSync(password, salt);
@@ -36,5 +36,3 @@ export const utils = {
     return decrypted.toString();
   },
 };
-
-export const helpers = {};

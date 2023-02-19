@@ -3,7 +3,7 @@ import { Cron } from '@nestjs/schedule';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class TaskService {
-  logger = new Logger();
+  private logger = new Logger(TaskService.name);
   /**
    * Cron run at every 45 seconds
    */

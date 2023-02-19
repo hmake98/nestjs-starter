@@ -1,21 +1,16 @@
 import 'reflect-metadata';
-import { config } from 'dotenv';
-config();
-import {
-  ClassSerializerInterceptor,
-  Logger,
-  ValidationPipe,
-} from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { HttpExceptionFilter, ResponseInterceptor } from './core/interceptors';
 import { AppModule } from './app.module';
+import { Logger } from 'nestjs-pino';
+import { JwtAuthGuard, RolesGuard } from './core';
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import { JwtAuthGuard, RolesGuard } from './core';
 
 const baseUrl = '/api';
 const port = process.env.PORT || 3000;
@@ -31,13 +26,14 @@ function configureSwagger(app): void {
 
 async function bootstrap(): Promise<void> {
   const server = express();
-  const logger = new Logger();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
     bufferLogs: true,
     cors: true,
   });
+  const logger = app.get(Logger);
   const moduleRef = app.select(AppModule);
   const reflector = moduleRef.get(Reflector);
+  app.useLogger(logger);
   app.setGlobalPrefix(baseUrl);
   app.useGlobalInterceptors(
     new ResponseInterceptor(reflector),

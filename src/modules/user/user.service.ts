@@ -5,7 +5,7 @@ import { UserUpdateDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../database/entities';
 import { Repository } from 'typeorm';
-import { utils } from '../../utils/helpers';
+import { helpers } from '../../utils/helpers';
 
 @Injectable()
 export class UserService {
@@ -26,7 +26,7 @@ export class UserService {
       },
       {
         email: email.trim(),
-        password: utils.createHash(password),
+        password: helpers.createHash(password),
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         profile,

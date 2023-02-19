@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import * as firebase from 'firebase-admin';
+import path from 'path';
 
 @Injectable()
 export class NotificationService {
   constructor() {
     if (!firebase.apps.length) {
-      firebase.initializeApp({
-        // credential: firebase.credential.cert(),
-      });
+      // firebase.initializeApp({
+      //   credential: firebase.credential.cert(
+      //     path.join(__dirname, '../../../firebase.config.json'),
+      //   ),
+      // });
     }
   }
 

@@ -1,5 +1,4 @@
 version: '3.3'
-
 services:
   database:
     image: kartoza/postgis:latest
@@ -8,13 +7,13 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=master123
-      - POSTGRES_DB=postgres 
+      - POSTGRES_DB=postgres
       - POSTGRES_MULTIPLE_EXTENSIONS=postgis
     volumes:
       - pg_data:/var/lib/postgresql
     networks:
       - backend
-  cache:
+  redis:
     image: redis:latest
     restart: always
     ports:
@@ -24,6 +23,20 @@ services:
       - redis_data:/data
     networks:
       - backend
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env.local
+    networks:
+      - backend
+    volumes:
+      - .:/app
+      - /app/node_modules
 networks:
   backend:
     driver: bridge

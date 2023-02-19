@@ -12,55 +12,71 @@ export class PostService {
   ) {}
 
   public async create(userId: number, data: CreatePostDto) {
-    const { content } = data;
-    const user = await this.userRepository.findOneBy({ id: userId });
-    if (!user) {
-      throw new HttpException('userNotFound', HttpStatus.NOT_FOUND);
+    try {
+      const { content } = data;
+      const user = await this.userRepository.findOneBy({ id: userId });
+      if (!user) {
+        throw new HttpException('userNotFound', HttpStatus.NOT_FOUND);
+      }
+      const post = new Post();
+      post.content = content.trim();
+      post.author = user;
+      return this.postRepository.save(post);
+    } catch (e) {
+      throw new Error(e);
     }
-    const post = new Post();
-    post.content = content.trim();
-    post.author = user;
-    return this.postRepository.save(post);
   }
 
   public async delete(id: number) {
-    const post = await this.postRepository.findOneBy({ id });
-    if (!post) {
-      throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
+    try {
+      const post = await this.postRepository.findOneBy({ id });
+      if (!post) {
+        throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
+      }
+      const result = await this.postRepository.delete({ id });
+      return result.raw;
+    } catch (e) {
+      throw new Error(e);
     }
-    const result = await this.postRepository.delete({ id });
-    return result.raw;
   }
 
   public async getAll(params: GetPostsDto) {
-    const { limit, page, search } = params;
-    const skip = (page - 1) * limit;
-    const [result, total] = await this.postRepository.findAndCount({
-      where: { content: ILike('%' + search + '%') },
-      order: { created_at: 'DESC' },
-      take: limit,
-      skip: skip,
-    });
-    return {
-      count: total,
-      data: result,
-    };
+    try {
+      const { limit, page, search } = params;
+      const skip = (page - 1) * limit;
+      const [result, total] = await this.postRepository.findAndCount({
+        where: { content: ILike('%' + search + '%') },
+        order: { created_at: 'DESC' },
+        take: limit,
+        skip: skip,
+      });
+      return {
+        count: total,
+        data: result,
+      };
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
   public async update(id: number, data: UpdatePostDto) {
-    const { content } = data;
-    const post = await this.postRepository.findOneBy({ id });
-    if (!post) {
-      throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
+    try {
+      const { content } = data;
+      const post = await this.postRepository.findOneBy({ id });
+      if (!post) {
+        throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
+      }
+      const result = await this.postRepository.update(
+        {
+          id,
+        },
+        {
+          content,
+        },
+      );
+      return result.raw;
+    } catch (e) {
+      throw new Error(e);
     }
-    const result = await this.postRepository.update(
-      {
-        id,
-      },
-      {
-        content,
-      },
-    );
-    return result.raw;
   }
 }

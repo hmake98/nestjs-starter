@@ -5,11 +5,12 @@ import { AuthService } from './auth.service';
 import { nanoid } from 'nanoid';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { appConfig } from '../../utils/common';
 import { AppModule } from '../../app.module';
 import { TypeOrmModule, getDataSourceToken } from '@nestjs/typeorm';
 import { User } from '../../database/entities';
 import { DataSource } from 'typeorm';
+import { ConfigModule } from '../../config/config.module';
+import { ConfigService } from '../../config/config.service';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -29,9 +30,13 @@ describe('AuthController', () => {
       imports: [
         AppModule,
         TypeOrmModule.forFeature([User]),
-        JwtModule.register({
-          secret: appConfig.authKey,
-          signOptions: { expiresIn: appConfig.accesstokenExpr },
+        JwtModule.registerAsync({
+          imports: [ConfigModule],
+          useFactory: (configService: ConfigService) => ({
+            secret: configService.get('auth_secret'),
+            signOptions: { expiresIn: configService.get('token_exp') },
+          }),
+          inject: [ConfigService],
         }),
       ],
       controllers: [AuthController],

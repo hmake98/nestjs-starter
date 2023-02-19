@@ -11,6 +11,10 @@
       {
         "include": "templates",
         "outDir": "dist"
+      },
+      {
+        "include": "Procfile",
+        "outDir": "dist"
       }
     ]
   }
