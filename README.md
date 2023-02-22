@@ -5,14 +5,6 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Prerequisite
-
-- Create `.env` file based on your environment like,
-  - for development > `.env.development`
-  - for staging > `.env.stage`
-  - for production > `.env.proudction`
-- For more information about env variables, refer `example.env` file.
-
 ## Installation
 
 ```bash
@@ -23,10 +15,17 @@ $ npm install
 
 ```bash
 # development
-$ npm start
+$ npm run dev
 
 # production
-$ npm run start:prod
+$ npm run start
+```
+
+## Running services on Docker
+
+```bash
+
+docker-compose up
 ```
 
 ## Build
@@ -54,13 +53,29 @@ $ npm run test:local
 $ npm run test:local-e2e
 ```
 
-### Run Database commands using Console
+## Run Database commands using Nesjs Console
 
-- `npm run console:dev db` will list down all commands related with database.
+```bash
+# will list down all commands related with database.
+$ npm run console:dev db
+```
 
-### Swagger Documentation
+## Swagger Documentation
 
-- Swagger documentation endpoint will be running at <b>`http://host:port/api` </b>.
+- Swagger documentation endpoint will be running at <b> `/api` </b>.
+
+## K8s Deployment Local
+
+```bash
+# first start minikube
+minikube start
+
+# deployment
+kubectl apply -f k8s/
+
+# get endpoint of k8s cluster
+minikube service nestjs-starter-service
+```
 
 ## Support
 

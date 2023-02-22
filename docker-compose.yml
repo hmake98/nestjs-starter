@@ -13,7 +13,7 @@ services:
       - pg_data:/var/lib/postgresql
     networks:
       - backend
-  redis:
+  cache:
     image: redis:latest
     restart: always
     ports:

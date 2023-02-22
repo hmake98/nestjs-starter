@@ -1,5 +1,5 @@
 import { CustomDecorator, SetMetadata } from '@nestjs/common';
-import { UserRole } from '../../shared';
+import { UserRoles } from '../../types';
 
-export const Roles = (...roles: UserRole[]): CustomDecorator<string> =>
+export const Roles = (...roles: UserRoles[]): CustomDecorator<string> =>
   SetMetadata('roles', roles);

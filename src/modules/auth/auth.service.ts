@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UserRole } from '../../types';
+import { UserRoles } from '../../types';
 import { UserCreateDto, UserLoginDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../database/entities';
@@ -51,7 +51,7 @@ export class AuthService {
         password: helpers.createHash(password),
         first_name: firstName.trim(),
         last_name: lastName.trim(),
-        role: UserRole.USER,
+        role: UserRoles.USER,
       });
       const accessToken = this.jwt.generateToken({
         role: create.role,

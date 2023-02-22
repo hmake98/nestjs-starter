@@ -6,11 +6,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../database/entities';
 import { Repository } from 'typeorm';
 import { helpers } from '../../utils/helpers';
+import { Queues } from '../../utils/common';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectQueue('notification') private notificationQueue: Queue,
+    @InjectQueue(Queues.notification) private notificationQueue: Queue,
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 

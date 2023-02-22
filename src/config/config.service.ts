@@ -17,8 +17,6 @@ export class ConfigService {
     aws_link_exp: null,
     redis_host: null,
     redis_port: null,
-    notification_queue: null,
-    email_queue: null,
     database_host: null,
     database_name: null,
     database_password: null,
@@ -40,8 +38,6 @@ export class ConfigService {
     this.appConfig.aws_link_exp = process.env.AWS_LINK_EXPIRES;
     this.appConfig.redis_host = process.env.REDIS_HOST;
     this.appConfig.redis_port = process.env.REDIS_PORT;
-    this.appConfig.notification_queue = process.env.NOTIFICATION_QUEUE;
-    this.appConfig.email_queue = process.env.EMAIL_QUEUE;
     this.appConfig.database_host = process.env.DATABASE_HOST;
     this.appConfig.database_user = process.env.DATABASE_USER;
     this.appConfig.database_password = process.env.DATABASE_PASSWORD;

@@ -1,27 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nestjs-starter
+  name: nestjs-server-deployment
+  labels:
+    app: server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nestjs-starter
+      app: server
   template:
     metadata:
       labels:
-        app: nestjs-starter
+        app: server
     spec:
       containers:
-        - name: nestjs-starter-server
+        - name: nestjs-server
           image: nestjs-starter_server:latest
           imagePullPolicy: Never
           ports:
             - containerPort: 3000
           resources:
             limits:
-              memory: "128Mi"
-              cpu: "500m"
+              memory: "256Mi"
+              cpu: "1000m"
           envFrom:
             - secretRef:
                 name: nestjs-secret

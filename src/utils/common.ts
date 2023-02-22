@@ -18,3 +18,8 @@ export const TEMPLATES = {
 };
 
 export const IS_PUBLIC_KEY = 'isPublic';
+
+export const Queues = {
+  email: 'email',
+  notification: 'notification',
+};

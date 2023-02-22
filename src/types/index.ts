@@ -44,7 +44,7 @@ export enum IStorage {
   POSTS = 'posts',
 }
 
-export enum UserRole {
+export enum UserRoles {
   ADMIN = 'admin',
   EDITOR = 'editor',
   USER = 'user',
@@ -73,6 +73,4 @@ export type AppConfig = {
   aws_source_email: string;
   redis_host: string;
   redis_port: string;
-  notification_queue: string;
-  email_queue: string;
 };

@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Post } from './post.entity';
-import { UserRole } from '../../types';
+import { UserRoles } from '../../types';
 import { Token } from './token.entity';
 import { Exclude } from 'class-transformer';
 
@@ -36,10 +36,10 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: UserRole,
-    default: UserRole.USER,
+    enum: UserRoles,
+    default: UserRoles.USER,
   })
-  role: UserRole;
+  role: UserRoles;
 
   @Column({ nullable: true })
   profile: string;

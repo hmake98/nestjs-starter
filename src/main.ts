@@ -27,6 +27,7 @@ function configureSwagger(app): void {
 async function bootstrap(): Promise<void> {
   const server = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
+    logger: false,
     bufferLogs: true,
     cors: true,
   });
