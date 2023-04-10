@@ -38,7 +38,7 @@
     "@nestjs/terminus": "^9.0.0",
     "@nestjs/throttler": "^3.1.0",
     "@nestjs/typeorm": "^9.0.1",
-    "aws-sdk": "^2.942.0",
+    "aws-sdk": "^2.1354.0",
     "bcrypt": "^5.0.1",
     "bull": "^3.29.3",
     "class-transformer": "^0.4.0",
@@ -68,7 +68,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.6",
     "swagger-ui-express": "^4.1.6",
-    "typeorm": "0.3.11",
+    "typeorm": "0.3.14",
     "typeorm-naming-strategies": "^4.1.0"
   },
   "devDependencies": {
