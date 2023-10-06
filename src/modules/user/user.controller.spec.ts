@@ -5,14 +5,22 @@ import { UserService } from './user.service';
 import { nanoid } from 'nanoid';
 import { BullModule } from '@nestjs/bull';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app.module';
+import { AppModule } from '../../app/app.module';
 import { TypeOrmModule, getDataSourceToken } from '@nestjs/typeorm';
-import { User } from '../../database/entities';
+import { User } from '../../common/database/entities';
 
 describe('UserController', () => {
   let userController: UserController;
   let userService: UserService;
   let connection: DataSource;
+  let userId: number;
+
+  const userData = {
+    firstName: 'John',
+    lastName: 'Smith',
+    email: `john_${nanoid()}@smith.com`,
+    password: 'password',
+  };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -42,5 +50,38 @@ describe('UserController', () => {
 
   it('service to be defined', () => {
     expect(userService).toBeDefined();
+  });
+
+  describe('signup', () => {
+    it('should return an access token with user data', async () => {
+      const spy = jest.spyOn(userService, 'signup');
+      const response = await userService.signup(userData);
+      userId = response.user.id;
+      expect(spy).toHaveBeenCalled();
+      expect(response.accessToken).toBeDefined();
+      expect(response.user).toBeDefined();
+    });
+  });
+
+  describe('login', () => {
+    it('should return an access token with user data', async () => {
+      const spy = jest.spyOn(userService, 'login');
+      const response = await userController.login({
+        email: userData.email,
+        password: userData.password,
+      });
+      expect(spy).toHaveBeenCalled();
+      expect(response.accessToken).toBeDefined();
+      expect(response.user).toBeDefined();
+    });
+  });
+
+  describe('me', () => {
+    it('should return authorized user data', async () => {
+      const spy = jest.spyOn(userService, 'me');
+      const response = await userController.me(userId);
+      expect(spy).toHaveBeenCalled();
+      expect(response.id).toBeDefined();
+    });
   });
 });

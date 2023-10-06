@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { CreatePostDto, GetPostsDto, UpdatePostDto } from './dto';
 import { PostService } from './post.service';
-import { CurrentUser } from '../../core';
+import { AuthUser } from 'src/core/decorators';
 
 @Controller('post')
 export class PostController {
@@ -18,7 +18,7 @@ export class PostController {
 
   @Post()
   public async createPost(
-    @CurrentUser() userId: number,
+    @AuthUser() userId: number,
     @Body() payload: CreatePostDto,
   ) {
     return this.postService.create(userId, payload);

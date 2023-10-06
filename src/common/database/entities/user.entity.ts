@@ -7,9 +7,14 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Post } from './post.entity';
-import { UserRoles } from '../../types';
 import { Token } from './token.entity';
 import { Exclude } from 'class-transformer';
+
+export enum UserRoles {
+  ADMIN = 'admin',
+  EDITOR = 'editor',
+  USER = 'user',
+}
 
 @Entity()
 export class User {

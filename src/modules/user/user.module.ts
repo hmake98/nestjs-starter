@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { BullModule } from '@nestjs/bull';
-import { User } from '../../database/entities';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../../common/database/entities';
+import { AuthModule } from 'src/common/auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     TypeOrmModule.forFeature([User]),
     BullModule.registerQueue({
       name: 'notification',

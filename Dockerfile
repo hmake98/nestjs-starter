@@ -1,23 +1,23 @@
-FROM node:14 AS builder
+FROM node:16 AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
-RUN npm run build
- 
-FROM node:14
+# RUN npm run build
 
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/dist ./dist
+# FROM node:16
+
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/package*.json ./
+# COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
 
-CMD [ "npm", "start" ]
+# CMD [ "npm", "start" ]
 
-# CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "dev" ]

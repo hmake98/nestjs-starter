@@ -1,47 +1,57 @@
 import 'reflect-metadata';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Logger,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { HttpExceptionFilter, ResponseInterceptor } from './core/interceptors';
-import { AppModule } from './app.module';
-import { Logger } from 'nestjs-pino';
-import { JwtAuthGuard, RolesGuard } from './core';
+import { AppModule } from './app/app.module';
+import { useContainer } from 'class-validator';
+import { ConfigService } from '@nestjs/config';
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import swaggerInit from './swagger';
 import rateLimit from 'express-rate-limit';
-
-const baseUrl = '/api';
-const port = process.env.PORT || 3000;
-
-function configureSwagger(app): void {
-  const config = new DocumentBuilder()
-    .setTitle('nestjs-starter')
-    .setVersion('1.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(baseUrl, app, document);
-}
 
 async function bootstrap(): Promise<void> {
   const server = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
-    logger: false,
-    bufferLogs: true,
     cors: true,
   });
+  const configService = app.get(ConfigService);
+  const host: string = configService.get<string>('app.http.host');
+  const port: number = configService.get<number>('app.http.port');
+  const globalPrefix: string = configService.get<string>('app.globalPrefix');
+  const versioningPrefix: string = configService.get<string>(
+    'app.versioning.prefix',
+  );
+  const version: string = configService.get<string>('app.versioning.version');
+  const versionEnable: string = configService.get<string>(
+    'app.versioning.enable',
+  );
+
   const logger = app.get(Logger);
   const moduleRef = app.select(AppModule);
   const reflector = moduleRef.get(Reflector);
+  app.setGlobalPrefix(globalPrefix);
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  if (versionEnable) {
+    app.enableVersioning({
+      type: VersioningType.URI,
+      defaultVersion: version,
+      prefix: versioningPrefix,
+    });
+  }
   app.useLogger(logger);
-  app.setGlobalPrefix(baseUrl);
   app.useGlobalInterceptors(
     new ResponseInterceptor(reflector),
     new ClassSerializerInterceptor(reflector),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -57,9 +67,8 @@ async function bootstrap(): Promise<void> {
   );
   app.use(morgan('combined'));
   app.use(helmet());
-  configureSwagger(app);
-  await app.init();
-  await app.listen(port);
+  swaggerInit(app);
+  await app.listen(port, host);
   logger.log(`Server running on ${await app.getUrl()}`);
 }
 

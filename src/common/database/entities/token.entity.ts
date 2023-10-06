@@ -1,4 +1,3 @@
-import { TokenStatus } from '../../types';
 import {
   Entity,
   Column,
@@ -8,6 +7,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+
+export enum TokenStatus {
+  ACTIVE = 'active',
+  ARCHIVE = 'archive',
+}
 
 @Entity()
 export class Token {

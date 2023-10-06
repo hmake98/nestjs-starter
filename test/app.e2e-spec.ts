@@ -2,8 +2,8 @@ import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
-import { AppModule } from '../src/app.module';
 import { nanoid } from 'nanoid';
+import { AppModule } from '../src/app/app.module';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
