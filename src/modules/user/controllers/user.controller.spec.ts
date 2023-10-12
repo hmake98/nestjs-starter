@@ -1,13 +1,13 @@
 import { Test } from '@nestjs/testing';
 import { UserController } from './user.controller';
-import { UserService } from './user.service';
+import { UserService } from '../services/user.service';
 
 import { nanoid } from 'nanoid';
 import { BullModule } from '@nestjs/bull';
 import { DataSource } from 'typeorm';
-import { AppModule } from '../../app/app.module';
+import { AppModule } from '../../../app/app.module';
 import { TypeOrmModule, getDataSourceToken } from '@nestjs/typeorm';
-import { User } from '../../common/database/entities';
+import { User } from '../../../common/database/entities';
 
 describe('UserController', () => {
   let userController: UserController;

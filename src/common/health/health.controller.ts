@@ -1,10 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
-import { Public } from '../../core/decorators/public-request.decorator';
 import {
   HealthCheck,
   HealthCheckService,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
+import { PublicRequest } from 'src/core/decorators/public-request.decorator';
 
 @Controller('health')
 export class HealthController {
@@ -15,7 +15,7 @@ export class HealthController {
 
   @Get()
   @HealthCheck()
-  @Public()
+  @PublicRequest()
   public async getHealth() {
     return this.healthCheckService.check([
       () => this.ormIndicator.pingCheck('database', { timeout: 1500 }),

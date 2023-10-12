@@ -1,15 +1,17 @@
 import { InjectQueue } from '@nestjs/bull';
 import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
 import { Queue } from 'bull';
-import { UserCreateDto, UserLoginDto, UserUpdateDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { helpers } from '../../utils/helpers';
-import { User } from '../../common/database/entities';
-import { AuthService } from '../../common/auth/auth.service';
+import { helpers } from '../../../utils/helpers';
+import { User } from '../../../common/database/entities';
+import { AuthService } from '../../../common/auth/services/auth.service';
 import { Queues } from 'src/utils/util';
 import { AuthResponse } from 'src/shared/interfaces/response.interface';
 import { UserRoles } from 'src/common/database/entities/user.entity';
+import { UserLoginDto } from '../dtos/login.dto';
+import { UserCreateDto } from '../dtos/signup.dto';
+import { UserUpdateDto } from '../dtos/user-update.dto';
 
 @Injectable()
 export class UserService {

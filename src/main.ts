@@ -7,14 +7,13 @@ import {
 } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { HttpExceptionFilter, ResponseInterceptor } from './core/interceptors';
 import { AppModule } from './app/app.module';
+import swaggerInit from './swagger';
 import { useContainer } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import swaggerInit from './swagger';
 import rateLimit from 'express-rate-limit';
 
 async function bootstrap(): Promise<void> {
@@ -47,11 +46,6 @@ async function bootstrap(): Promise<void> {
     });
   }
   app.useLogger(logger);
-  app.useGlobalInterceptors(
-    new ResponseInterceptor(reflector),
-    new ClassSerializerInterceptor(reflector),
-  );
-  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

@@ -1,19 +1,22 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import { UserCreateDto, UserLoginDto, UserUpdateDto } from './dto';
-import { UserService } from './user.service';
-import { AuthUser, Public } from 'src/core/decorators';
+import { UserService } from '../services/user.service';
+import { PublicRequest } from 'src/core/decorators/public-request.decorator';
+import { AuthUser } from 'src/core/decorators/auth-user.decorator';
+import { UserLoginDto } from '../dtos/login.dto';
+import { UserCreateDto } from '../dtos/signup.dto';
+import { UserUpdateDto } from '../dtos/user-update.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Public()
+  @PublicRequest()
   @Post('login')
   public login(@Body() payload: UserLoginDto) {
     return this.userService.login(payload);
   }
 
-  @Public()
+  @PublicRequest()
   @Post('signup')
   public signup(@Body() payload: UserCreateDto) {
     return this.userService.signup(payload);

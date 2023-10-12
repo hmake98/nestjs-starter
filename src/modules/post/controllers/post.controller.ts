@@ -8,9 +8,11 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { CreatePostDto, GetPostsDto, UpdatePostDto } from './dto';
-import { PostService } from './post.service';
-import { AuthUser } from 'src/core/decorators';
+import { PostService } from '../services/post.service';
+import { AuthUser } from 'src/core/decorators/auth-user.decorator';
+import { CreatePostDto } from '../dtos/create-post.dto';
+import { GetPostsDto } from '../dtos/get-post.dto';
+import { UpdatePostDto } from '../dtos/update-post.dto';
 
 @Controller('post')
 export class PostController {

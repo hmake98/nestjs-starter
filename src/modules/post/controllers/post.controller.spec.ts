@@ -1,11 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { PostController } from './post.controller';
-import { PostService } from './post.service';
+import { PostService } from '../services/post.service';
 
-import { AppModule } from '../../app/app.module';
+import { AppModule } from '../../../app/app.module';
 import { TypeOrmModule, getDataSourceToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { Post, User } from '../../common/database/entities';
+import { Post, User } from '../../../common/database/entities';
 
 describe('PostController', () => {
   let postController: PostController;
