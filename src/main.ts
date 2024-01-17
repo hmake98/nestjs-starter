@@ -1,10 +1,5 @@
 import 'reflect-metadata';
-import {
-  ClassSerializerInterceptor,
-  Logger,
-  ValidationPipe,
-  VersioningType,
-} from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app/app.module';
@@ -32,10 +27,7 @@ async function bootstrap(): Promise<void> {
   const versionEnable: string = configService.get<string>(
     'app.versioning.enable',
   );
-
   const logger = app.get(Logger);
-  const moduleRef = app.select(AppModule);
-  const reflector = moduleRef.get(Reflector);
   app.setGlobalPrefix(globalPrefix);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   if (versionEnable) {
@@ -63,7 +55,7 @@ async function bootstrap(): Promise<void> {
   app.use(helmet());
   swaggerInit(app);
   await app.listen(port, host);
-  logger.log(`Server running on ${await app.getUrl()}`);
+  logger.log(`Server is running on ${await app.getUrl()}`);
 }
 
 bootstrap();

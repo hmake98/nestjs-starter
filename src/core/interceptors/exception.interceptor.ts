@@ -4,30 +4,50 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
-import { getI18nContextFromRequest } from 'nestjs-i18n';
+import { Response } from 'express';
+import { I18nContext } from 'nestjs-i18n';
 
-@Catch(HttpException)
-export class HttpExceptionFilter implements ExceptionFilter {
+@Catch()
+export class GlobalExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(GlobalExceptionFilter.name);
+
   async catch(exception: HttpException, host: ArgumentsHost) {
     const context = host.switchToHttp();
-    const request = context.getRequest<Request>();
     const response = context.getResponse<Response>();
-    const i18n = getI18nContextFromRequest(request);
-    if (exception.getStatus() === 400) response.send(exception.getResponse());
+    const i18n = I18nContext.current(host);
+
     const statusCode =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    const message = exception?.message
-      ? await i18n.translate(`translation.${exception.message}`, {
-          lang: i18n.lang,
-        })
-      : 'Internal server error';
+    const message = await i18n.t(`translation.${exception.message}`);
+
+    if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
+      const error = {
+        stack: exception.stack,
+        message,
+        statusCode,
+      };
+      this.logger.error(JSON.stringify(error));
+    }
+
+    if (message?.split('.')[0] === 'translation') {
+      const message = exception.message || 'Internal server error';
+      response.status(statusCode).json({
+        statusCode,
+        message,
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+
     response.status(statusCode).json({
       statusCode,
       message,
+      timestamp: new Date().toISOString(),
     });
+    return;
   }
 }

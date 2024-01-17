@@ -5,24 +5,21 @@
   "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "prebuild": "rimraf build",
+    "prebuild": "rimraf dist",
+    "postinstall": "npm run generate",
     "build": "nest build",
-    "postinstall": "npx typesync",
-    "start": "node dist/main",
     "dev": "dotenv -e .env.local -- nest start --watch",
-    "console:dev": "dotenv -e .env.development -- ts-node -r tsconfig-paths/register src/console.ts",
-    "console:test": "dotenv -e .env.test -- ts-node -r tsconfig-paths/register src/console.ts",
-    "console:prod": "ts-node -r tsconfig-paths/register src/console.ts",
-    "lint:check": "eslint \"{src,test}/**/*.ts\"",
-    "lint:fix": "npm run lint:check -- --fix",
-    "prettier:write": "prettier --write ./**/*.{ts,js,json}",
-    "prettier:check": "prettier --check ./**/*.{ts,js,json}",
+    "debug": "nest start --debug --watch",
+    "generate": "prisma generate",
+    "start": "node dist/main",
+    "migrate": "dotenv -e .env.local -- prisma migrate dev",
+    "migrate:prod": "prisma migrate deploy",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "test": "jest",
-    "test:local": "dotenv -e .env.test -- jest",
-    "test:local-e2e": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "jest --config ./test/jest-e2e.json --forceExit",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -38,7 +35,6 @@
     "@nestjs/swagger": "^6.0.4",
     "@nestjs/terminus": "^9.0.0",
     "@nestjs/throttler": "^3.1.0",
-    "@nestjs/typeorm": "^9.0.1",
     "bcrypt": "^5.0.1",
     "bull": "^3.29.3",
     "class-transformer": "^0.4.0",
@@ -56,17 +52,16 @@
     "morgan": "^1.10.0",
     "nanoid": "^3.1.23",
     "nestjs-console": "^8.0.0",
-    "nestjs-i18n": "^9.1.5",
+    "nestjs-i18n": "^10.4.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.4.0",
+    "prisma": "^5.8.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.6",
-    "swagger-ui-express": "^4.1.6",
-    "typeorm": "0.3.11",
-    "typeorm-naming-strategies": "^4.1.0"
+    "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.7.2",
@@ -74,6 +69,7 @@
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^7.3.0",
     "@nestjs/testing": "^9.0.3",
+    "@prisma/client": "^5.8.1",
     "@types/bcrypt": "^10.0.28-alpha",
     "@types/bull": "^3.15.7",
     "@types/copyfiles": "^2.4.0",
@@ -120,6 +116,22 @@
     "tsconfig-paths": "^3.9.0",
     "typescript": "4.5.2"
   },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "useTabs": false,
+    "tabWidth": 2,
+    "overrides": [
+      {
+        "files": "*.yml",
+        "options": {
+          "tadWidth": 2,
+          "printWidth": 40,
+          "singleQuote": true
+        }
+      }
+    ]
+  },
   "jest": {
     "moduleFileExtensions": [
       "js",
@@ -149,6 +161,6 @@
   },
   "lint-staged": {
     "*.{js,ts}": "npm run lint:fix",
-    "*.{ts,js,json,md}": "npm run prettier:write"
+    "*.{ts,js,json,md}": "prettier --write"
   }
 }

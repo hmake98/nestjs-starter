@@ -1,16 +1,11 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { JwtAuthGuard } from './guards/auth.guard';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RolesGuard } from './guards/roles.guard';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
-import { HttpExceptionFilter } from './interceptors/exception.interceptor';
+import { GlobalExceptionFilter } from './interceptors/exception.interceptor';
 
 @Module({
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
@@ -20,8 +15,8 @@ import { HttpExceptionFilter } from './interceptors/exception.interceptor';
       useClass: ResponseInterceptor,
     },
     {
-      provide: APP_INTERCEPTOR,
-      useClass: HttpExceptionFilter,
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
     },
   ],
 })

@@ -1,4 +1,4 @@
-import { User } from '../../common/database/entities';
+import { User } from '@prisma/client';
 
 export interface ErrorResponse {
   status: boolean;

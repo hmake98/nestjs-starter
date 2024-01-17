@@ -1,17 +1,14 @@
+import configs from '../config';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import configs from '../config';
-import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
-import { DatabaseModule } from './database/database.module';
 import { TerminusModule } from '@nestjs/terminus';
+import { PrismaService } from './services/prisma.service';
 
 @Module({
-  controllers: [HealthController],
-  providers: [],
+  controllers: [],
   imports: [
     AuthModule,
-    DatabaseModule,
     TerminusModule,
     ConfigModule.forRoot({
       load: configs,
@@ -21,5 +18,6 @@ import { TerminusModule } from '@nestjs/terminus';
       expandVariables: true,
     }),
   ],
+  providers: [PrismaService],
 })
 export class CommonModule {}
