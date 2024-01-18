@@ -6,4 +6,9 @@ export class UpdatePostDto {
   @IsString()
   @IsOptional()
   public content: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  public title: string;
 }

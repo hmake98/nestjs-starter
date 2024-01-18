@@ -12,13 +12,5 @@ export class GetPostsDto {
 
   @ApiProperty()
   @IsString()
-  public sort_col: string;
-
-  @ApiProperty()
-  @IsString()
-  public sort_type: string;
-
-  @ApiProperty()
-  @IsString()
   public search: string;
 }

@@ -1,3 +1,6 @@
 dist
+.github
+.husky
+prisma
 node_modules
 commitlint.config.js

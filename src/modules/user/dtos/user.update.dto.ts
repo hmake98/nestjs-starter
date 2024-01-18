@@ -20,10 +20,5 @@ export class UserUpdateDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  public password: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
   public profile: string;
 }

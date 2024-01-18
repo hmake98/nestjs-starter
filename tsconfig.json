@@ -16,7 +16,8 @@
     "allowJs": false,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"]
   },
   "include": ["src", "test"],
   "exclude": ["node_modules", "dist", "*coverage"]

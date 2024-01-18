@@ -1,7 +1,7 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: 'tsconfig.eslint.json',
+    project: 'tsconfig.json',
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
@@ -21,11 +21,5 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-    'require-await': 'off',
-    '@typescript-eslint/require-await': 'off',
-    '@typescript-eslint/no-floating-promises': 'off',
-    '@typescript-eslint/no-empty-function': 'off',
   },
 };

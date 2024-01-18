@@ -11,19 +11,32 @@ datasource db {
 }
 
 model User {
-  id                Int       @id @default(autoincrement())
-  email             String    @unique
-  password          String?
-  first_name        String
-  last_name         String
-  is_verified       Boolean   @default(false)
-  phone             String?
-  role              Role      @default(USER)
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
-  deleted_at        DateTime?
-  is_deleted        Boolean?
-  profile           String?
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String?
+  first_name  String
+  last_name   String
+  is_verified Boolean   @default(false)
+  phone       String?
+  role        Role      @default(USER)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
+  is_deleted  Boolean?
+  avatar      String?
+  posts       Post[]
+}
+
+model Post {
+  id         String    @id @default(uuid())
+  title      String
+  content    String
+  author     User      @relation(fields: [author_id], references: [id])
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  is_deleted Boolean?
+  author_id  String
 }
 
 enum Role {

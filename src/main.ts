@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app/app.module';
 import swaggerInit from './swagger';

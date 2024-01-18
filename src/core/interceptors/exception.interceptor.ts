@@ -22,6 +22,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
+
     const message = await i18n.t(`translation.${exception.message}`);
 
     if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
@@ -48,6 +49,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message,
       timestamp: new Date().toISOString(),
     });
+
     return;
   }
 }

@@ -1,9 +1,9 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { Queues } from 'src/utils/util';
+import { Queues } from 'src/utils/constants';
 
-@Processor(Queues.notification)
+@Processor(Queues.Notification)
 export class NotificationConsumer {
   private logger = new Logger(NotificationConsumer.name);
   @Process()

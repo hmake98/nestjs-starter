@@ -1,82 +1,112 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
-import { Post, User } from '../../../common/database/entities';
-import { CreatePostDto } from '../dtos/create-post.dto';
-import { GetPostsDto } from '../dtos/get-post.dto';
-import { UpdatePostDto } from '../dtos/update-post.dto';
+import { CreatePostDto } from '../dtos/create.post.dto';
+import { GetPostsDto } from '../dtos/get.post.dto';
+import { UpdatePostDto } from '../dtos/update.post.dto';
+import { PrismaService } from 'src/shared/services/prisma.service';
+import { IPostService } from '../interfaces/post.service.interface';
 
 @Injectable()
-export class PostService {
-  constructor(
-    @InjectRepository(Post) private postRepository: Repository<Post>,
-    @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+export class PostService implements IPostService {
+  constructor(private readonly prismaService: PrismaService) {}
 
-  public async create(userId: number, data: CreatePostDto) {
+  async create(userId: string, data: CreatePostDto) {
     try {
-      const { content } = data;
-      const user = await this.userRepository.findOneBy({ id: userId });
+      const { content, title } = data;
+      const user = await this.prismaService.user.findUnique({
+        where: { id: userId },
+      });
       if (!user) {
         throw new HttpException('userNotFound', HttpStatus.NOT_FOUND);
       }
-      const post = new Post();
-      post.content = content.trim();
-      post.author = user;
-      return this.postRepository.save(post);
+      return this.prismaService.post.create({
+        data: {
+          content,
+          title,
+          author: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      });
     } catch (e) {
       throw new Error(e);
     }
   }
 
-  public async delete(id: number) {
+  async delete(id: string) {
     try {
-      const post = await this.postRepository.findOneBy({ id });
+      const post = await this.prismaService.post.findUnique({ where: { id } });
       if (!post) {
         throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
       }
-      const result = await this.postRepository.delete({ id });
-      return result.raw;
-    } catch (e) {
-      throw new Error(e);
-    }
-  }
-
-  public async getAll(params: GetPostsDto) {
-    try {
-      const { limit, page, search } = params;
-      const skip = (page - 1) * limit;
-      const [result, total] = await this.postRepository.findAndCount({
-        where: { content: ILike('%' + search + '%') },
-        order: { created_at: 'DESC' },
-        take: limit,
-        skip: skip,
-      });
+      await this.prismaService.post.delete({ where: { id } });
       return {
-        count: total,
-        data: result,
+        status: true,
+        message: 'Post is deleted',
       };
     } catch (e) {
       throw new Error(e);
     }
   }
 
-  public async update(id: number, data: UpdatePostDto) {
+  async getAll(params: GetPostsDto) {
     try {
-      const { content } = data;
-      const post = await this.postRepository.findOneBy({ id });
+      const { limit, page, search } = params;
+      const skip = (page - 1) * limit;
+      const count = await this.prismaService.post.count({
+        where: {
+          ...(search && {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+            content: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          }),
+        },
+      });
+      const data = await this.prismaService.post.findMany({
+        where: {
+          ...(search && {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+            content: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          }),
+        },
+        take: limit,
+        skip: skip,
+      });
+      return {
+        count,
+        data,
+      };
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  async update(id: string, data: UpdatePostDto) {
+    try {
+      const { content, title } = data;
+      const post = await this.prismaService.post.findUnique({ where: { id } });
       if (!post) {
         throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
       }
-      const result = await this.postRepository.update(
-        {
-          id,
-        },
-        {
+      return this.prismaService.post.update({
+        where: { id },
+        data: {
+          title,
           content,
         },
-      );
-      return result.raw;
+      });
     } catch (e) {
       throw new Error(e);
     }

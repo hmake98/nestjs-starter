@@ -2,14 +2,12 @@ import configs from '../config';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { TerminusModule } from '@nestjs/terminus';
-import { PrismaService } from './services/prisma.service';
+import { FilesModule } from './files/files.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   controllers: [],
   imports: [
-    AuthModule,
-    TerminusModule,
     ConfigModule.forRoot({
       load: configs,
       isGlobal: true,
@@ -17,7 +15,10 @@ import { PrismaService } from './services/prisma.service';
       envFilePath: ['.env'],
       expandVariables: true,
     }),
+    AuthModule,
+    FilesModule,
+    NotificationModule,
   ],
-  providers: [PrismaService],
+  providers: [],
 })
 export class CommonModule {}

@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { createCipheriv, randomBytes, createDecipheriv } from 'crypto';
 
 @Injectable()
-export class HelperService {
+export class EncryptionService {
   private iv: Buffer;
   private key: Buffer;
 

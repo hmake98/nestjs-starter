@@ -1,13 +1,11 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { Queues } from 'src/utils/util';
+import { Queues } from 'src/utils/constants';
 
-@Processor(Queues.email)
+@Processor(Queues.Email)
 export class EmailConsumer {
   private logger = new Logger(EmailConsumer.name);
-  constructor() {}
-
   @Process()
   async sender(job: Job<unknown>): Promise<void> {
     this.logger.log(job);
