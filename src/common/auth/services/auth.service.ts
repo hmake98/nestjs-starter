@@ -6,6 +6,7 @@ import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { EncryptionService } from 'src/common/helper/services/encryption.service';
 import { UserCreateDto } from '../dtos/signup.dto';
 import { Role } from '@prisma/client';
+import { AuthResponse } from 'src/common/helper/interfaces/response.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -15,7 +16,7 @@ export class AuthService implements IAuthService {
     private readonly encryptionService: EncryptionService,
   ) {}
 
-  async login(data: UserLoginDto) {
+  public async login(data: UserLoginDto): Promise<AuthResponse> {
     try {
       const { email, password } = data;
       const user = await this.prismaService.user.findUnique({
@@ -41,7 +42,7 @@ export class AuthService implements IAuthService {
     }
   }
 
-  async signup(data: UserCreateDto) {
+  public async signup(data: UserCreateDto): Promise<AuthResponse> {
     try {
       const { email, firstName, lastName, password } = data;
       const user = await this.prismaService.user.findUnique({

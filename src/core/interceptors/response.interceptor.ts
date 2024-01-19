@@ -7,16 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { firstValueFrom, of } from 'rxjs';
 import { Request } from 'express';
-
-const statusMessages = {
-  200: 'OK',
-  201: 'Created',
-  202: 'Accepted',
-  203: 'NonAuthoritativeInfo',
-  204: 'NoContent',
-  205: 'ResetContent',
-  206: 'PartialContent',
-};
+import { statusMessages } from 'src/app/app.constant';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {

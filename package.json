@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.425.0",
+    "@aws-sdk/client-sns": "^3.495.0",
     "@nestjs/bull": "^0.4.2",
     "@nestjs/common": "^9.0.3",
     "@nestjs/config": "^3.1.1",
