@@ -62,7 +62,7 @@ $ npm run console:dev db
 
 ## Swagger Documentation
 
-- Swagger documentation endpoint will be running at <b> `/api` </b>.
+- Swagger documentation endpoint will be running at <b> `/docs` </b>.
 
 ## K8s Deployment Local
 
