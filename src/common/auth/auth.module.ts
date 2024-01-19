@@ -4,14 +4,14 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './providers/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SharedModule } from 'src/shared/shared.module';
 import { AuthController } from './controllers/auth.controller';
+import { HelperModule } from '../helper/helper.module';
 
 @Module({
   controllers: [AuthController],
   imports: [
+    HelperModule,
     PassportModule,
-    SharedModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({

@@ -8,16 +8,22 @@ import { PostModule } from '../modules/post/post.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommonModule } from 'src/common/common.module';
 import { CoreModule } from 'src/core/core.module';
+import { AppController } from './app.controller';
+import { TerminusModule } from '@nestjs/terminus';
+import { HelperModule } from 'src/common/helper/helper.module';
 
 @Module({
+  controllers: [AppController],
   imports: [
+    TerminusModule,
     CoreModule,
     CommonModule,
+    HelperModule,
     ScheduleModule.forRoot(),
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
-        path: join(__dirname, '../i18n/'),
+        path: join(__dirname, '../languages/'),
         watch: true,
       },
       resolvers: [

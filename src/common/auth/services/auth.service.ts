@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { IAuthService } from '../interfaces/auth.service.interface';
 import { UserLoginDto } from '../dtos/login.dto';
-import { PrismaService } from 'src/shared/services/prisma.service';
-import { EncryptionService } from 'src/shared/services/encryption.service';
+import { PrismaService } from '../../../common/helper/services/prisma.service';
+import { EncryptionService } from 'src/common/helper/services/encryption.service';
 import { UserCreateDto } from '../dtos/signup.dto';
 import { Role } from '@prisma/client';
 

@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { EncryptionService } from './services/encryption.service';
 import { PrismaService } from './services/prisma.service';
 import { TaskService } from './services/task.service';
-import { NotificationConsumer } from './workers/notification.worker';
 import { EmailConsumer } from './workers/email.worker';
+import { NotificationConsumer } from './workers/notification.worker';
 
 @Module({
   imports: [],
@@ -11,15 +11,10 @@ import { EmailConsumer } from './workers/email.worker';
     EncryptionService,
     PrismaService,
     TaskService,
-    NotificationConsumer,
     EmailConsumer,
-  ],
-  exports: [
-    EncryptionService,
-    PrismaService,
-    TaskService,
     NotificationConsumer,
-    EmailConsumer,
   ],
+  controllers: [],
+  exports: [PrismaService, EncryptionService],
 })
-export class SharedModule {}
+export class HelperModule {}

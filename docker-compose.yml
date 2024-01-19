@@ -1,14 +1,13 @@
 version: '3.3'
 services:
   postgres:
-    image: kartoza/postgis:latest
+    image: postgres:latest
     ports:
       - '5432:5432'
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=master123
       - POSTGRES_DB=postgres
-      - POSTGRES_MULTIPLE_EXTENSIONS=postgis
     volumes:
       - pg_data:/var/lib/postgresql
     networks:
@@ -27,7 +26,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - '3000:3000'
     env_file:

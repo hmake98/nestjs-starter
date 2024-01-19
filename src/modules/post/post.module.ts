@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PostController } from './controllers/post.controller';
 import { PostService } from './services/post.service';
-import { SharedModule } from 'src/shared/shared.module';
+import { HelperModule } from 'src/common/helper/helper.module';
 
 @Module({
-  imports: [SharedModule],
+  imports: [HelperModule],
   controllers: [PostController],
   providers: [PostService],
 })

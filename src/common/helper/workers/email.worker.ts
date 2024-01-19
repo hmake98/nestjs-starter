@@ -1,7 +1,7 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { Queues } from 'src/utils/constants';
+import { Queues } from 'src/app/app.constant';
 
 @Processor(Queues.Email)
 export class EmailConsumer {

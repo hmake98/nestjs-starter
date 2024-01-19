@@ -8,10 +8,11 @@ import { AppModule } from '../src/app/app.module';
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let accessToken: string;
+
   const userData = {
     firstName: 'John',
     lastName: 'Smith',
-    email: `john_${nanoid()}@smith.com`,
+    email: `john_${nanoid()}@email.com`,
     password: 'password',
   };
 

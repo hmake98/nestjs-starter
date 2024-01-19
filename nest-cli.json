@@ -1,17 +1,7 @@
 {
-  "language": "ts",
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": [
-      {
-        "include": "i18n",
-        "outDir": "dist"
-      },
-      {
-        "include": "Procfile",
-        "outDir": "dist"
-      }
-    ]
+    "assets": [{ "include": "languages/**/*", "watchAssets": true }]
   }
 }

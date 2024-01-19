@@ -7,23 +7,27 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { I18nContext } from 'nestjs-i18n';
+import { I18nService } from 'nestjs-i18n';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionFilter.name);
 
+  constructor(private readonly i18nService: I18nService) {}
+
   async catch(exception: HttpException, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
-    const i18n = I18nContext.current(host);
 
     const statusCode =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message = await i18n.t(`translation.${exception.message}`);
+    const message = await this.i18nService.translate(
+      `translation.${exception.message}`,
+    );
+    console.log(message);
 
     if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
       const error = {

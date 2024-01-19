@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreatePostDto } from '../dtos/create.post.dto';
 import { GetPostsDto } from '../dtos/get.post.dto';
 import { UpdatePostDto } from '../dtos/update.post.dto';
-import { PrismaService } from 'src/shared/services/prisma.service';
+import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { IPostService } from '../interfaces/post.service.interface';
 
 @Injectable()

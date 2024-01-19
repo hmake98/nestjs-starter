@@ -8,10 +8,10 @@ import { useContainer } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
 import express from 'express';
 import helmet from 'helmet';
-import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 
 async function bootstrap(): Promise<void> {
+  const logger = new Logger();
   const server = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
     cors: true,
@@ -27,17 +27,7 @@ async function bootstrap(): Promise<void> {
   const versionEnable: string = configService.get<string>(
     'app.versioning.enable',
   );
-  const logger = app.get(Logger);
-  app.setGlobalPrefix(globalPrefix);
-  useContainer(app.select(AppModule), { fallbackOnErrors: true });
-  if (versionEnable) {
-    app.enableVersioning({
-      type: VersioningType.URI,
-      defaultVersion: version,
-      prefix: versioningPrefix,
-    });
-  }
-  app.useLogger(logger);
+  app.use(helmet());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -51,8 +41,15 @@ async function bootstrap(): Promise<void> {
       max: 100,
     }),
   );
-  app.use(morgan('combined'));
-  app.use(helmet());
+  app.setGlobalPrefix(globalPrefix);
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  if (versionEnable) {
+    app.enableVersioning({
+      type: VersioningType.URI,
+      defaultVersion: version,
+      prefix: versioningPrefix,
+    });
+  }
   swaggerInit(app);
   await app.listen(port, host);
   logger.log(`Server is running on ${await app.getUrl()}`);

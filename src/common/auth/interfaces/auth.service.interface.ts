@@ -1,4 +1,4 @@
-import { AuthResponse } from 'src/shared/interfaces/response.interface';
+import { AuthResponse } from 'src/common/helper/interfaces/response.interface';
 import { UserLoginDto } from '../dtos/login.dto';
 import { UserCreateDto } from '../dtos/signup.dto';
 

@@ -3,7 +3,7 @@ import { CreatePostDto } from '../dtos/create.post.dto';
 import {
   GetResponse,
   SuccessResponse,
-} from 'src/shared/interfaces/response.interface';
+} from 'src/common/helper/interfaces/response.interface';
 import { GetPostsDto } from '../dtos/get.post.dto';
 import { UpdatePostDto } from '../dtos/update.post.dto';
 
