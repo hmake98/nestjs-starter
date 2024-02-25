@@ -28,6 +28,7 @@
   "dependencies": {
     "@aws-sdk/client-ses": "^3.425.0",
     "@aws-sdk/client-sns": "^3.495.0",
+    "@nestjs-modules/mailer": "^1.11.0",
     "@nestjs/bull": "^0.4.2",
     "@nestjs/common": "^9.0.3",
     "@nestjs/config": "^3.1.1",
@@ -47,6 +48,7 @@
     "dotenv": "^9.0.2",
     "express-rate-limit": "^6.7.0",
     "firebase-admin": "^11.0.0",
+    "handlebars": "^4.7.8",
     "helmet": "^4.6.0",
     "ioredis": "^4.28.5",
     "jest-junit": "^15.0.0",
@@ -57,6 +59,7 @@
     "nanoid": "^3.1.23",
     "nestjs-console": "^8.0.0",
     "nestjs-i18n": "^10.2.6",
+    "nodemailer": "^6.9.10",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -113,7 +116,8 @@
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "webpack": "^5.90.3"
   },
   "prettier": {
     "singleQuote": true,

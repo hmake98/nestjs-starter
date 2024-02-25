@@ -15,7 +15,6 @@ export default async function (app: INestApplication) {
     .setTitle(docName)
     .setDescription(docDesc)
     .setVersion(docVersion)
-    .addTag("API's")
     .build();
 
   const document = SwaggerModule.createDocument(app, documentBuild, {

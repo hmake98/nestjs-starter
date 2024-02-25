@@ -18,7 +18,7 @@ $ npm install
 $ npm run dev
 
 # production
-$ npm run start
+$ npm start
 ```
 
 ## Running services on Docker

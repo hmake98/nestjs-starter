@@ -23,14 +23,29 @@ model User {
   updated_at  DateTime  @updatedAt
   deleted_at  DateTime?
   is_deleted  Boolean?
-  avatar      String?
+  avatar      Files?    @relation(fields: [avatar_id], references: [id])
   posts       Post[]
+  avatar_id   String?
+}
+
+model Files {
+  id         String    @id @default(uuid())
+  file_name  String
+  link       String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  is_deleted Boolean?
+  users      User[]
+  post       Post?     @relation(fields: [post_id], references: [id])
+  post_id    String?
 }
 
 model Post {
   id         String    @id @default(uuid())
   title      String
   content    String
+  photos     Files[]
   author     User      @relation(fields: [author_id], references: [id])
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
