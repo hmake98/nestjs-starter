@@ -36,7 +36,7 @@ import { HelperModule } from 'src/common/helper/helper.module';
       useFactory: async (configService: ConfigService) => ({
         redis: {
           host: configService.get('redis.host'),
-          port: +configService.get('redis.port'),
+          port: Number(configService.get('redis.port')),
         },
       }),
       inject: [ConfigService],

@@ -4,7 +4,10 @@ import { AuthService } from '../services/auth.service';
 import { UserLoginDto } from '../dtos/login.dto';
 import { UserCreateDto } from '../dtos/signup.dto';
 
-@Controller()
+@Controller({
+  version: '1',
+  path: '/auth',
+})
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

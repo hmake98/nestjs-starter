@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
 import { UserUpdateDto } from '../dtos/user.update.dto';
-import { PrismaService } from 'src/common/helper/services/prisma.service';
+import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { IUserService } from '../interfaces/user.service.interface';
 
 @Injectable()
@@ -24,7 +24,12 @@ export class UserService implements IUserService {
           email: email.trim(),
           first_name: firstName.trim(),
           last_name: lastName.trim(),
-          avatar: profile,
+          avatar: {
+            create: {
+              file_name: `${Date.now()}`,
+              link: profile,
+            },
+          },
         },
       });
       return result;

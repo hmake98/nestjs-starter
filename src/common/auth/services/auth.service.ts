@@ -3,10 +3,13 @@ import { JwtService } from '@nestjs/jwt';
 import { IAuthService } from '../interfaces/auth.service.interface';
 import { UserLoginDto } from '../dtos/login.dto';
 import { PrismaService } from '../../../common/helper/services/prisma.service';
-import { EncryptionService } from 'src/common/helper/services/encryption.service';
+import { EncryptionService } from '../../../common/helper/services/encryption.service';
 import { UserCreateDto } from '../dtos/signup.dto';
 import { Role } from '@prisma/client';
-import { AuthResponse } from 'src/common/helper/interfaces/response.interface';
+import { AuthResponse } from '../../../common/helper/interfaces/response.interface';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
+import { Queues } from '../../../app/app.constant';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -14,6 +17,7 @@ export class AuthService implements IAuthService {
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
     private readonly encryptionService: EncryptionService,
+    @InjectQueue(Queues.WelcomeEmail) private welcomeQueue: Queue,
   ) {}
 
   public async login(data: UserLoginDto): Promise<AuthResponse> {
@@ -38,7 +42,7 @@ export class AuthService implements IAuthService {
         user,
       };
     } catch (e) {
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -60,6 +64,7 @@ export class AuthService implements IAuthService {
           role: Role.USER,
         },
       });
+      this.welcomeQueue.add({ firstName, lastName, email }, { delay: 15000 });
       const accessToken = this.jwtService.sign({
         role: create.role,
         userId: create.id,
@@ -69,7 +74,7 @@ export class AuthService implements IAuthService {
         user: create,
       };
     } catch (e) {
-      throw new Error(e);
+      throw e;
     }
   }
 }

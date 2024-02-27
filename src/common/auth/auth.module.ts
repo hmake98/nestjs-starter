@@ -6,12 +6,17 @@ import { JwtStrategy } from './providers/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './controllers/auth.controller';
 import { HelperModule } from '../helper/helper.module';
+import { BullModule } from '@nestjs/bull';
+import { Queues } from 'src/app/app.constant';
 
 @Module({
   controllers: [AuthController],
   imports: [
     HelperModule,
     PassportModule,
+    BullModule.registerQueue({
+      name: Queues.WelcomeEmail,
+    }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({

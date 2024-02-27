@@ -25,9 +25,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const message = await this.i18nService.translate(
-      `translation.${exception.message}`,
+      `translations.${exception.message}`,
     );
-    console.log(message);
 
     if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
       const error = {

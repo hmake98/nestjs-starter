@@ -4,6 +4,7 @@ export default registerAs(
   'app',
   (): Record<string, any> => ({
     env: process.env.APP_ENV ?? 'development',
+    name: process.env.APP_NAME ?? 'nestjs-starter',
     versioning: {
       enable: process.env.HTTP_VERSIONING_ENABLE === 'true' ?? false,
       prefix: 'v',

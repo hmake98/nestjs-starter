@@ -1,5 +1,5 @@
 export const Queues = {
-  Email: 'email',
+  WelcomeEmail: 'welcome_email',
   Notification: 'notification',
 };
 

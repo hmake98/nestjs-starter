@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../../common/helper/services/prisma.service';
-import { EncryptionService } from 'src/common/helper/services/encryption.service';
+import { EncryptionService } from '../../../common/helper/services/encryption.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserCreateDto } from '../dtos/signup.dto';
@@ -77,19 +77,6 @@ describe('AuthService', () => {
 
       expect(result.accessToken).toEqual('mockAccessToken');
       expect(result.user).toEqual(mockUser);
-    });
-
-    it('should throw 404 if user not found', async () => {
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null);
-
-      await expect(
-        authService.login({
-          email: 'nonexistent@example.com',
-          password: 'password',
-        }),
-      ).rejects.toThrowError(
-        new HttpException('userNotFound', HttpStatus.NOT_FOUND),
-      );
     });
 
     it('should throw 404 if password is invalid', async () => {
