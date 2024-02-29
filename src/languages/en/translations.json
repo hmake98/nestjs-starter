@@ -2,5 +2,6 @@
   "userNotFound": "User not found.",
   "userExists": "User already exists.",
   "invalidPassword": "Password is invalid.",
-  "postNotFound": "Post not found."
+  "postNotFound": "Post not found.",
+  "fileNotFound": "File not found."
 }
