@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { FileModuleType } from '../interfaces/files.interface';
+import { FileMimeType, FileModuleType } from 'src/app/app.enum';
 
 export class GetPresignDto {
   @ApiProperty()
@@ -10,8 +10,15 @@ export class GetPresignDto {
 
   @ApiProperty()
   @IsEnum(FileModuleType, {
-    message: '[Profile, Posts] enum type is required',
+    message: '[Profile, Posts] should be enum',
   })
-  @IsNotEmpty({ message: 'type is required.' })
-  type: FileModuleType;
+  @IsNotEmpty({ message: 'store type is required.' })
+  storeType: FileModuleType;
+
+  @ApiProperty()
+  @IsEnum(FileMimeType, {
+    message: ' type is required',
+  })
+  @IsNotEmpty({ message: 'store type is required.' })
+  mimeType: FileMimeType;
 }

@@ -1,13 +1,16 @@
 import { GetPresignDto } from '../dtos/get.presign.dto';
-import { FilesResponseInterface } from './files.interface';
+import {
+  IFilePresignGetResponse,
+  IFilesPresignPutResponse,
+} from './files.interface';
 
 export interface IFilesServiceInterface {
   getPresignGetObject(
     fileId: string,
     userId: string,
-  ): Promise<FilesResponseInterface>;
+  ): Promise<IFilePresignGetResponse>;
   getPresginPutObject(
     file: GetPresignDto,
     userId: string,
-  ): Promise<FilesResponseInterface>;
+  ): Promise<IFilesPresignPutResponse>;
 }

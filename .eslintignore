@@ -1,6 +1,6 @@
-dist
-.github
-.husky
-prisma
-node_modules
+dist/*
+coverage/*
+node_modules/*
+.husky/*
+.github/*
 commitlint.config.js

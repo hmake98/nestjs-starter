@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { ConfigService } from '@nestjs/config';
-import { IAwsSNSService } from '../interfaces/aws.sns.service.interface';
+import { ITextMessageService } from '../interfaces/text-message.service.interface';
 
 @Injectable()
-export class AwsSNSService implements IAwsSNSService {
+export class TextMessageService implements ITextMessageService {
   private readonly snsClient: SNSClient;
 
   constructor(private readonly configService: ConfigService) {

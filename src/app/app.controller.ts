@@ -1,7 +1,7 @@
 import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 import { PrismaService } from 'src/common/helper/services/prisma.service';
-import { Public } from 'src/core/decorators/public.request.decorator';
+import { PublicRoute } from 'src/core/decorators/public.request.decorator';
 
 @Controller({
   version: VERSION_NEUTRAL,
@@ -15,7 +15,7 @@ export class AppController {
 
   @Get('/health')
   @HealthCheck()
-  @Public()
+  @PublicRoute()
   public async getHealth() {
     return this.healthCheckService.check([
       () => this.prismaService.isHealthy(),

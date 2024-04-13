@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
   id          String    @id @default(uuid())
   email       String    @unique
   password    String?
@@ -18,13 +18,13 @@ model User {
   last_name   String
   is_verified Boolean   @default(false)
   phone       String?
-  role        Role      @default(USER)
+  role        Roles     @default(USER)
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
   deleted_at  DateTime?
   is_deleted  Boolean?
   avatar      Files?    @relation(fields: [avatar_id], references: [id])
-  posts       Post[]
+  posts       Posts[]
   avatar_id   String?
 }
 
@@ -36,17 +36,17 @@ model Files {
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
   is_deleted Boolean?
-  users      User[]
-  post       Post?     @relation(fields: [post_id], references: [id])
+  users      Users[]
+  post       Posts?    @relation(fields: [post_id], references: [id])
   post_id    String?
 }
 
-model Post {
+model Posts {
   id         String    @id @default(uuid())
   title      String
   content    String
   photos     Files[]
-  author     User      @relation(fields: [author_id], references: [id])
+  author     Users     @relation(fields: [author_id], references: [id])
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
@@ -54,7 +54,7 @@ model Post {
   author_id  String
 }
 
-enum Role {
+enum Roles {
   USER
   ADMIN
 }

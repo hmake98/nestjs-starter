@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { Public } from 'src/core/decorators/public.request.decorator';
+import { PublicRoute } from 'src/core/decorators/public.request.decorator';
 import { AuthService } from '../services/auth.service';
-import { UserLoginDto } from '../dtos/login.dto';
-import { UserCreateDto } from '../dtos/signup.dto';
+import { UserLoginDto } from '../dtos/auth.login.dto';
+import { UserCreateDto } from '../dtos/auth.signup.dto';
 
 @Controller({
   version: '1',
@@ -11,13 +11,13 @@ import { UserCreateDto } from '../dtos/signup.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
+  @PublicRoute()
   @Post('login')
   public login(@Body() payload: UserLoginDto) {
     return this.authService.login(payload);
   }
 
-  @Public()
+  @PublicRoute()
   @Post('signup')
   public signup(@Body() payload: UserCreateDto) {
     return this.authService.signup(payload);

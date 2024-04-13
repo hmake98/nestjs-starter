@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { NotificationModule } from './notification/notification.module';
+import { HelperModule } from './helper/helper.module';
 
 @Module({
   controllers: [],
@@ -18,6 +19,7 @@ import { NotificationModule } from './notification/notification.module';
     AuthModule,
     FilesModule,
     NotificationModule,
+    HelperModule,
   ],
   providers: [],
 })

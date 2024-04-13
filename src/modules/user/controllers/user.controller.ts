@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Put } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { AuthUser } from 'src/core/decorators/auth.user.decorator';
 import { UserUpdateDto } from '../dtos/user.update.dto';
@@ -7,9 +7,9 @@ import { UserUpdateDto } from '../dtos/user.update.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('me')
-  public me(@AuthUser() userId: string) {
-    return this.userService.me(userId);
+  @Get('profile')
+  public getProfile(@AuthUser() userId: string) {
+    return this.userService.getProfile(userId);
   }
 
   @Put(':id')

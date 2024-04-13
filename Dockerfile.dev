@@ -1,16 +1,15 @@
-FROM node:18 AS builder
+FROM node:18.18.0 AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json ./
+COPY yarn.lock ./
 COPY prisma ./prisma/
 
-RUN npm config set legacy-peer-deps true
-
-RUN npm install
+RUN yarn install --frozen-lockfile
 
 COPY . .
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "dev" ]
+CMD [ "yarn", "dev" ]

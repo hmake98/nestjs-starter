@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { Users } from '@prisma/client';
 
 export interface ErrorResponse {
   status: boolean;
@@ -18,5 +18,5 @@ export interface SuccessResponse {
 
 export interface AuthResponse {
   accessToken: string;
-  user: User;
+  user: Users;
 }

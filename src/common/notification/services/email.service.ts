@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import {
-  EmailPayload,
-  IEmailService,
-} from '../interfaces/mailer.service.interface';
+import { EmailPayload } from '../interfaces/email.interface';
 import { MailerService } from '@nestjs-modules/mailer';
+import { IEmailService } from '../interfaces/email.service.interface';
 
 @Injectable()
 export class EmailService implements IEmailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendEmail({ emails, subject, template, data }: EmailPayload) {
+  async sendEmail({
+    emails,
+    subject,
+    template,
+    data,
+  }: EmailPayload): Promise<any> {
     try {
       const response = await this.mailerService.sendMail({
         to: emails,

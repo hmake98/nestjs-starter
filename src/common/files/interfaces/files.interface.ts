@@ -1,11 +1,11 @@
 import { Files } from '@prisma/client';
 
-export interface FilesResponseInterface {
+export interface IFilesPresignPutResponse {
   url: string;
-  file: Files;
+  expiresIn: string;
 }
 
-export enum FileModuleType {
-  user_profile = 'Profile',
-  post_picture = 'Posts',
+export interface IFilePresignGetResponse {
+  file: Files;
+  url: string;
 }

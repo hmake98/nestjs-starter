@@ -6,18 +6,23 @@ phases:
       nodejs: 18
   pre_build:
     commands:
-      - npm install
-      - npm test
+      - yarn install --frozen-lockfile
   build:
     commands:
-      - npm run build
+      - yarn build
+
 artifacts:
   files:
-    - "**/*"
+    - '**/*'
   discard-paths: no
+
 reports:
   jest_reports:
     files:
-      - "junit.xml"
+      - 'junit.xml'
     file-format: JUNITXML
-    base-directory: "."
+    base-directory: '.'
+
+cache:
+  paths:
+    - node_modules

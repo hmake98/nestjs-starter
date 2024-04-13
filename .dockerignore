@@ -1,5 +1,7 @@
 Dockerfile
+Dockerfile.dev
 .dockerignore
 node_modules
 npm-debug.log
 dist
+junit.xml

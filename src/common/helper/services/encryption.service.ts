@@ -1,9 +1,11 @@
 import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
-import { createCipheriv, randomBytes, createDecipheriv } from 'crypto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import { IEncryptionService } from '../interfaces/encryption.service.interface';
+import { IEncryptDataPayload } from '../interfaces/encryption.interface';
 
 @Injectable()
-export class EncryptionService {
+export class EncryptionService implements IEncryptionService {
   private iv: Buffer;
   private key: Buffer;
 
@@ -12,28 +14,27 @@ export class EncryptionService {
     this.key = randomBytes(32);
   }
 
-  createHash(password: string) {
-    const salt = bcrypt.genSaltSync();
-    return bcrypt.hashSync(password, salt);
+  createHash(password: string): string {
+    return bcrypt.hashSync(password, 10);
   }
 
-  match(hash: string, password: string) {
+  match(hash: string, password: string): boolean {
     return bcrypt.compareSync(password, hash);
   }
 
-  async encrypt(text: string): Promise<{ iv: string; encryptedData: string }> {
+  encrypt(text: string): IEncryptDataPayload {
     const cipher = createCipheriv('aes-256-ctr', this.key, this.iv);
     const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
     return {
       iv: this.iv.toString('hex'),
-      encryptedData: encrypted.toString('hex'),
+      data: encrypted.toString('hex'),
     };
   }
 
-  decrypt(data: { iv: string; encryptedData: string }): string {
-    const iv = Buffer.from(data.iv, 'hex');
-    const encryptedText = Buffer.from(data.encryptedData, 'hex');
-    const decipher = createDecipheriv('aes-256-ctr', Buffer.from(this.key), iv);
+  decrypt({ data, iv }: IEncryptDataPayload): string {
+    const _iv = Buffer.from(iv, 'hex');
+    const encryptedText = Buffer.from(data, 'hex');
+    const decipher = createDecipheriv('aes-256-ctr', this.key, _iv);
     const decrypted = Buffer.concat([
       decipher.update(encryptedText),
       decipher.final(),

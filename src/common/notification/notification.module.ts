@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { join } from 'path';
 import { EmailService } from './services/email.service';
-import { FirebaseService } from './services/firebase.service';
 import { NotificationController } from './controllers/notification.controller';
-import { AwsSNSService } from './services/aws.sns.service';
+import { TextMessageService } from './services/text-message.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -30,7 +29,7 @@ import * as aws from '@aws-sdk/client-ses';
         }).transporter,
         defaults: {
           from: `${configService.get('app.name')} ${configService.get<string>(
-            'aws.sourceEmail',
+            'aws.ses.sourceEmail',
           )}`,
         },
         template: {
@@ -44,6 +43,6 @@ import * as aws from '@aws-sdk/client-ses';
       inject: [ConfigService],
     }),
   ],
-  providers: [EmailService, FirebaseService, AwsSNSService],
+  providers: [EmailService, TextMessageService],
 })
 export class NotificationModule {}

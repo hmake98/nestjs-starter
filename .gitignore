@@ -1,11 +1,15 @@
+# Directories
 .idea/
 node_modules/
 dist/
 tmp/
 temp/
+
+# Files
 junit.xml
 .env.development
 .env.stage
 .env.prod
 .env.test
 .env
+yarn-error.log

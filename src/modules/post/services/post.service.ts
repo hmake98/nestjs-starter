@@ -12,13 +12,13 @@ export class PostService implements IPostService {
   async create(userId: string, data: CreatePostDto) {
     try {
       const { content, title } = data;
-      const user = await this.prismaService.user.findUnique({
+      const user = await this.prismaService.users.findUnique({
         where: { id: userId },
       });
       if (!user) {
         throw new HttpException('userNotFound', HttpStatus.NOT_FOUND);
       }
-      return this.prismaService.post.create({
+      return this.prismaService.posts.create({
         data: {
           content,
           title,
@@ -30,23 +30,23 @@ export class PostService implements IPostService {
         },
       });
     } catch (e) {
-      throw new Error(e);
+      throw e;
     }
   }
 
   async delete(id: string) {
     try {
-      const post = await this.prismaService.post.findUnique({ where: { id } });
+      const post = await this.prismaService.posts.findUnique({ where: { id } });
       if (!post) {
         throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
       }
-      await this.prismaService.post.delete({ where: { id } });
+      await this.prismaService.posts.delete({ where: { id } });
       return {
         status: true,
         message: 'Post is deleted',
       };
     } catch (e) {
-      throw new Error(e);
+      throw e;
     }
   }
 
@@ -54,7 +54,7 @@ export class PostService implements IPostService {
     try {
       const { limit, page, search } = params;
       const skip = (page - 1) * limit;
-      const count = await this.prismaService.post.count({
+      const count = await this.prismaService.posts.count({
         where: {
           ...(search && {
             title: {
@@ -68,7 +68,7 @@ export class PostService implements IPostService {
           }),
         },
       });
-      const data = await this.prismaService.post.findMany({
+      const data = await this.prismaService.posts.findMany({
         where: {
           ...(search && {
             title: {
@@ -89,18 +89,18 @@ export class PostService implements IPostService {
         data,
       };
     } catch (e) {
-      throw new Error(e);
+      throw e;
     }
   }
 
   async update(id: string, data: UpdatePostDto) {
     try {
       const { content, title } = data;
-      const post = await this.prismaService.post.findUnique({ where: { id } });
+      const post = await this.prismaService.posts.findUnique({ where: { id } });
       if (!post) {
         throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
       }
-      return this.prismaService.post.update({
+      return this.prismaService.posts.update({
         where: { id },
         data: {
           title,
@@ -108,7 +108,7 @@ export class PostService implements IPostService {
         },
       });
     } catch (e) {
-      throw new Error(e);
+      throw e;
     }
   }
 }

@@ -15,7 +15,7 @@ import { Queues } from 'src/app/app.constant';
     HelperModule,
     PassportModule,
     BullModule.registerQueue({
-      name: Queues.WelcomeEmail,
+      name: Queues.EMAIL,
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

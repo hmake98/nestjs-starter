@@ -1,14 +1,14 @@
 import 'reflect-metadata';
+import express from 'express';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import swaggerInit from './swagger';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app/app.module';
-import swaggerInit from './swagger';
 import { useContainer } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
-import express from 'express';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 
 async function bootstrap(): Promise<void> {
   const logger = new Logger();

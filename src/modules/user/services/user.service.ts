@@ -2,21 +2,22 @@ import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
 import { UserUpdateDto } from '../dtos/user.update.dto';
 import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { IUserService } from '../interfaces/user.service.interface';
+import { Users } from '@prisma/client';
 
 @Injectable()
 export class UserService implements IUserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async updateUser(userId: string, data: UserUpdateDto) {
+  async updateUser(userId: string, data: UserUpdateDto): Promise<Users> {
     try {
       const { email, firstName, lastName, profile } = data;
-      const user = await this.prismaService.user.findUnique({
+      const user = await this.prismaService.users.findUnique({
         where: { id: userId },
       });
       if (!user) {
         throw new HttpException('userNotFound', HttpStatus.NOT_FOUND);
       }
-      const result = await this.prismaService.user.update({
+      return this.prismaService.users.update({
         where: {
           id: userId,
         },
@@ -26,20 +27,19 @@ export class UserService implements IUserService {
           last_name: lastName.trim(),
           avatar: {
             create: {
-              file_name: `${Date.now()}`,
+              file_name: `avatar_${Date.now()}`,
               link: profile,
             },
           },
         },
       });
-      return result;
     } catch (e) {
       throw e;
     }
   }
 
-  async me(id: string) {
-    return this.prismaService.user.findUnique({
+  async getProfile(id: string): Promise<Users> {
+    return this.prismaService.users.findUnique({
       where: {
         id,
       },

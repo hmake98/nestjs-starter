@@ -6,8 +6,14 @@ export default registerAs(
     accessKey: process.env.AWS_ACCESS_KEY,
     secretKey: process.env.AWS_SECRET_KEY,
     region: process.env.AWS_REGION,
-    linkExpire: process.env.AWS_LINK_EXPIRES,
-    sourceEmail: process.env.SOURCE_EMAIL,
-    bucket: process.env.AWS_BUCKET,
+
+    s3: {
+      linkExpire: process.env.AWS_PRESIGN_LINK_EXPIRES,
+      bucket: process.env.AWS_BUCKET,
+    },
+
+    ses: {
+      sourceEmail: process.env.SOURCE_EMAIL,
+    },
   }),
 );

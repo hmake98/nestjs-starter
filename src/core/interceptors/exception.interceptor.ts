@@ -15,7 +15,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
   constructor(private readonly i18nService: I18nService) {}
 
-  async catch(exception: HttpException, host: ArgumentsHost) {
+  catch(exception: HttpException, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
 
@@ -24,7 +24,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message = await this.i18nService.translate(
+    const message = this.i18nService.translate(
       `translations.${exception.message}`,
     );
 
