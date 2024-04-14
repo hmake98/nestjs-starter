@@ -1,63 +1,50 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# NestJS Starter Boilerplate
 
 ## Installation
 
 ```bash
-$ npm install
+$ yarn
 ```
 
-## Running the Server
+## Running Server
 
 ```bash
 # development
-$ npm run dev
+$ yarn dev
 
 # production
-$ npm start
+$ yarn start
 ```
 
-## Running services on Docker
+## Running all services on Docker
 
 ```bash
+docker-compose up --build
+```
 
-docker-compose up
+## Run only database and redis services on Docker
+
+```bash
+docker-compose up postgres redis
 ```
 
 ## Build
 
 ```bash
-npm run build
+yarn build
 ```
 
 ## Tests
 
 ```bash
 # unit tests
-$ npm run test
+$ yarn test
 
 # e2e tests
-$ npm run test:e2e
+$ yarn test:e2e
 
 # test coverage
-$ npm run test:cov
-
-# run tests in local
-$ npm run test:local
-
-# run e2e tests in local
-$ npm run test:local-e2e
-```
-
-## Run Database commands using Nesjs Console
-
-```bash
-# will list down all commands related with database.
-$ npm run console:dev db
+$ yarn test:cov
 ```
 
 ## Swagger Documentation
@@ -84,3 +71,10 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+## Author
+
+🇮🇳 Harsh Makwana <br>
+[Github](https://github.com/hmake98/nestjs-starter)
+[Linkedin](https://www.linkedin.com/in/hmake98)
+[Instagram](https://www.instagram.com/hmake98)
