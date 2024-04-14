@@ -1,4 +1,4 @@
-# NestJS Starter Boilerplate
+# NestJS Starter Boilerplate [![CodeQL](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql)
 
 ## Installation
 
