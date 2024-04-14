@@ -2760,10 +2760,17 @@
     pg-protocol "*"
     pg-types "^4.0.1"
 
-"@types/prettier@^2.0.0", "@types/prettier@^2.7.3":
+"@types/prettier@^2.0.0":
   version "2.7.3"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.7.3.tgz#3e51a17e291d01d17d3fc61422015a933af7a08f"
   integrity sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==
+
+"@types/prettier@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-3.0.0.tgz#e9bc8160230d3a461dab5c5b41cceef1ef723057"
+  integrity sha512-mFMBfMOz8QxhYVbuINtswBp9VL2b4Y0QqYHwqLz3YbgtfAcat2Dl6Y1o4e22S/OVE6Ebl9m7wWiMT2lSbAs1wA==
+  dependencies:
+    prettier "*"
 
 "@types/pretty-quick@^3.1.6":
   version "3.1.6"
@@ -8193,7 +8200,7 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^3.2.5:
+prettier@*, prettier@^3.2.5:
   version "3.2.5"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.2.5.tgz#e52bc3090586e824964a8813b09aba6233b28368"
   integrity sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==
