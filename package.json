@@ -99,7 +99,7 @@
     "@types/pg": "^8.11.5",
     "@types/prettier": "^2.7.3",
     "@types/pretty-quick": "^3.1.6",
-    "@types/rimraf": "^3.0.2",
+    "@types/rimraf": "^4.0.5",
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.6",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
