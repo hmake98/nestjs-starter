@@ -1,4 +1,4 @@
-export const Queues = {
+export const BullQueues = {
   EMAIL: 'EMAIL',
 };
 

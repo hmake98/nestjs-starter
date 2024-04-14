@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 import { UserCreateDto } from '../dtos/auth.signup.dto';
 import { Roles } from '@prisma/client';
 import { BullModule } from '@nestjs/bull';
-import { Queues } from '../../../app/app.constant';
+import { BullQueues } from '../../../app/app.constant';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -32,7 +32,7 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         BullModule.registerQueue({
-          name: Queues.EMAIL,
+          name: BullQueues.EMAIL,
         }),
       ],
       providers: [

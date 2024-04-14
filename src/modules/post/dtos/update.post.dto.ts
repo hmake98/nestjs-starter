@@ -1,14 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { CreatePostDto } from './create.post.dto';
 
-export class UpdatePostDto {
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  public content: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  public title: string;
-}
+export class UpdatePostDto extends CreatePostDto {}

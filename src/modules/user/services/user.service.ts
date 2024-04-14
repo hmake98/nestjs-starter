@@ -3,6 +3,7 @@ import { UserUpdateDto } from '../dtos/user.update.dto';
 import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { IUserService } from '../interfaces/user.service.interface';
 import { Users } from '@prisma/client';
+import { FileMimeType } from 'src/app/app.enum';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -29,6 +30,7 @@ export class UserService implements IUserService {
             create: {
               file_name: `avatar_${Date.now()}`,
               link: profile,
+              type: FileMimeType.JPEG,
             },
           },
         },
@@ -36,6 +38,18 @@ export class UserService implements IUserService {
     } catch (e) {
       throw e;
     }
+  }
+
+  async deleteUser(userId: string): Promise<Users> {
+    return this.prismaService.users.update({
+      data: {
+        is_deleted: true,
+        deleted_at: new Date(),
+      },
+      where: {
+        id: userId,
+      },
+    });
   }
 
   async getProfile(id: string): Promise<Users> {

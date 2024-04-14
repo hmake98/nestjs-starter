@@ -34,6 +34,7 @@
     "@aws-sdk/client-ses": "^3.554.0",
     "@aws-sdk/client-sns": "^3.554.0",
     "@aws-sdk/s3-request-presigner": "^3.554.0",
+    "@faker-js/faker": "^8.4.1",
     "@nestjs-modules/mailer": "^1.11.2",
     "@nestjs/bull": "^10.1.1",
     "@nestjs/common": "^10.3.7",

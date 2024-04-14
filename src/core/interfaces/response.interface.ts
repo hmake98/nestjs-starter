@@ -1,22 +1,16 @@
-import { Users } from '@prisma/client';
+import { ClassConstructor } from 'class-transformer';
 
-export interface ErrorResponse {
-  status: boolean;
-  message: string;
-  error: any;
-}
-
-export interface GetResponse<T> {
+export interface IGetResponse<T> {
   count: number;
   data: T[];
 }
 
-export interface SuccessResponse {
+export interface IGenericResponse {
   status: boolean;
   message: string;
 }
 
-export interface AuthResponse {
-  accessToken: string;
-  user: Users;
+export interface IResponseOptions<T> {
+  serialization: ClassConstructor<T>;
+  httpStatus: number;
 }

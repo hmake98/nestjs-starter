@@ -7,7 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './controllers/auth.controller';
 import { HelperModule } from '../helper/helper.module';
 import { BullModule } from '@nestjs/bull';
-import { Queues } from 'src/app/app.constant';
+import { BullQueues } from 'src/app/app.constant';
 
 @Module({
   controllers: [AuthController],
@@ -15,7 +15,7 @@ import { Queues } from 'src/app/app.constant';
     HelperModule,
     PassportModule,
     BullModule.registerQueue({
-      name: Queues.EMAIL,
+      name: BullQueues.EMAIL,
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

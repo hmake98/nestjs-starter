@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PostController } from './controllers/post.controller';
+import { PostController } from './controllers/posts.controller';
 import { PostService } from './services/post.service';
 import { HelperModule } from 'src/common/helper/helper.module';
 

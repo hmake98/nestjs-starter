@@ -1,4 +1,4 @@
-//
+// File mime type supported
 export enum FileMimeType {
   JPEG = 'image/jpeg',
   PNG = 'image/png',
@@ -15,11 +15,13 @@ export enum FileMimeType {
   MKV = 'video/x-matroska',
 }
 
+// File store type for bucket
 export enum FileModuleType {
   UserProfile = 'Profile',
   PostPictures = 'Posts',
 }
 
+// Email templates
 export enum EmailTemplates {
   WELCOME_EMAIL = 'welcome',
 }

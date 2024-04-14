@@ -7,9 +7,9 @@ import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { EncryptionService } from '../../../common/helper/services/encryption.service';
 import { UserCreateDto } from '../dtos/auth.signup.dto';
 import { Roles } from '@prisma/client';
-import { AuthResponse } from '../../../core/interfaces/response.interface';
 import { InjectQueue } from '@nestjs/bull';
-import { Queues } from '../../../app/app.constant';
+import { BullQueues } from '../../../app/app.constant';
+import { IAuthResponse } from '../interfaces/auth.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -17,10 +17,10 @@ export class AuthService implements IAuthService {
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
     private readonly encryptionService: EncryptionService,
-    @InjectQueue(Queues.EMAIL) private emailQueue: Queue,
+    @InjectQueue(BullQueues.EMAIL) private emailQueue: Queue,
   ) {}
 
-  public async login(data: UserLoginDto): Promise<AuthResponse> {
+  public async login(data: UserLoginDto): Promise<IAuthResponse> {
     try {
       const { email, password } = data;
       const user = await this.prismaService.users.findUnique({
@@ -46,7 +46,7 @@ export class AuthService implements IAuthService {
     }
   }
 
-  public async signup(data: UserCreateDto): Promise<AuthResponse> {
+  public async signup(data: UserCreateDto): Promise<IAuthResponse> {
     try {
       const { email, firstName, lastName, password } = data;
       const user = await this.prismaService.users.findUnique({

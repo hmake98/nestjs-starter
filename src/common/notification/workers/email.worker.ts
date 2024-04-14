@@ -1,11 +1,11 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { Queues } from '../../../app/app.constant';
-import { EmailService } from '../../notification/services/email.service';
+import { BullQueues } from '../../../app/app.constant';
+import { EmailService } from '../services/email.service';
 import { EmailTemplates } from '../../../app/app.enum';
 
-@Processor(Queues.EMAIL)
+@Processor(BullQueues.EMAIL)
 export class EmailWorker {
   private logger = new Logger(EmailWorker.name);
 

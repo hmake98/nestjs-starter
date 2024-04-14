@@ -1,24 +1,27 @@
+import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { FileMimeType, FileModuleType } from 'src/app/app.enum';
+import { FileModuleType } from 'src/app/app.enum';
 
 export class GetPresignDto {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'file name',
+    example: faker.lorem.slug(),
+    required: true,
+  })
   @IsString()
   @IsNotEmpty({ message: 'file name is required.' })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'file store type',
+    example: FileModuleType.UserProfile,
+    required: true,
+    enum: FileModuleType,
+  })
   @IsEnum(FileModuleType, {
     message: '[Profile, Posts] should be enum',
   })
   @IsNotEmpty({ message: 'store type is required.' })
   storeType: FileModuleType;
-
-  @ApiProperty()
-  @IsEnum(FileMimeType, {
-    message: ' type is required',
-  })
-  @IsNotEmpty({ message: 'store type is required.' })
-  mimeType: FileMimeType;
 }

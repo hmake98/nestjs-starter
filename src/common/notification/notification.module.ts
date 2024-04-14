@@ -8,6 +8,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { createTransport } from 'nodemailer';
 import * as aws from '@aws-sdk/client-ses';
+import { EmailWorker } from './workers/email.worker';
 
 @Module({
   controllers: [NotificationController],
@@ -43,6 +44,7 @@ import * as aws from '@aws-sdk/client-ses';
       inject: [ConfigService],
     }),
   ],
-  providers: [EmailService, TextMessageService],
+  providers: [EmailService, EmailWorker, TextMessageService],
+  exports: [EmailService, EmailWorker, TextMessageService],
 })
 export class NotificationModule {}

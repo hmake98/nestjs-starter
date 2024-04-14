@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
-import { NotificationModule } from './notification/notification.module';
+// import { NotificationModule } from './notification/notification.module';
 import { HelperModule } from './helper/helper.module';
 
 @Module({
@@ -18,7 +18,7 @@ import { HelperModule } from './helper/helper.module';
     }),
     AuthModule,
     FilesModule,
-    NotificationModule,
+    // NotificationModule,
     HelperModule,
   ],
   providers: [],

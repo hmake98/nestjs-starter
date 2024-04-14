@@ -14,8 +14,8 @@ model Users {
   id          String    @id @default(uuid())
   email       String    @unique
   password    String?
-  first_name  String
-  last_name   String
+  first_name  String?
+  last_name   String?
   is_verified Boolean   @default(false)
   phone       String?
   role        Roles     @default(USER)
@@ -32,6 +32,7 @@ model Files {
   id         String    @id @default(uuid())
   file_name  String
   link       String
+  type       String
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
