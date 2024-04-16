@@ -1,4 +1,5 @@
 import { $Enums, Users } from '@prisma/client';
+import { Exclude } from 'class-transformer';
 
 export class UserResponseDto implements Users {
   avatar_id: string;
@@ -10,10 +11,12 @@ export class UserResponseDto implements Users {
   is_deleted: boolean;
   is_verified: boolean;
   last_name: string;
-  password: string;
   phone: string;
   role: $Enums.Roles;
   updated_at: Date;
+
+  @Exclude()
+  password: string;
 }
 
 export class DeleteProfileResponseDto extends UserResponseDto {}

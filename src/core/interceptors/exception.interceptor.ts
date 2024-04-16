@@ -27,8 +27,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     const translationKey =
       exception instanceof HttpException && exception.message
-        ? `translations.${exception.message}`
-        : 'translations.defaultErrorMessage';
+        ? exception.message
+        : 'errors.defaultErrorMessage';
 
     const message = this.i18nService.translate(translationKey, {
       lang: request.headers['accept-language'] || 'en',

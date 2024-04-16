@@ -1,0 +1,1270 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/posts": {
+      "post": {
+        "operationId": "PostController_createPost",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatePostDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "Created" },
+                        "statusCode": { "type": "number", "example": 201 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CreatePostResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.370Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["posts"],
+        "security": [{ "accessToken": [] }]
+      },
+      "get": {
+        "operationId": "PostController_getPosts",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "description": "limit",
+            "example": 10,
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "page",
+            "example": 0,
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "search",
+            "required": true,
+            "in": "query",
+            "description": "search",
+            "example": "usitas",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/GetPostsResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["posts"],
+        "security": [{ "accessToken": [] }]
+      }
+    },
+    "/api/v1/posts/{id}": {
+      "delete": {
+        "operationId": "PostController_deletePost",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DeletePostResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.370Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["posts"],
+        "security": [{ "accessToken": [] }]
+      },
+      "put": {
+        "operationId": "PostController_updatePost",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePostDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UpdatePostResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.370Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["posts"],
+        "security": [{ "accessToken": [] }]
+      }
+    },
+    "/api/v1/users/profile": {
+      "get": {
+        "operationId": "UserController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/GetProfileResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.339Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["user.users"],
+        "security": [{ "accessToken": [] }]
+      }
+    },
+    "/api/v1/users": {
+      "post": {
+        "operationId": "UserController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserUpdateDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UpdateProfileResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateProfileResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.339Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["user.users"],
+        "security": [{ "accessToken": [] }]
+      }
+    },
+    "/api/v1/admin/users/{id}": {
+      "delete": {
+        "operationId": "AdminUserController_deleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DeleteProfileResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.367Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["admin.users"],
+        "security": [{ "accessToken": [] }]
+      },
+      "put": {
+        "operationId": "AdminUserController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserUpdateDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UpdateProfileAdminResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.367Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["admin.users"],
+        "security": [{ "accessToken": [] }]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "info": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "error" },
+                    "info": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": { "status": "up" },
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserLoginDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "Created" },
+                        "statusCode": { "type": "number", "example": 201 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/AuthResponseDto" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.384Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/auth/signup": {
+      "post": {
+        "operationId": "AuthController_signup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserCreateDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "Created" },
+                        "statusCode": { "type": "number", "example": 201 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/AuthResponseDto" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.384Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Conflict" },
+                        "statusCode": { "type": "number", "example": 409 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.385Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/files/get-presign": {
+      "post": {
+        "operationId": "FilesController_putPresignUrl",
+        "parameters": [
+          {
+            "name": "name",
+            "required": true,
+            "in": "query",
+            "description": "file name",
+            "example": "vis-perspiciatis-vinitor",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "storeType",
+            "required": true,
+            "in": "query",
+            "description": "file store type",
+            "example": "Profile",
+            "schema": { "enum": ["Profile", "Posts"], "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FilePutPresignResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilePutPresignResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Internal Server Error" },
+                        "statusCode": { "type": "number", "example": 500 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-16T16:05:33.424Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["files"],
+        "security": [{ "accessToken": [] }]
+      }
+    }
+  },
+  "info": {
+    "title": "nestjs-starter APIs Specification",
+    "description": "Section for description",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "accessToken": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "refreshToken": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "ResponseDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": { "type": "number", "example": 201 },
+          "message": { "type": "string", "nullable": false },
+          "timestamp": {
+            "type": "string",
+            "example": "2024-04-16T16:05:33.338Z",
+            "nullable": false
+          },
+          "data": { "type": "object", "nullable": false }
+        },
+        "required": ["statusCode", "message", "timestamp", "data"]
+      },
+      "CreatePostResponseDto": {
+        "type": "object",
+        "properties": {
+          "author_id": { "type": "string" },
+          "content": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "title": { "type": "string" },
+          "updated_at": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "author_id",
+          "content",
+          "created_at",
+          "deleted_at",
+          "id",
+          "is_deleted",
+          "title",
+          "updated_at"
+        ]
+      },
+      "CreatePostDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "post content",
+            "example": "Supellex deleniti crudelis amissio adfero.\nVitium viridis caute vulgus molestias."
+          },
+          "title": {
+            "type": "string",
+            "description": "post title",
+            "example": "defendo sumptus tergo"
+          }
+        },
+        "required": ["content", "title"]
+      },
+      "DeletePostResponseDto": {
+        "type": "object",
+        "properties": {
+          "author_id": { "type": "string" },
+          "content": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "title": { "type": "string" },
+          "updated_at": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "author_id",
+          "content",
+          "created_at",
+          "deleted_at",
+          "id",
+          "is_deleted",
+          "title",
+          "updated_at"
+        ]
+      },
+      "PostResponseDto": {
+        "type": "object",
+        "properties": {
+          "author_id": { "type": "string" },
+          "content": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "title": { "type": "string" },
+          "updated_at": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "author_id",
+          "content",
+          "created_at",
+          "deleted_at",
+          "id",
+          "is_deleted",
+          "title",
+          "updated_at"
+        ]
+      },
+      "GetPostsResponseDto": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "number", "example": 10, "nullable": false },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PostResponseDto" }
+          }
+        },
+        "required": ["count", "data"]
+      },
+      "UpdatePostResponseDto": {
+        "type": "object",
+        "properties": {
+          "author_id": { "type": "string" },
+          "content": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "title": { "type": "string" },
+          "updated_at": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "author_id",
+          "content",
+          "created_at",
+          "deleted_at",
+          "id",
+          "is_deleted",
+          "title",
+          "updated_at"
+        ]
+      },
+      "UpdatePostDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "post content",
+            "example": "Supellex deleniti crudelis amissio adfero.\nVitium viridis caute vulgus molestias."
+          },
+          "title": {
+            "type": "string",
+            "description": "post title",
+            "example": "defendo sumptus tergo"
+          }
+        },
+        "required": ["content", "title"]
+      },
+      "GetProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "avatar_id": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "email": { "type": "string" },
+          "first_name": { "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "is_verified": { "type": "boolean" },
+          "last_name": { "type": "string" },
+          "phone": { "type": "string" },
+          "role": { "type": "object" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": [
+          "avatar_id",
+          "created_at",
+          "deleted_at",
+          "email",
+          "first_name",
+          "id",
+          "is_deleted",
+          "is_verified",
+          "last_name",
+          "phone",
+          "role",
+          "updated_at",
+          "password"
+        ]
+      },
+      "UpdateProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "avatar_id": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "email": { "type": "string" },
+          "first_name": { "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "is_verified": { "type": "boolean" },
+          "last_name": { "type": "string" },
+          "phone": { "type": "string" },
+          "role": { "type": "object" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": [
+          "avatar_id",
+          "created_at",
+          "deleted_at",
+          "email",
+          "first_name",
+          "id",
+          "is_deleted",
+          "is_verified",
+          "last_name",
+          "phone",
+          "role",
+          "updated_at",
+          "password"
+        ]
+      },
+      "UserUpdateDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "user email address",
+            "example": "Gene44@gmail.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "user first name",
+            "example": "Josephine"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "user last name",
+            "example": "Roberts"
+          },
+          "profile": {
+            "type": "string",
+            "description": "user profile picture",
+            "example": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/882.jpg"
+          }
+        }
+      },
+      "DeleteProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "avatar_id": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "email": { "type": "string" },
+          "first_name": { "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "is_verified": { "type": "boolean" },
+          "last_name": { "type": "string" },
+          "phone": { "type": "string" },
+          "role": { "type": "object" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": [
+          "avatar_id",
+          "created_at",
+          "deleted_at",
+          "email",
+          "first_name",
+          "id",
+          "is_deleted",
+          "is_verified",
+          "last_name",
+          "phone",
+          "role",
+          "updated_at",
+          "password"
+        ]
+      },
+      "UpdateProfileAdminResponseDto": {
+        "type": "object",
+        "properties": {
+          "avatar_id": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "email": { "type": "string" },
+          "first_name": { "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "is_verified": { "type": "boolean" },
+          "last_name": { "type": "string" },
+          "phone": { "type": "string" },
+          "role": { "type": "object" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": [
+          "avatar_id",
+          "created_at",
+          "deleted_at",
+          "email",
+          "first_name",
+          "id",
+          "is_deleted",
+          "is_verified",
+          "last_name",
+          "phone",
+          "role",
+          "updated_at",
+          "password"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "avatar_id": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "email": { "type": "string" },
+          "first_name": { "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "is_verified": { "type": "boolean" },
+          "last_name": { "type": "string" },
+          "phone": { "type": "string" },
+          "role": { "type": "object" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": [
+          "avatar_id",
+          "created_at",
+          "deleted_at",
+          "email",
+          "first_name",
+          "id",
+          "is_deleted",
+          "is_verified",
+          "last_name",
+          "phone",
+          "role",
+          "updated_at",
+          "password"
+        ]
+      },
+      "AuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "fur21oYUpbxkNlYrV24zACrynV6RFC",
+            "nullable": false
+          },
+          "user": {
+            "nullable": false,
+            "allOf": [{ "$ref": "#/components/schemas/UserResponseDto" }]
+          }
+        },
+        "required": ["accessToken", "user"]
+      },
+      "UserLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "user email address",
+            "example": "Jannie.Kris33@yahoo.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "user password",
+            "example": "howezxOv7D8VKgj"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "UserCreateDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "user email address",
+            "example": "Jannie.Kris33@yahoo.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "user password",
+            "example": "howezxOv7D8VKgj"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "user first name",
+            "example": "Mckayla"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "user last name",
+            "example": "Hermiston"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "FilePutPresignResponseDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "https://loremflickr.com/640/480?lock=3970508649398272",
+            "nullable": false
+          },
+          "expiresIn": {
+            "type": "string",
+            "example": "1200",
+            "nullable": false
+          }
+        },
+        "required": ["url", "expiresIn"]
+      }
+    }
+  }
+}

@@ -7,6 +7,14 @@ describe('EncryptionService', () => {
     encryptionService = new EncryptionService();
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  beforeAll(done => {
+    done();
+  });
+
   it('should be defined', () => {
     expect(encryptionService).toBeDefined();
   });

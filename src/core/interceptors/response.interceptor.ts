@@ -5,8 +5,9 @@ import {
   CallHandler,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { HTTP_STATUS_MESSAGES } from '../constants/core.constant';
+import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -17,15 +18,16 @@ export class ResponseInterceptor implements NestInterceptor {
     next: CallHandler,
   ): Promise<any> {
     const body = await firstValueFrom(next.handle());
-    const statusCode = this.reflector.get<number>(
-      '__httpCode__',
-      context.getHandler(),
-    );
-    return {
+
+    const ctx: HttpArgumentsHost = context.switchToHttp();
+    const response = ctx.getResponse();
+    const statusCode: number = response.statusCode;
+
+    return of({
       statusCode,
       timestamp: new Date().toISOString(),
       message: HTTP_STATUS_MESSAGES[statusCode],
       data: body,
-    };
+    });
   }
 }

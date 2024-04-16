@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { UserUpdateDto } from '../dtos/user.update.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AllowedRoles } from 'src/core/decorators/role.decorator';
 import { Roles } from '@prisma/client';
 import {
@@ -25,6 +25,7 @@ import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
 export class AdminUserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiBearerAuth('accessToken')
   @AllowedRoles([Roles.ADMIN])
   @DocResponse({
     serialization: DeleteProfileResponseDto,
@@ -38,6 +39,7 @@ export class AdminUserController {
     return this.userService.deleteUser(userId);
   }
 
+  @ApiBearerAuth('accessToken')
   @AllowedRoles([Roles.ADMIN])
   @DocResponse({
     serialization: UpdateProfileAdminResponseDto,

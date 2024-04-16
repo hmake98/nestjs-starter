@@ -34,6 +34,10 @@ describe('PostService', () => {
     jest.clearAllMocks();
   });
 
+  beforeAll(done => {
+    done();
+  });
+
   it('should be defined', () => {
     expect(postService).toBeDefined();
   });
@@ -64,7 +68,7 @@ describe('PostService', () => {
       prismaServiceMock.users.findUnique.mockResolvedValueOnce(null);
 
       await expect(postService.create(userId, postData)).rejects.toThrowError(
-        new HttpException('userNotFound', HttpStatus.NOT_FOUND),
+        new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
       );
     });
   });

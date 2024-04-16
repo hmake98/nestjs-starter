@@ -14,7 +14,7 @@ import { AuthUser } from 'src/core/decorators/auth.user.decorator';
 import { CreatePostDto } from '../dtos/create.post.dto';
 import { GetPostsDto } from '../dtos/get.post.dto';
 import { UpdatePostDto } from '../dtos/update.post.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   CreatePostResponseDto,
   DeletePostResponseDto,
@@ -31,6 +31,7 @@ import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @ApiBearerAuth('accessToken')
   @DocResponse({
     serialization: CreatePostResponseDto,
     httpStatus: 201,
@@ -44,6 +45,7 @@ export class PostController {
     return this.postService.create(userId, payload);
   }
 
+  @ApiBearerAuth('accessToken')
   @DocResponse({
     serialization: DeletePostResponseDto,
     httpStatus: 200,
@@ -56,6 +58,7 @@ export class PostController {
     return this.postService.delete(postId);
   }
 
+  @ApiBearerAuth('accessToken')
   @DocResponse({
     serialization: GetPostsResponseDto,
     httpStatus: 200,
@@ -67,6 +70,7 @@ export class PostController {
     return this.postService.getAll(params);
   }
 
+  @ApiBearerAuth('accessToken')
   @DocResponse({
     serialization: UpdatePostResponseDto,
     httpStatus: 200,

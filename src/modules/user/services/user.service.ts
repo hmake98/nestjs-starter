@@ -16,7 +16,7 @@ export class UserService implements IUserService {
         where: { id: userId },
       });
       if (!user) {
-        throw new HttpException('userNotFound', HttpStatus.NOT_FOUND);
+        throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
       }
       return this.prismaService.users.update({
         where: {

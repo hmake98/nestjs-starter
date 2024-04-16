@@ -7,6 +7,6 @@ import { TaskService } from './services/task.service';
   imports: [],
   providers: [EncryptionService, PrismaService, TaskService],
   controllers: [],
-  exports: [PrismaService, EncryptionService, TaskService],
+  exports: [EncryptionService, PrismaService, TaskService],
 })
 export class HelperModule {}

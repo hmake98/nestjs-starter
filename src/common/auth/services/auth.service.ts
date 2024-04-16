@@ -1,13 +1,13 @@
 import { Queue } from 'bull';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { IAuthService } from '../interfaces/auth.service.interface';
-import { UserLoginDto } from '../dtos/auth.login.dto';
-import { PrismaService } from '../../../common/helper/services/prisma.service';
-import { EncryptionService } from '../../../common/helper/services/encryption.service';
-import { UserCreateDto } from '../dtos/auth.signup.dto';
 import { Roles } from '@prisma/client';
 import { InjectQueue } from '@nestjs/bull';
+import { IAuthService } from '../interfaces/auth.service.interface';
+import { UserLoginDto } from '../dtos/auth.login.dto';
+import { PrismaService } from '../../helper/services/prisma.service';
+import { EncryptionService } from '../../../common/helper/services/encryption.service';
+import { UserCreateDto } from '../dtos/auth.signup.dto';
 import { BullQueues } from '../../../app/app.constant';
 import { IAuthResponse } from '../interfaces/auth.interface';
 
@@ -27,11 +27,11 @@ export class AuthService implements IAuthService {
         where: { email },
       });
       if (!user) {
-        throw new HttpException('userNotFound', HttpStatus.NOT_FOUND);
+        throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
       }
       const match = this.encryptionService.match(user.password, password);
       if (!match) {
-        throw new HttpException('invalidPassword', HttpStatus.NOT_FOUND);
+        throw new HttpException('auth.invalidPassword', HttpStatus.NOT_FOUND);
       }
       const accessToken = this.jwtService.sign({
         role: user.role,
@@ -53,7 +53,7 @@ export class AuthService implements IAuthService {
         where: { email },
       });
       if (user) {
-        throw new HttpException('userExists', HttpStatus.CONFLICT);
+        throw new HttpException('users.userExists', HttpStatus.CONFLICT);
       }
       const create = await this.prismaService.users.create({
         data: {

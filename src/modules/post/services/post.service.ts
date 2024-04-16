@@ -18,7 +18,7 @@ export class PostService implements IPostService {
         where: { id: userId },
       });
       if (!user) {
-        throw new HttpException('userNotFound', HttpStatus.NOT_FOUND);
+        throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
       }
       return this.prismaService.posts.create({
         data: {
@@ -40,7 +40,7 @@ export class PostService implements IPostService {
     try {
       const post = await this.prismaService.posts.findUnique({ where: { id } });
       if (!post) {
-        throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
+        throw new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND);
       }
       return this.prismaService.posts.delete({ where: { id } });
     } catch (e) {
@@ -96,7 +96,7 @@ export class PostService implements IPostService {
       const { content, title } = data;
       const post = await this.prismaService.posts.findUnique({ where: { id } });
       if (!post) {
-        throw new HttpException('postNotFound', HttpStatus.NOT_FOUND);
+        throw new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND);
       }
       return this.prismaService.posts.update({
         where: { id },

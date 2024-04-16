@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { AuthUser } from 'src/core/decorators/auth.user.decorator';
 import { UserUpdateDto } from '../dtos/user.update.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   GetProfileResponseDto,
   UpdateProfileResponseDto,
@@ -17,6 +17,7 @@ import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiBearerAuth('accessToken')
   @DocResponse({
     serialization: GetProfileResponseDto,
     httpStatus: 200,
@@ -29,6 +30,7 @@ export class UserController {
     return this.userService.getProfile(userId);
   }
 
+  @ApiBearerAuth('accessToken')
   @DocResponse({
     serialization: UpdateProfileResponseDto,
     httpStatus: 200,

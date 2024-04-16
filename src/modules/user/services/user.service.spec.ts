@@ -32,6 +32,10 @@ describe('UserService', () => {
     jest.clearAllMocks();
   });
 
+  beforeAll(done => {
+    done();
+  });
+
   it('should be defined', () => {
     expect(userService).toBeDefined();
   });
@@ -78,7 +82,7 @@ describe('UserService', () => {
       await expect(
         userService.updateUser(userId, userData),
       ).rejects.toThrowError(
-        new HttpException('userNotFound', HttpStatus.NOT_FOUND),
+        new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
       );
     });
   });

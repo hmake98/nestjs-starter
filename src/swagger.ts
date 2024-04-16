@@ -1,6 +1,7 @@
 import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { writeFileSync } from 'fs';
 
 export default async function (app: INestApplication) {
   const configService = app.get(ConfigService);
@@ -15,11 +16,21 @@ export default async function (app: INestApplication) {
     .setTitle(docName)
     .setDescription(docDesc)
     .setVersion(docVersion)
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'accessToken',
+    )
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'refreshToken',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, documentBuild, {
     deepScanRoutes: true,
   });
+
+  writeFileSync('./swagger.json', JSON.stringify(document));
 
   SwaggerModule.setup(docPrefix, app, document, {
     explorer: false,

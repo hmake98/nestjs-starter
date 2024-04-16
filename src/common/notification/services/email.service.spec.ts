@@ -25,6 +25,14 @@ describe('EmailService', () => {
     mailerServiceMock = module.get<MailerService>(MailerService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  beforeAll(done => {
+    done();
+  });
+
   it('should be defined', () => {
     expect(emailService).toBeDefined();
   });

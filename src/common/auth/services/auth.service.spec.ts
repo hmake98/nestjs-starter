@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../../../common/helper/services/prisma.service';
+import { PrismaService } from '../../helper/services/prisma.service';
 import { EncryptionService } from '../../../common/helper/services/encryption.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -53,6 +53,14 @@ describe('AuthService', () => {
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  beforeAll(done => {
+    done();
   });
 
   describe('login', () => {
@@ -112,7 +120,7 @@ describe('AuthService', () => {
           password: 'invalidPassword',
         }),
       ).rejects.toThrowError(
-        new HttpException('invalidPassword', HttpStatus.NOT_FOUND),
+        new HttpException('auth.invalidPassword', HttpStatus.NOT_FOUND),
       );
     });
   });
@@ -178,7 +186,7 @@ describe('AuthService', () => {
           password: 'existingPassword',
         }),
       ).rejects.toThrowError(
-        new HttpException('userExists', HttpStatus.CONFLICT),
+        new HttpException('users.userExists', HttpStatus.CONFLICT),
       );
     });
   });

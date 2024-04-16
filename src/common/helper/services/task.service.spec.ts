@@ -12,6 +12,14 @@ describe('TaskService', () => {
     taskService = module.get<TaskService>(TaskService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  beforeAll(done => {
+    done();
+  });
+
   it('should be defined', () => {
     expect(taskService).toBeDefined();
   });
