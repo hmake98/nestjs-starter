@@ -1,6 +1,5 @@
 import { Queue } from 'bull';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Roles } from '@prisma/client';
 import { InjectQueue } from '@nestjs/bull';
 import { IAuthService } from '../interfaces/auth.service.interface';
@@ -9,15 +8,19 @@ import { PrismaService } from '../../helper/services/prisma.service';
 import { EncryptionService } from '../../../common/helper/services/encryption.service';
 import { UserCreateDto } from '../dtos/auth.signup.dto';
 import { BullQueues } from '../../../app/app.constant';
-import { IAuthResponse } from '../interfaces/auth.interface';
+import {
+  IAuthResponse,
+  IAuthTokenResponse,
+  IAuthUser,
+} from '../interfaces/auth.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
     private readonly encryptionService: EncryptionService,
-    @InjectQueue(BullQueues.EMAIL) private emailQueue: Queue,
+    @InjectQueue(BullQueues.EMAIL)
+    private emailQueue: Queue,
   ) {}
 
   public async login(data: UserLoginDto): Promise<IAuthResponse> {
@@ -33,12 +36,12 @@ export class AuthService implements IAuthService {
       if (!match) {
         throw new HttpException('auth.invalidPassword', HttpStatus.NOT_FOUND);
       }
-      const accessToken = this.jwtService.sign({
+      const tokens = await this.encryptionService.createJwtTokens({
         role: user.role,
         userId: user.id,
       });
       return {
-        accessToken,
+        ...tokens,
         user,
       };
     } catch (e) {
@@ -55,7 +58,7 @@ export class AuthService implements IAuthService {
       if (user) {
         throw new HttpException('users.userExists', HttpStatus.CONFLICT);
       }
-      const create = await this.prismaService.users.create({
+      const createdUser = await this.prismaService.users.create({
         data: {
           email,
           password: this.encryptionService.createHash(password),
@@ -64,17 +67,25 @@ export class AuthService implements IAuthService {
           role: Roles.USER,
         },
       });
-      // this.emailQueue.add({ firstName, lastName, email }, { delay: 15000 });
-      const accessToken = this.jwtService.sign({
-        role: create.role,
-        userId: create.id,
+      this.emailQueue.add({ firstName, lastName, email }, { delay: 15000 });
+      const tokens = await this.encryptionService.createJwtTokens({
+        role: createdUser.role,
+        userId: createdUser.id,
       });
       return {
-        accessToken,
-        user: create,
+        ...tokens,
+        user: createdUser,
       };
     } catch (e) {
       throw e;
     }
+  }
+
+  public async refreshTokens(payload: IAuthUser): Promise<IAuthTokenResponse> {
+    const tokens = await this.encryptionService.createJwtTokens({
+      userId: payload.userId,
+      role: payload.role,
+    });
+    return tokens;
   }
 }

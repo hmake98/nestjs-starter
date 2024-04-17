@@ -22,6 +22,7 @@ import {
   UpdatePostResponseDto,
 } from '../dtos/post.response.dto';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
+import { IAuthUser } from 'src/common/auth/interfaces/auth.interface';
 
 @ApiTags('posts')
 @Controller({
@@ -39,10 +40,10 @@ export class PostController {
   @DocErrors([HttpStatus.NOT_FOUND])
   @Post()
   public async createPost(
-    @AuthUser() userId: string,
+    @AuthUser() user: IAuthUser,
     @Body() payload: CreatePostDto,
   ): Promise<CreatePostResponseDto> {
-    return this.postService.create(userId, payload);
+    return this.postService.create(user.userId, payload);
   }
 
   @ApiBearerAuth('accessToken')

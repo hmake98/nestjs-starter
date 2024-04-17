@@ -1,8 +1,11 @@
-import { applyDecorators } from '@nestjs/common';
+import { SetMetadata, applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { IResponseOptions } from '../interfaces/response.interface';
 import { ResponseDto } from '../dtos/response.dto';
-import { HTTP_STATUS_MESSAGES } from '../constants/core.constant';
+import {
+  HTTP_STATUS_MESSAGES,
+  RESPONSE_SERIALIZATION_META_KEY,
+} from '../constants/core.constant';
 
 export function DocResponse<T>(options: IResponseOptions<T>): MethodDecorator {
   const docs = [];
@@ -42,6 +45,7 @@ export function DocResponse<T>(options: IResponseOptions<T>): MethodDecorator {
       schema,
     }),
     ...docs,
+    SetMetadata(RESPONSE_SERIALIZATION_META_KEY, options?.serialization),
   );
 }
 

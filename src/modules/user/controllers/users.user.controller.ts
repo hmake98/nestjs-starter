@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Put } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { AuthUser } from 'src/core/decorators/auth.user.decorator';
 import { UserUpdateDto } from '../dtos/user.update.dto';
@@ -8,6 +8,7 @@ import {
   UpdateProfileResponseDto,
 } from '../dtos/user.response.dto';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
+import { IAuthUser } from 'src/common/auth/interfaces/auth.interface';
 
 @ApiTags('user.users')
 @Controller({
@@ -25,9 +26,9 @@ export class UserController {
   @DocErrors([HttpStatus.NOT_FOUND])
   @Get('profile')
   public getProfile(
-    @AuthUser() userId: string,
+    @AuthUser() user: IAuthUser,
   ): Promise<GetProfileResponseDto> {
-    return this.userService.getProfile(userId);
+    return this.userService.getProfile(user.userId);
   }
 
   @ApiBearerAuth('accessToken')
@@ -36,11 +37,11 @@ export class UserController {
     httpStatus: 200,
   })
   @DocErrors([HttpStatus.NOT_FOUND])
-  @Post()
+  @Put()
   public update(
-    @AuthUser() userId: string,
+    @AuthUser() user: IAuthUser,
     @Body() payload: UserUpdateDto,
   ): Promise<UpdateProfileResponseDto> {
-    return this.userService.updateUser(userId, payload);
+    return this.userService.updateUser(user.userId, payload);
   }
 }

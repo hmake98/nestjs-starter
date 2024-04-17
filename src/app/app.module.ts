@@ -13,11 +13,6 @@ import { HelperModule } from 'src/common/helper/helper.module';
 @Module({
   controllers: [AppController],
   imports: [
-    TerminusModule,
-    CoreModule,
-    CommonModule,
-    HelperModule,
-    ScheduleModule.forRoot(),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -28,6 +23,11 @@ import { HelperModule } from 'src/common/helper/helper.module';
       }),
       inject: [ConfigService],
     }),
+    TerminusModule,
+    CoreModule,
+    CommonModule,
+    HelperModule,
+    ScheduleModule.forRoot(),
     PostModule,
     UserModule,
   ],

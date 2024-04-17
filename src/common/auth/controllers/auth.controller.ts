@@ -1,11 +1,24 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { PublicRoute } from 'src/core/decorators/public.request.decorator';
 import { AuthService } from '../services/auth.service';
 import { UserLoginDto } from '../dtos/auth.login.dto';
 import { UserCreateDto } from '../dtos/auth.signup.dto';
-import { ApiTags } from '@nestjs/swagger';
-import { AuthResponseDto } from '../dtos/auth.response.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  AuthRefreshResponseDto,
+  AuthResponseDto,
+} from '../dtos/auth.response.dto';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
+import { AuthUser } from 'src/core/decorators/auth.user.decorator';
+import { IAuthUser } from '../interfaces/auth.interface';
+import { JwtRefreshGuard } from 'src/core/guards/jwt.refresh.guard';
 
 @ApiTags('auth')
 @Controller({
@@ -35,5 +48,20 @@ export class AuthController {
   @Post('signup')
   public signup(@Body() payload: UserCreateDto): Promise<AuthResponseDto> {
     return this.authService.signup(payload);
+  }
+
+  @ApiBearerAuth('refreshToken')
+  @PublicRoute()
+  @UseGuards(JwtRefreshGuard)
+  @DocErrors([HttpStatus.UNAUTHORIZED])
+  @DocResponse({
+    serialization: AuthResponseDto,
+    httpStatus: 200,
+  })
+  @Get('refresh-token')
+  public refreshTokens(
+    @AuthUser() user: IAuthUser,
+  ): Promise<AuthRefreshResponseDto> {
+    return this.authService.refreshTokens(user);
   }
 }

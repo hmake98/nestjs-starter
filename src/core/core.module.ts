@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { JwtRolesGuard } from './guards/roles.guard';
+import { RolesGuard } from './guards/roles.guard';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './interceptors/exception.interceptor';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
@@ -11,7 +11,7 @@ import {
   QueryResolver,
 } from 'nestjs-i18n';
 import { join } from 'path';
-import { JwtAuthGuard } from './guards/auth.guard';
+import { JwtAccessGuard } from './guards/jwt.access.guard';
 
 @Module({
   imports: [
@@ -31,11 +31,11 @@ import { JwtAuthGuard } from './guards/auth.guard';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
+      useClass: JwtAccessGuard,
     },
     {
       provide: APP_GUARD,
-      useClass: JwtRolesGuard,
+      useClass: RolesGuard,
     },
     {
       provide: APP_INTERCEPTOR,

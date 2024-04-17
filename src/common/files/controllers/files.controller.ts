@@ -5,6 +5,7 @@ import { FilesService } from '../services/files.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FilePutPresignResponseDto } from '../dtos/file.response.dto';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
+import { IAuthUser } from 'src/common/auth/interfaces/auth.interface';
 
 @ApiTags('files')
 @Controller({
@@ -22,9 +23,9 @@ export class FilesController {
   @DocErrors([HttpStatus.INTERNAL_SERVER_ERROR])
   @Post('/get-presign')
   putPresignUrl(
-    @AuthUser() userId: string,
+    @AuthUser() user: IAuthUser,
     @Query() params: GetPresignDto,
   ): Promise<FilePutPresignResponseDto> {
-    return this.fileService.getPresginPutObject(params, userId);
+    return this.fileService.getPresginPutObject(params, user.userId);
   }
 }

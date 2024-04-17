@@ -13,10 +13,36 @@ export class AuthResponseDto {
   accessToken: string;
 
   @ApiProperty({
+    example: faker.string.alphanumeric(30),
+    required: true,
+    nullable: false,
+  })
+  @Expose()
+  refreshToken: string;
+
+  @ApiProperty({
     example: UserResponseDto,
     required: true,
     nullable: false,
   })
   @Expose()
   user: UserResponseDto;
+}
+
+export class AuthRefreshResponseDto {
+  @ApiProperty({
+    example: faker.string.alphanumeric(30),
+    required: true,
+    nullable: false,
+  })
+  @Expose()
+  accessToken: string;
+
+  @ApiProperty({
+    example: faker.string.alphanumeric(30),
+    required: true,
+    nullable: false,
+  })
+  @Expose()
+  refreshToken: string;
 }

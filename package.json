@@ -17,7 +17,7 @@
     "lint": "eslint 'src/**/*.ts'",
     "lint:fix": "eslint --fix 'src/**/*.ts'",
     "format": "prettier --write 'src/**/*.ts'",
-    "test": "dotenv -e .env.local -- jest",
+    "test": "dotenv -e .env.local -- jest --runInBand --forceExit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json --forceExit",

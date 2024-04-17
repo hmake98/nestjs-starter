@@ -33,8 +33,17 @@ export default async function (app: INestApplication) {
   writeFileSync('./swagger.json', JSON.stringify(document));
 
   SwaggerModule.setup(docPrefix, app, document, {
-    explorer: false,
+    explorer: true,
     customSiteTitle: docName,
+    swaggerOptions: {
+      docExpansion: 'none',
+      persistAuthorization: true,
+      displayOperationId: true,
+      operationsSorter: 'method',
+      tagsSorter: 'alpha',
+      tryItOutEnabled: true,
+      filter: true,
+    },
   });
 
   logger.log(`Docs will serve on ${docPrefix}`, 'NestApplication');

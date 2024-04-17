@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { Roles } from '@prisma/client';
 
 @Injectable()
-export class JwtRolesGuard implements CanActivate {
+export class RolesGuard implements CanActivate {
   public constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {

@@ -49,7 +49,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.370Z"
+                          "example": "2024-04-17T10:38:42.343Z"
                         }
                       }
                     }
@@ -86,7 +86,7 @@
             "required": true,
             "in": "query",
             "description": "search",
-            "example": "usitas",
+            "example": "theca",
             "schema": { "type": "string" }
           }
         ],
@@ -166,7 +166,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.370Z"
+                          "example": "2024-04-17T10:38:42.343Z"
                         }
                       }
                     }
@@ -233,7 +233,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.370Z"
+                          "example": "2024-04-17T10:38:42.343Z"
                         }
                       }
                     }
@@ -287,7 +287,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.339Z"
+                          "example": "2024-04-17T10:38:42.304Z"
                         }
                       }
                     }
@@ -302,7 +302,7 @@
       }
     },
     "/api/v1/users": {
-      "post": {
+      "put": {
         "operationId": "UserController_update",
         "parameters": [],
         "requestBody": {
@@ -337,16 +337,6 @@
               }
             }
           },
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateProfileResponseDto"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -359,7 +349,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.339Z"
+                          "example": "2024-04-17T10:38:42.304Z"
                         }
                       }
                     }
@@ -420,7 +410,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.367Z"
+                          "example": "2024-04-17T10:38:42.340Z"
                         }
                       }
                     }
@@ -487,7 +477,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.367Z"
+                          "example": "2024-04-17T10:38:42.340Z"
                         }
                       }
                     }
@@ -656,7 +646,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.384Z"
+                          "example": "2024-04-17T10:38:42.350Z"
                         }
                       }
                     }
@@ -715,7 +705,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.384Z"
+                          "example": "2024-04-17T10:38:42.350Z"
                         }
                       }
                     }
@@ -736,7 +726,7 @@
                         "statusCode": { "type": "number", "example": 409 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.385Z"
+                          "example": "2024-04-17T10:38:42.351Z"
                         }
                       }
                     }
@@ -749,6 +739,58 @@
         "tags": ["auth"]
       }
     },
+    "/api/v1/auth/refresh-token": {
+      "get": {
+        "operationId": "AuthController_refreshTokens",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/AuthResponseDto" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Unauthorized" },
+                        "statusCode": { "type": "number", "example": 401 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-17T10:38:42.351Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["auth"],
+        "security": [{ "refreshToken": [] }]
+      }
+    },
     "/api/v1/files/get-presign": {
       "post": {
         "operationId": "FilesController_putPresignUrl",
@@ -758,7 +800,7 @@
             "required": true,
             "in": "query",
             "description": "file name",
-            "example": "vis-perspiciatis-vinitor",
+            "example": "cribro-corrigo-clibanus",
             "schema": { "type": "string" }
           },
           {
@@ -816,7 +858,7 @@
                         "statusCode": { "type": "number", "example": 500 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-16T16:05:33.424Z"
+                          "example": "2024-04-17T10:38:42.387Z"
                         }
                       }
                     }
@@ -860,7 +902,7 @@
           "message": { "type": "string", "nullable": false },
           "timestamp": {
             "type": "string",
-            "example": "2024-04-16T16:05:33.338Z",
+            "example": "2024-04-17T10:38:42.303Z",
             "nullable": false
           },
           "data": { "type": "object", "nullable": false }
@@ -896,12 +938,12 @@
           "content": {
             "type": "string",
             "description": "post content",
-            "example": "Supellex deleniti crudelis amissio adfero.\nVitium viridis caute vulgus molestias."
+            "example": "Qui defleo cursim.\nCommodi creptio venustas ratione adinventitias adiuvo aegre asperiores atrox spoliatio."
           },
           "title": {
             "type": "string",
             "description": "post title",
-            "example": "defendo sumptus tergo"
+            "example": "autus clarus aggero"
           }
         },
         "required": ["content", "title"]
@@ -992,12 +1034,12 @@
           "content": {
             "type": "string",
             "description": "post content",
-            "example": "Supellex deleniti crudelis amissio adfero.\nVitium viridis caute vulgus molestias."
+            "example": "Qui defleo cursim.\nCommodi creptio venustas ratione adinventitias adiuvo aegre asperiores atrox spoliatio."
           },
           "title": {
             "type": "string",
             "description": "post title",
-            "example": "defendo sumptus tergo"
+            "example": "autus clarus aggero"
           }
         },
         "required": ["content", "title"]
@@ -1074,22 +1116,22 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Gene44@gmail.com"
+            "example": "Nya.Reichert65@yahoo.com"
           },
           "firstName": {
             "type": "string",
             "description": "user first name",
-            "example": "Josephine"
+            "example": "Winston"
           },
           "lastName": {
             "type": "string",
             "description": "user last name",
-            "example": "Roberts"
+            "example": "Sipes"
           },
           "profile": {
             "type": "string",
             "description": "user profile picture",
-            "example": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/882.jpg"
+            "example": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/501.jpg"
           }
         }
       },
@@ -1197,7 +1239,12 @@
         "properties": {
           "accessToken": {
             "type": "string",
-            "example": "fur21oYUpbxkNlYrV24zACrynV6RFC",
+            "example": "iTftUFjCcgp8i48MdCZ3Sh93cy2lIj",
+            "nullable": false
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "lcuTln4CIV6zoZ5ItwUxg9fmnMwuy1",
             "nullable": false
           },
           "user": {
@@ -1205,7 +1252,7 @@
             "allOf": [{ "$ref": "#/components/schemas/UserResponseDto" }]
           }
         },
-        "required": ["accessToken", "user"]
+        "required": ["accessToken", "refreshToken", "user"]
       },
       "UserLoginDto": {
         "type": "object",
@@ -1213,12 +1260,12 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Jannie.Kris33@yahoo.com"
+            "example": "Rosalinda_Stamm@gmail.com"
           },
           "password": {
             "type": "string",
             "description": "user password",
-            "example": "howezxOv7D8VKgj"
+            "example": "HijVgMtaJJDYkJR"
           }
         },
         "required": ["email", "password"]
@@ -1229,22 +1276,22 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Jannie.Kris33@yahoo.com"
+            "example": "Rosalinda_Stamm@gmail.com"
           },
           "password": {
             "type": "string",
             "description": "user password",
-            "example": "howezxOv7D8VKgj"
+            "example": "HijVgMtaJJDYkJR"
           },
           "firstName": {
             "type": "string",
             "description": "user first name",
-            "example": "Mckayla"
+            "example": "Richie"
           },
           "lastName": {
             "type": "string",
             "description": "user last name",
-            "example": "Hermiston"
+            "example": "Runte"
           }
         },
         "required": ["email", "password"]
@@ -1254,7 +1301,7 @@
         "properties": {
           "url": {
             "type": "string",
-            "example": "https://loremflickr.com/640/480?lock=3970508649398272",
+            "example": "https://loremflickr.com/640/480?lock=560897149894656",
             "nullable": false
           },
           "expiresIn": {

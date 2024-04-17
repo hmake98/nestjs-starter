@@ -7,7 +7,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { createTransport } from 'nodemailer';
-import * as aws from '@aws-sdk/client-ses';
+import * as AWS from '@aws-sdk/client-ses';
 import { EmailWorker } from './workers/email.worker';
 
 @Module({
@@ -18,14 +18,14 @@ import { EmailWorker } from './workers/email.worker';
       useFactory: (configService: ConfigService) => ({
         transport: createTransport({
           SES: {
-            ses: new aws.SES({
+            ses: new AWS.SES({
               region: configService.get<string>('aws.region'),
               credentials: {
                 accessKeyId: configService.get<string>('aws.accessKey'),
                 secretAccessKey: configService.get<string>('aws.secretKey'),
               },
             }),
-            aws,
+            AWS,
           },
         }).transporter,
         defaults: {
