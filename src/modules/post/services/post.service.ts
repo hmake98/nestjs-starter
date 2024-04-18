@@ -43,7 +43,6 @@ export class PostService implements IPostService {
         },
       });
     } catch (e) {
-      console.log(e);
       throw e;
     }
   }
