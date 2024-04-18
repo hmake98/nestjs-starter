@@ -111,8 +111,6 @@ export class PostService implements IPostService {
         data,
       };
     } catch (e) {
-      console.log(e);
-
       throw e;
     }
   }
