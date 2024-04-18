@@ -76,7 +76,7 @@
     "@nestjs/testing": "^10.3.7",
     "@prisma/client": "^5.12.1",
     "@types/bcrypt": "^10.0.28-alpha",
-    "@types/bull": "^3.15.9",
+    "@types/bull": "^4.10.0",
     "@types/copyfiles": "^2.4.4",
     "@types/eslint": "~8.56.9",
     "@types/eslint-config-prettier": "~6.11.3",
