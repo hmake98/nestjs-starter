@@ -64,8 +64,10 @@ export class PostController {
     serialization: GetPostsResponseDto,
     httpStatus: 200,
   })
+  @DocErrors([HttpStatus.BAD_REQUEST])
   @Get()
   public async getPosts(
+    @AuthUser() _user: IAuthUser,
     @Query() params: GetPostsDto,
   ): Promise<GetPostsResponseDto> {
     return this.postService.getAll(params);

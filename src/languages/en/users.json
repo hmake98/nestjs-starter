@@ -1,4 +1,5 @@
 {
   "userNotFound": "User not found.",
-  "userExists": "User already exists."
+  "userExists": "User already exists.",
+  "userDeleted": "User is deleted."
 }

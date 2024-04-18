@@ -49,7 +49,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.101Z"
+                          "example": "2024-04-18T14:53:13.831Z"
                         }
                       }
                     }
@@ -78,15 +78,14 @@
             "required": true,
             "in": "query",
             "description": "page",
-            "example": 0,
+            "example": 1,
             "schema": { "type": "number" }
           },
           {
             "name": "search",
-            "required": true,
+            "required": false,
             "in": "query",
             "description": "search",
-            "example": "civitas",
             "schema": { "type": "string" }
           }
         ],
@@ -110,6 +109,27 @@
                       "$ref": "#/components/schemas/GetPostsResponseDto"
                     }
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Bad Request" },
+                        "statusCode": { "type": "number", "example": 400 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-18T14:53:13.831Z"
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
@@ -166,7 +186,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.102Z"
+                          "example": "2024-04-18T14:53:13.831Z"
                         }
                       }
                     }
@@ -233,7 +253,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.102Z"
+                          "example": "2024-04-18T14:53:13.831Z"
                         }
                       }
                     }
@@ -287,7 +307,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.069Z"
+                          "example": "2024-04-18T14:53:13.799Z"
                         }
                       }
                     }
@@ -349,7 +369,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.070Z"
+                          "example": "2024-04-18T14:53:13.799Z"
                         }
                       }
                     }
@@ -410,7 +430,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.098Z"
+                          "example": "2024-04-18T14:53:13.827Z"
                         }
                       }
                     }
@@ -477,7 +497,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.098Z"
+                          "example": "2024-04-18T14:53:13.828Z"
                         }
                       }
                     }
@@ -646,7 +666,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.112Z"
+                          "example": "2024-04-18T14:53:13.842Z"
                         }
                       }
                     }
@@ -705,7 +725,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.112Z"
+                          "example": "2024-04-18T14:53:13.842Z"
                         }
                       }
                     }
@@ -726,7 +746,7 @@
                         "statusCode": { "type": "number", "example": 409 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.113Z"
+                          "example": "2024-04-18T14:53:13.842Z"
                         }
                       }
                     }
@@ -779,7 +799,7 @@
                         "statusCode": { "type": "number", "example": 401 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.113Z"
+                          "example": "2024-04-18T14:53:13.842Z"
                         }
                       }
                     }
@@ -802,7 +822,7 @@
             "required": true,
             "in": "query",
             "description": "file name",
-            "example": "tristis-autem-asperiores",
+            "example": "allatus-quaerat-uredo",
             "schema": { "type": "string" }
           },
           {
@@ -850,7 +870,7 @@
                         "statusCode": { "type": "number", "example": 500 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.173Z"
+                          "example": "2024-04-18T14:53:13.900Z"
                         }
                       }
                     }
@@ -912,7 +932,7 @@
                         "statusCode": { "type": "number", "example": 409 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.177Z"
+                          "example": "2024-04-18T14:53:13.903Z"
                         }
                       }
                     }
@@ -949,7 +969,7 @@
             "required": true,
             "in": "query",
             "description": "search",
-            "example": "iste",
+            "example": "adulatio",
             "schema": { "type": "string" }
           }
         ],
@@ -989,7 +1009,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.177Z"
+                          "example": "2024-04-18T14:53:13.903Z"
                         }
                       }
                     }
@@ -1050,7 +1070,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-18T08:48:35.177Z"
+                          "example": "2024-04-18T14:53:13.903Z"
                         }
                       }
                     }
@@ -1094,7 +1114,7 @@
           "message": { "type": "string", "nullable": false },
           "timestamp": {
             "type": "string",
-            "example": "2024-04-18T08:48:35.068Z",
+            "example": "2024-04-18T14:53:13.798Z",
             "nullable": false
           },
           "data": { "type": "object", "nullable": false }
@@ -1195,12 +1215,12 @@
           "content": {
             "type": "string",
             "description": "post content",
-            "example": "Velum defero conturbo curia sollicito auctus ventus illo temporibus.\nVilis amitto substantia vere basium amplexus quisquam amplexus demonstro."
+            "example": "Subseco tibi tenus nostrum eveniet modi bellicus magnam desolo claudeo.\nSupra verbum cultura conitor vulticulus anser turba blandior decretum."
           },
           "title": {
             "type": "string",
             "description": "post title",
-            "example": "aranea coaegresco adsuesco"
+            "example": "thymum amplexus peccatus"
           }
         },
         "required": ["content", "title"]
@@ -1209,7 +1229,7 @@
         "type": "object",
         "properties": {
           "status": { "type": "boolean", "example": true },
-          "message": { "type": "string", "example": "record is deleted" }
+          "message": { "type": "string", "example": "string" }
         },
         "required": ["status", "message"]
       },
@@ -1290,12 +1310,12 @@
           "content": {
             "type": "string",
             "description": "post content",
-            "example": "Velum defero conturbo curia sollicito auctus ventus illo temporibus.\nVilis amitto substantia vere basium amplexus quisquam amplexus demonstro."
+            "example": "Subseco tibi tenus nostrum eveniet modi bellicus magnam desolo claudeo.\nSupra verbum cultura conitor vulticulus anser turba blandior decretum."
           },
           "title": {
             "type": "string",
             "description": "post title",
-            "example": "aranea coaegresco adsuesco"
+            "example": "thymum amplexus peccatus"
           }
         },
         "required": ["content", "title"]
@@ -1372,12 +1392,12 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Reagan.Swift@yahoo.com"
+            "example": "Shaniya_Schumm82@gmail.com"
           },
           "firstName": {
             "type": "string",
             "description": "user first name",
-            "example": "Sedrick"
+            "example": "Luz"
           },
           "lastName": {
             "type": "string",
@@ -1387,7 +1407,7 @@
           "profile": {
             "type": "string",
             "description": "user profile picture",
-            "example": "https://avatars.githubusercontent.com/u/7709463"
+            "example": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1011.jpg"
           }
         }
       },
@@ -1429,12 +1449,12 @@
         "properties": {
           "accessToken": {
             "type": "string",
-            "example": "xE9iQWcOqV94jkOp8i3CH7zlwpklrM",
+            "example": "HCh4BHUKz6FkIhWAgex65bcQmKFSn1",
             "nullable": false
           },
           "refreshToken": {
             "type": "string",
-            "example": "4vIHhd7IRgQErS4JvRsOaETsIwppXV",
+            "example": "4BXrudzbPcvXBJQuPkInnPqt0asAyG",
             "nullable": false
           },
           "user": {
@@ -1450,12 +1470,12 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Camren26@yahoo.com"
+            "example": "Elta.Kuhn71@hotmail.com"
           },
           "password": {
             "type": "string",
             "description": "user password",
-            "example": "23tBw4TqfxfRB5K"
+            "example": "5VGJVwMIEMw4C0Y"
           }
         },
         "required": ["email", "password"]
@@ -1466,22 +1486,22 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Camren26@yahoo.com"
+            "example": "Elta.Kuhn71@hotmail.com"
           },
           "password": {
             "type": "string",
             "description": "user password",
-            "example": "23tBw4TqfxfRB5K"
+            "example": "5VGJVwMIEMw4C0Y"
           },
           "firstName": {
             "type": "string",
             "description": "user first name",
-            "example": "Samanta"
+            "example": "Diego"
           },
           "lastName": {
             "type": "string",
             "description": "user last name",
-            "example": "Stehr"
+            "example": "Beatty"
           }
         },
         "required": ["email", "password"]
@@ -1491,12 +1511,12 @@
         "properties": {
           "accessToken": {
             "type": "string",
-            "example": "eThHQGH9gesqQYgRxCP0ZRaKVwPcx0",
+            "example": "mhMYGfUIo03JHxCM3LWKB8ROUYiYEq",
             "nullable": false
           },
           "refreshToken": {
             "type": "string",
-            "example": "1LL3r0EBlngrfT1M1YMuVWJ92BELy4",
+            "example": "6NEbeUx1TiHBbUOHqQHmWuWkMrBVTj",
             "nullable": false
           }
         },
@@ -1507,7 +1527,7 @@
         "properties": {
           "url": {
             "type": "string",
-            "example": "https://loremflickr.com/640/480?lock=6926834369298432",
+            "example": "https://picsum.photos/seed/NjdkD/640/480",
             "nullable": false
           },
           "expiresIn": {
@@ -1577,12 +1597,12 @@
           "title": {
             "type": "string",
             "description": "title content",
-            "example": "Deludo utique colligo amiculum depono modi coniuratio voluptas basium.\nCotidie altus consuasor fuga thermae."
+            "example": "Veritas venustas tamquam cogo alter amplus comparo.\nCuius curiositas tredecim minus desino utor vos."
           },
           "body": {
             "type": "string",
             "description": "notification body",
-            "example": "repellat culpo aduro"
+            "example": "arbor minus vulariter"
           },
           "payload": {
             "type": "object",

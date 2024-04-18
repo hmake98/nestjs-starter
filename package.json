@@ -19,8 +19,7 @@
     "test": "dotenv -e .env.local -- jest --runInBand --forceExit",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json --forceExit",
-    "prepare": "husky install"
+    "test:e2e": "jest --config ./test/jest-e2e.json --forceExit"
   },
   "engines": {
     "node": ">=18.0.0"

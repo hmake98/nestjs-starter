@@ -1,6 +1,5 @@
-import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class GetPostsDto {
   @ApiProperty({
@@ -8,23 +7,22 @@ export class GetPostsDto {
     example: 10,
     required: true,
   })
-  @IsNumber()
+  @IsString()
   @IsNotEmpty({ message: 'limit is required' })
   public limit: number;
 
   @ApiProperty({
     description: 'page',
-    example: 0,
+    example: 1,
     required: true,
   })
-  @IsNumber()
+  @IsString()
   @IsNotEmpty({ message: 'page is required' })
   public page: number;
 
   @ApiProperty({
     description: 'search',
-    example: faker.lorem.word(),
-    required: true,
+    required: false,
   })
   @IsString()
   @IsOptional()

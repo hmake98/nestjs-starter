@@ -45,7 +45,7 @@ export class GenericResponseDto {
   status: boolean;
 
   @ApiProperty({
-    example: 'record is deleted',
+    example: 'string',
     required: true,
   })
   message: string;

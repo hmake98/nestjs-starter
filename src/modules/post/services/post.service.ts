@@ -43,6 +43,7 @@ export class PostService implements IPostService {
         },
       });
     } catch (e) {
+      console.log(e);
       throw e;
     }
   }
@@ -82,6 +83,7 @@ export class PostService implements IPostService {
               mode: 'insensitive',
             },
           }),
+          is_deleted: false,
         },
       });
       const data = await this.prismaService.posts.findMany({
@@ -96,9 +98,10 @@ export class PostService implements IPostService {
               mode: 'insensitive',
             },
           }),
+          is_deleted: false,
         },
-        take: limit,
-        skip: skip,
+        take: Number(limit),
+        skip: Number(skip),
         include: {
           author: true,
           photos: true,
@@ -109,6 +112,8 @@ export class PostService implements IPostService {
         data,
       };
     } catch (e) {
+      console.log(e);
+
       throw e;
     }
   }

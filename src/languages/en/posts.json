@@ -1,3 +1,4 @@
 {
-  "postNotFound": "Post not found."
+  "postNotFound": "Post not found.",
+  "postDeleted": "Post is deleted."
 }
