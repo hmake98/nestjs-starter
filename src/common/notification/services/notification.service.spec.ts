@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationService } from './notification.service';
-import { PrismaService } from 'src/common/helper/services/prisma.service';
+import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { NotificationCreateDto } from '../dtos/create.notification.dto';
 import { NotificationGetDto } from '../dtos/get.notification.dto';
 import { NotificationDto } from '../dtos/notification.response.dto';
@@ -15,6 +15,7 @@ describe('NotificationService', () => {
       findMany: jest.fn(),
       count: jest.fn(),
       update: jest.fn(),
+      findUnique: jest.fn(),
     },
   };
 
@@ -145,26 +146,23 @@ describe('NotificationService', () => {
   describe('deleteNotification', () => {
     it('should delete a notification', async () => {
       const notificationId = 'notification-id';
-      const deletedNotification: Notification = {
-        id: notificationId,
-        title: 'Test Title',
-        body: 'Test Body',
-        payload: {},
-        type: 'EMAIL',
-        sender_id: 'user-id',
-        is_deleted: true,
-        created_at: new Date(),
-        updated_at: new Date(),
-        deleted_at: new Date(),
-      };
 
-      prismaServiceMock.notification.update.mockResolvedValue(
-        deletedNotification,
-      );
+      prismaServiceMock.notification.findUnique.mockResolvedValue({
+        id: notificationId,
+      });
+
+      prismaServiceMock.notification.update.mockResolvedValue({
+        status: true,
+        message: 'notifications.notificationDeleted',
+      });
 
       const result =
         await notificationService.deleteNotification(notificationId);
-      expect(result).toEqual(deletedNotification);
+
+      expect(result).toEqual({
+        status: true,
+        message: 'notifications.notificationDeleted',
+      });
       expect(prismaServiceMock.notification.update).toHaveBeenCalledWith(
         expect.any(Object),
       );

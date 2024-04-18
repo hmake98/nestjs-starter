@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { INotificationService } from '../interfaces/notification.service.interface';
 import { NotificationCreateDto } from '../dtos/create.notification.dto';
 import { NotificationGetDto } from '../dtos/get.notification.dto';
-import { PrismaService } from 'src/common/helper/services/prisma.service';
+import { PrismaService } from '../../../common/helper/services/prisma.service';
 import {
   NotificationCreateResponseDto,
   NotificationGetResponseDto,

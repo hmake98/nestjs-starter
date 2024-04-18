@@ -7,13 +7,13 @@ import { UserLoginDto } from '../dtos/auth.login.dto';
 import { PrismaService } from '../../helper/services/prisma.service';
 import { EncryptionService } from '../../../common/helper/services/encryption.service';
 import { UserCreateDto } from '../dtos/auth.signup.dto';
-import { BullQueues } from 'src/common/notification/constants/notification.constants';
-import { EmailTemplates } from 'src/common/notification/constants/notification.enum';
+import { BullQueues } from '../../../common/notification/constants/notification.constants';
+import { EmailTemplates } from '../../../common/notification/constants/notification.enum';
 import {
   AuthRefreshResponseDto,
   AuthResponseDto,
 } from '../dtos/auth.response.dto';
-import { IAuthUser } from 'src/core/interfaces/request.interface';
+import { IAuthUser } from '../../../core/interfaces/request.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {

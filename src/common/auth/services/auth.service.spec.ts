@@ -8,7 +8,7 @@ import { UserCreateDto } from '../dtos/auth.signup.dto';
 import { Roles } from '@prisma/client';
 import { BullModule } from '@nestjs/bull';
 import { UserLoginDto } from '../dtos/auth.login.dto';
-import { BullQueues } from 'src/common/notification/constants/notification.constants';
+import { BullQueues } from '../../../common/notification/constants/notification.constants';
 
 describe('AuthService', () => {
   let authService: AuthService;

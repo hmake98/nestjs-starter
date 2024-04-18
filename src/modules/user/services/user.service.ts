@@ -2,8 +2,8 @@ import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
 import { UserUpdateDto } from '../dtos/user.update.dto';
 import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { IUserService } from '../interfaces/user.service.interface';
-import { FileMimeType } from 'src/common/files/constants/files.enum';
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
+import { FileMimeType } from '../../../common/files/constants/files.enum';
+import { GenericResponseDto } from '../../../core/dtos/response.dto';
 import {
   GetProfileResponseDto,
   UpdateProfileResponseDto,
@@ -85,11 +85,7 @@ export class UserService implements IUserService {
       if (!check) {
         throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
       }
-      return this.prismaService.users.findUnique({
-        where: {
-          id,
-        },
-      });
+      return check;
     } catch (e) {
       throw e;
     }

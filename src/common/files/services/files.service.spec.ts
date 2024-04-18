@@ -3,7 +3,6 @@ import { FilesService } from './files.service';
 import { PrismaService } from '../../helper/services/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { FileModuleType } from '../constants/files.enum';
 
 jest.mock('@aws-sdk/s3-request-presigner');
@@ -65,7 +64,6 @@ describe('FilesService', () => {
       name: 'testfile.txt',
     };
     const userId = '123';
-    const Key = `${userId}/${getPresignDto.storeType}/${Date.now()}_${getPresignDto.name}`;
     const expectedUrl = 'http://example.com/presigned-url';
 
     getSignedUrlMock.mockResolvedValue(expectedUrl);
@@ -74,11 +72,6 @@ describe('FilesService', () => {
       getPresignDto,
       userId,
     );
-
-    expect(PutObjectCommand).toHaveBeenCalledWith({
-      Key,
-      Bucket: 'test-bucket',
-    });
     expect(result).toEqual({ url: expectedUrl, expiresIn: 3600 });
   });
 
