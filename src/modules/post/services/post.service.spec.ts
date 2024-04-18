@@ -34,10 +34,6 @@ describe('PostService', () => {
     jest.clearAllMocks();
   });
 
-  beforeAll(done => {
-    done();
-  });
-
   it('should be defined', () => {
     expect(postService).toBeDefined();
   });

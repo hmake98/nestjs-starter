@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { join } from 'path';
-import { EmailService } from './services/email.service';
 import { NotificationController } from './controllers/notification.controller';
 import { TextMessageService } from './services/text-message.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { createTransport } from 'nodemailer';
-import * as AWS from '@aws-sdk/client-ses';
 import { EmailWorker } from './workers/email.worker';
+import { SES } from '@aws-sdk/client-ses';
+import { NotificationService } from './services/notification.service';
+import { HelperModule } from '../helper/helper.module';
 
 @Module({
   controllers: [NotificationController],
@@ -16,18 +16,15 @@ import { EmailWorker } from './workers/email.worker';
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        transport: createTransport({
-          SES: {
-            ses: new AWS.SES({
-              region: configService.get<string>('aws.region'),
-              credentials: {
-                accessKeyId: configService.get<string>('aws.accessKey'),
-                secretAccessKey: configService.get<string>('aws.secretKey'),
-              },
-            }),
-            AWS,
-          },
-        }).transporter,
+        transport: {
+          SES: new SES({
+            region: configService.get<string>('aws.region'),
+            credentials: {
+              accessKeyId: configService.get<string>('aws.accessKey'),
+              secretAccessKey: configService.get<string>('aws.secretKey'),
+            },
+          }),
+        },
         defaults: {
           from: `${configService.get('app.name')} ${configService.get<string>(
             'aws.ses.sourceEmail',
@@ -43,8 +40,9 @@ import { EmailWorker } from './workers/email.worker';
       }),
       inject: [ConfigService],
     }),
+    HelperModule,
   ],
-  providers: [EmailService, EmailWorker, TextMessageService],
-  exports: [EmailService, EmailWorker, TextMessageService],
+  providers: [EmailWorker, TextMessageService, NotificationService],
+  exports: [EmailWorker, TextMessageService, NotificationService],
 })
 export class NotificationModule {}

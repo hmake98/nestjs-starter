@@ -5,14 +5,14 @@ import { JwtAccessStrategy } from './providers/access-jwt.strategy';
 import { AuthController } from './controllers/auth.controller';
 import { HelperModule } from '../helper/helper.module';
 import { BullModule } from '@nestjs/bull';
-import { BullQueues } from 'src/app/app.constant';
 import { JwtRefreshStrategy } from './providers/refresh-jwt.strategy';
+import { BullQueues } from '../notification/constants/notification.constants';
 
 @Module({
   controllers: [AuthController],
   imports: [
     BullModule.registerQueue({
-      name: BullQueues.EMAIL,
+      name: BullQueues.EMAIL_QUEUE,
     }),
     HelperModule,
     PassportModule,

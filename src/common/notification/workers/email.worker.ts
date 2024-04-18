@@ -1,28 +1,28 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { BullQueues } from '../../../app/app.constant';
-import { EmailService } from '../services/email.service';
-import { EmailTemplates } from '../../../app/app.enum';
+import { MailerService } from '@nestjs-modules/mailer';
+import { BullQueues } from '../constants/notification.constants';
+import { EmailTemplates } from '../constants/notification.enum';
 
-@Processor(BullQueues.EMAIL)
+@Processor(BullQueues.EMAIL_QUEUE)
 export class EmailWorker {
   private logger = new Logger(EmailWorker.name);
 
-  constructor(private readonly emailService: EmailService) {}
+  constructor(private readonly mailerService: MailerService) {}
 
-  @Process()
-  async sender(job: Job<any>): Promise<void> {
-    const { firstName, lastName, email } = job.data;
-    this.emailService
-      .sendEmail({
-        data: { firstName, lastName },
-        emails: [email],
-        subject: 'Welcome Email',
+  @Process(EmailTemplates.WELCOME_EMAIL)
+  async sendEmailWorker(job: Job<any>): Promise<void> {
+    const { data, email } = job.data;
+    this.mailerService
+      .sendMail({
+        to: [email],
+        subject: 'welcome to the platform',
         template: EmailTemplates.WELCOME_EMAIL,
+        context: data,
       })
       .then(response => {
-        this.logger.log('welcome email sent', JSON.stringify(response));
+        this.logger.log('Welcome email sent: ', JSON.stringify(response));
       })
       .catch(e => this.logger.error(e));
   }

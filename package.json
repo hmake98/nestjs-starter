@@ -5,7 +5,6 @@
   "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "prebuild": "rimraf dist",
     "postinstall": "npx typesync && yarn generate",
     "build": "nest build",
     "dev": "dotenv -e .env.local -- nest start --watch",
@@ -25,9 +24,6 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "resolutions": {
-    "string-width": "4.2.3"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.554.0",
@@ -70,7 +66,6 @@
     "passport-local": "^1.0.0",
     "prisma": "^5.12.1",
     "reflect-metadata": "^0.2.2",
-    "rimraf": "^5.0.5",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.0"
   },

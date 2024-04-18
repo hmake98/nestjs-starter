@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FilesService } from './files.service';
 import { PrismaService } from '../../helper/services/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { FileModuleType } from '../../../app/app.enum';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { FileModuleType } from '../constants/files.enum';
 
 jest.mock('@aws-sdk/s3-request-presigner');
 jest.mock('@aws-sdk/client-s3');
@@ -53,10 +53,6 @@ describe('FilesService', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-  });
-
-  beforeAll(done => {
-    done();
   });
 
   it('should be defined', () => {

@@ -8,7 +8,7 @@ import {
   UpdateProfileResponseDto,
 } from '../dtos/user.response.dto';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
-import { IAuthUser } from 'src/common/auth/interfaces/auth.interface';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
 
 @ApiTags('user.users')
 @Controller({

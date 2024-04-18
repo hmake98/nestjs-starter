@@ -49,7 +49,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.343Z"
+                          "example": "2024-04-18T08:48:35.101Z"
                         }
                       }
                     }
@@ -86,7 +86,7 @@
             "required": true,
             "in": "query",
             "description": "search",
-            "example": "theca",
+            "example": "civitas",
             "schema": { "type": "string" }
           }
         ],
@@ -147,7 +147,7 @@
                   ],
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/DeletePostResponseDto"
+                      "$ref": "#/components/schemas/GenericResponseDto"
                     }
                   }
                 }
@@ -166,7 +166,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.343Z"
+                          "example": "2024-04-18T08:48:35.102Z"
                         }
                       }
                     }
@@ -233,7 +233,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.343Z"
+                          "example": "2024-04-18T08:48:35.102Z"
                         }
                       }
                     }
@@ -287,7 +287,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.304Z"
+                          "example": "2024-04-18T08:48:35.069Z"
                         }
                       }
                     }
@@ -349,7 +349,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.304Z"
+                          "example": "2024-04-18T08:48:35.070Z"
                         }
                       }
                     }
@@ -391,7 +391,7 @@
                   ],
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/DeleteProfileResponseDto"
+                      "$ref": "#/components/schemas/GenericResponseDto"
                     }
                   }
                 }
@@ -410,7 +410,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.340Z"
+                          "example": "2024-04-18T08:48:35.098Z"
                         }
                       }
                     }
@@ -458,7 +458,7 @@
                   ],
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/UpdateProfileAdminResponseDto"
+                      "$ref": "#/components/schemas/UpdateProfileResponseDto"
                     }
                   }
                 }
@@ -477,7 +477,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.340Z"
+                          "example": "2024-04-18T08:48:35.098Z"
                         }
                       }
                     }
@@ -646,7 +646,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.350Z"
+                          "example": "2024-04-18T08:48:35.112Z"
                         }
                       }
                     }
@@ -705,7 +705,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.350Z"
+                          "example": "2024-04-18T08:48:35.112Z"
                         }
                       }
                     }
@@ -726,7 +726,7 @@
                         "statusCode": { "type": "number", "example": 409 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.351Z"
+                          "example": "2024-04-18T08:48:35.113Z"
                         }
                       }
                     }
@@ -759,7 +759,9 @@
                     }
                   ],
                   "properties": {
-                    "data": { "$ref": "#/components/schemas/AuthResponseDto" }
+                    "data": {
+                      "$ref": "#/components/schemas/AuthRefreshResponseDto"
+                    }
                   }
                 }
               }
@@ -777,7 +779,7 @@
                         "statusCode": { "type": "number", "example": 401 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.351Z"
+                          "example": "2024-04-18T08:48:35.113Z"
                         }
                       }
                     }
@@ -800,7 +802,7 @@
             "required": true,
             "in": "query",
             "description": "file name",
-            "example": "cribro-corrigo-clibanus",
+            "example": "tristis-autem-asperiores",
             "schema": { "type": "string" }
           },
           {
@@ -810,6 +812,145 @@
             "description": "file store type",
             "example": "Profile",
             "schema": { "enum": ["Profile", "Posts"], "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "Created" },
+                        "statusCode": { "type": "number", "example": 201 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FilePutPresignResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Internal Server Error" },
+                        "statusCode": { "type": "number", "example": 500 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-18T08:48:35.173Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["files"],
+        "security": [{ "accessToken": [] }]
+      }
+    },
+    "/api/v1/notifications": {
+      "post": {
+        "operationId": "NotificationController_createNotification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NotificationCreateDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "Created" },
+                        "statusCode": { "type": "number", "example": 201 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/NotificationCreateResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Conflict" },
+                        "statusCode": { "type": "number", "example": 409 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-18T08:48:35.177Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["notifications"],
+        "security": [{ "accessToken": [] }]
+      },
+      "get": {
+        "operationId": "NotificationController_getNotifications",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "description": "limit",
+            "example": 10,
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "page",
+            "example": 0,
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "search",
+            "required": true,
+            "in": "query",
+            "description": "search",
+            "example": "iste",
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
@@ -829,36 +970,26 @@
                   ],
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/FilePutPresignResponseDto"
+                      "$ref": "#/components/schemas/NotificationGetResponseDto"
                     }
                   }
                 }
               }
             }
           },
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FilePutPresignResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
                   "allOf": [
                     {
                       "properties": {
-                        "message": { "example": "Internal Server Error" },
-                        "statusCode": { "type": "number", "example": 500 },
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-17T10:38:42.387Z"
+                          "example": "2024-04-18T08:48:35.177Z"
                         }
                       }
                     }
@@ -868,7 +999,68 @@
             }
           }
         },
-        "tags": ["files"],
+        "tags": ["notifications"],
+        "security": [{ "accessToken": [] }]
+      }
+    },
+    "/api/v1/notifications/{id}": {
+      "delete": {
+        "operationId": "NotificationController_deleteNotification",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ResponseDto" },
+                    {
+                      "properties": {
+                        "message": { "example": "OK" },
+                        "statusCode": { "type": "number", "example": 200 }
+                      }
+                    }
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/GenericResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "message": { "example": "Not Found" },
+                        "statusCode": { "type": "number", "example": 404 },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2024-04-18T08:48:35.177Z"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["notifications"],
         "security": [{ "accessToken": [] }]
       }
     }
@@ -902,12 +1094,70 @@
           "message": { "type": "string", "nullable": false },
           "timestamp": {
             "type": "string",
-            "example": "2024-04-17T10:38:42.303Z",
+            "example": "2024-04-18T08:48:35.068Z",
             "nullable": false
           },
           "data": { "type": "object", "nullable": false }
         },
         "required": ["statusCode", "message", "timestamp", "data"]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "avatar_id": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "email": { "type": "string" },
+          "first_name": { "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "is_verified": { "type": "boolean" },
+          "last_name": { "type": "string" },
+          "phone": { "type": "string" },
+          "role": { "type": "object" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": [
+          "avatar_id",
+          "created_at",
+          "deleted_at",
+          "email",
+          "first_name",
+          "id",
+          "is_deleted",
+          "is_verified",
+          "last_name",
+          "phone",
+          "role",
+          "updated_at",
+          "password"
+        ]
+      },
+      "FileDto": {
+        "type": "object",
+        "properties": {
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "file_name": { "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "link": { "type": "string" },
+          "post_id": { "type": "string" },
+          "type": { "type": "string" },
+          "updated_at": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "created_at",
+          "deleted_at",
+          "file_name",
+          "id",
+          "is_deleted",
+          "link",
+          "post_id",
+          "type",
+          "updated_at"
+        ]
       },
       "CreatePostResponseDto": {
         "type": "object",
@@ -919,7 +1169,12 @@
           "id": { "type": "string" },
           "is_deleted": { "type": "boolean" },
           "title": { "type": "string" },
-          "updated_at": { "format": "date-time", "type": "string" }
+          "updated_at": { "format": "date-time", "type": "string" },
+          "author": { "$ref": "#/components/schemas/UserDto" },
+          "photos": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/FileDto" }
+          }
         },
         "required": [
           "author_id",
@@ -929,7 +1184,9 @@
           "id",
           "is_deleted",
           "title",
-          "updated_at"
+          "updated_at",
+          "author",
+          "photos"
         ]
       },
       "CreatePostDto": {
@@ -938,38 +1195,23 @@
           "content": {
             "type": "string",
             "description": "post content",
-            "example": "Qui defleo cursim.\nCommodi creptio venustas ratione adinventitias adiuvo aegre asperiores atrox spoliatio."
+            "example": "Velum defero conturbo curia sollicito auctus ventus illo temporibus.\nVilis amitto substantia vere basium amplexus quisquam amplexus demonstro."
           },
           "title": {
             "type": "string",
             "description": "post title",
-            "example": "autus clarus aggero"
+            "example": "aranea coaegresco adsuesco"
           }
         },
         "required": ["content", "title"]
       },
-      "DeletePostResponseDto": {
+      "GenericResponseDto": {
         "type": "object",
         "properties": {
-          "author_id": { "type": "string" },
-          "content": { "type": "string" },
-          "created_at": { "format": "date-time", "type": "string" },
-          "deleted_at": { "format": "date-time", "type": "string" },
-          "id": { "type": "string" },
-          "is_deleted": { "type": "boolean" },
-          "title": { "type": "string" },
-          "updated_at": { "format": "date-time", "type": "string" }
+          "status": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "record is deleted" }
         },
-        "required": [
-          "author_id",
-          "content",
-          "created_at",
-          "deleted_at",
-          "id",
-          "is_deleted",
-          "title",
-          "updated_at"
-        ]
+        "required": ["status", "message"]
       },
       "PostResponseDto": {
         "type": "object",
@@ -981,7 +1223,12 @@
           "id": { "type": "string" },
           "is_deleted": { "type": "boolean" },
           "title": { "type": "string" },
-          "updated_at": { "format": "date-time", "type": "string" }
+          "updated_at": { "format": "date-time", "type": "string" },
+          "author": { "$ref": "#/components/schemas/UserDto" },
+          "photos": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/FileDto" }
+          }
         },
         "required": [
           "author_id",
@@ -991,7 +1238,9 @@
           "id",
           "is_deleted",
           "title",
-          "updated_at"
+          "updated_at",
+          "author",
+          "photos"
         ]
       },
       "GetPostsResponseDto": {
@@ -1015,7 +1264,12 @@
           "id": { "type": "string" },
           "is_deleted": { "type": "boolean" },
           "title": { "type": "string" },
-          "updated_at": { "format": "date-time", "type": "string" }
+          "updated_at": { "format": "date-time", "type": "string" },
+          "author": { "$ref": "#/components/schemas/UserDto" },
+          "photos": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/FileDto" }
+          }
         },
         "required": [
           "author_id",
@@ -1025,7 +1279,9 @@
           "id",
           "is_deleted",
           "title",
-          "updated_at"
+          "updated_at",
+          "author",
+          "photos"
         ]
       },
       "UpdatePostDto": {
@@ -1034,12 +1290,12 @@
           "content": {
             "type": "string",
             "description": "post content",
-            "example": "Qui defleo cursim.\nCommodi creptio venustas ratione adinventitias adiuvo aegre asperiores atrox spoliatio."
+            "example": "Velum defero conturbo curia sollicito auctus ventus illo temporibus.\nVilis amitto substantia vere basium amplexus quisquam amplexus demonstro."
           },
           "title": {
             "type": "string",
             "description": "post title",
-            "example": "autus clarus aggero"
+            "example": "aranea coaegresco adsuesco"
           }
         },
         "required": ["content", "title"]
@@ -1116,90 +1372,24 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Nya.Reichert65@yahoo.com"
+            "example": "Reagan.Swift@yahoo.com"
           },
           "firstName": {
             "type": "string",
             "description": "user first name",
-            "example": "Winston"
+            "example": "Sedrick"
           },
           "lastName": {
             "type": "string",
             "description": "user last name",
-            "example": "Sipes"
+            "example": "Bahringer"
           },
           "profile": {
             "type": "string",
             "description": "user profile picture",
-            "example": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/501.jpg"
+            "example": "https://avatars.githubusercontent.com/u/7709463"
           }
         }
-      },
-      "DeleteProfileResponseDto": {
-        "type": "object",
-        "properties": {
-          "avatar_id": { "type": "string" },
-          "created_at": { "format": "date-time", "type": "string" },
-          "deleted_at": { "format": "date-time", "type": "string" },
-          "email": { "type": "string" },
-          "first_name": { "type": "string" },
-          "id": { "type": "string" },
-          "is_deleted": { "type": "boolean" },
-          "is_verified": { "type": "boolean" },
-          "last_name": { "type": "string" },
-          "phone": { "type": "string" },
-          "role": { "type": "object" },
-          "updated_at": { "format": "date-time", "type": "string" },
-          "password": { "type": "string" }
-        },
-        "required": [
-          "avatar_id",
-          "created_at",
-          "deleted_at",
-          "email",
-          "first_name",
-          "id",
-          "is_deleted",
-          "is_verified",
-          "last_name",
-          "phone",
-          "role",
-          "updated_at",
-          "password"
-        ]
-      },
-      "UpdateProfileAdminResponseDto": {
-        "type": "object",
-        "properties": {
-          "avatar_id": { "type": "string" },
-          "created_at": { "format": "date-time", "type": "string" },
-          "deleted_at": { "format": "date-time", "type": "string" },
-          "email": { "type": "string" },
-          "first_name": { "type": "string" },
-          "id": { "type": "string" },
-          "is_deleted": { "type": "boolean" },
-          "is_verified": { "type": "boolean" },
-          "last_name": { "type": "string" },
-          "phone": { "type": "string" },
-          "role": { "type": "object" },
-          "updated_at": { "format": "date-time", "type": "string" },
-          "password": { "type": "string" }
-        },
-        "required": [
-          "avatar_id",
-          "created_at",
-          "deleted_at",
-          "email",
-          "first_name",
-          "id",
-          "is_deleted",
-          "is_verified",
-          "last_name",
-          "phone",
-          "role",
-          "updated_at",
-          "password"
-        ]
       },
       "UserResponseDto": {
         "type": "object",
@@ -1239,12 +1429,12 @@
         "properties": {
           "accessToken": {
             "type": "string",
-            "example": "iTftUFjCcgp8i48MdCZ3Sh93cy2lIj",
+            "example": "xE9iQWcOqV94jkOp8i3CH7zlwpklrM",
             "nullable": false
           },
           "refreshToken": {
             "type": "string",
-            "example": "lcuTln4CIV6zoZ5ItwUxg9fmnMwuy1",
+            "example": "4vIHhd7IRgQErS4JvRsOaETsIwppXV",
             "nullable": false
           },
           "user": {
@@ -1260,12 +1450,12 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Rosalinda_Stamm@gmail.com"
+            "example": "Camren26@yahoo.com"
           },
           "password": {
             "type": "string",
             "description": "user password",
-            "example": "HijVgMtaJJDYkJR"
+            "example": "23tBw4TqfxfRB5K"
           }
         },
         "required": ["email", "password"]
@@ -1276,32 +1466,48 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Rosalinda_Stamm@gmail.com"
+            "example": "Camren26@yahoo.com"
           },
           "password": {
             "type": "string",
             "description": "user password",
-            "example": "HijVgMtaJJDYkJR"
+            "example": "23tBw4TqfxfRB5K"
           },
           "firstName": {
             "type": "string",
             "description": "user first name",
-            "example": "Richie"
+            "example": "Samanta"
           },
           "lastName": {
             "type": "string",
             "description": "user last name",
-            "example": "Runte"
+            "example": "Stehr"
           }
         },
         "required": ["email", "password"]
+      },
+      "AuthRefreshResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eThHQGH9gesqQYgRxCP0ZRaKVwPcx0",
+            "nullable": false
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "1LL3r0EBlngrfT1M1YMuVWJ92BELy4",
+            "nullable": false
+          }
+        },
+        "required": ["accessToken", "refreshToken"]
       },
       "FilePutPresignResponseDto": {
         "type": "object",
         "properties": {
           "url": {
             "type": "string",
-            "example": "https://loremflickr.com/640/480?lock=560897149894656",
+            "example": "https://loremflickr.com/640/480?lock=6926834369298432",
             "nullable": false
           },
           "expiresIn": {
@@ -1311,6 +1517,136 @@
           }
         },
         "required": ["url", "expiresIn"]
+      },
+      "RecipientsDto": {
+        "type": "object",
+        "properties": {
+          "created_at": { "format": "date-time", "type": "string" },
+          "id": { "type": "string" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "user": { "$ref": "#/components/schemas/UserDto" },
+          "notification_id": { "type": "string" },
+          "users_id": { "type": "string" }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "updated_at",
+          "user",
+          "notification_id",
+          "users_id"
+        ]
+      },
+      "NotificationCreateResponseDto": {
+        "type": "object",
+        "properties": {
+          "body": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "payload": { "type": "object" },
+          "sender_id": { "type": "string" },
+          "title": { "type": "string" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "type": { "type": "object" },
+          "sender": { "$ref": "#/components/schemas/UserDto" },
+          "recipients": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RecipientsDto" }
+          }
+        },
+        "required": [
+          "body",
+          "created_at",
+          "deleted_at",
+          "id",
+          "is_deleted",
+          "payload",
+          "sender_id",
+          "title",
+          "updated_at",
+          "type",
+          "sender",
+          "recipients"
+        ]
+      },
+      "NotificationCreateDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "title content",
+            "example": "Deludo utique colligo amiculum depono modi coniuratio voluptas basium.\nCotidie altus consuasor fuga thermae."
+          },
+          "body": {
+            "type": "string",
+            "description": "notification body",
+            "example": "repellat culpo aduro"
+          },
+          "payload": {
+            "type": "object",
+            "description": "payload",
+            "example": {}
+          },
+          "recipients": {
+            "description": "recipients",
+            "example": [],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "type": {
+            "type": "object",
+            "description": "notification type",
+            "example": { "EMAIL": "EMAIL", "TEXT": "TEXT", "IN_APP": "IN_APP" }
+          }
+        },
+        "required": ["title", "body", "type"]
+      },
+      "NotificationDto": {
+        "type": "object",
+        "properties": {
+          "body": { "type": "string" },
+          "created_at": { "format": "date-time", "type": "string" },
+          "deleted_at": { "format": "date-time", "type": "string" },
+          "id": { "type": "string" },
+          "is_deleted": { "type": "boolean" },
+          "payload": { "type": "object" },
+          "sender_id": { "type": "string" },
+          "title": { "type": "string" },
+          "updated_at": { "format": "date-time", "type": "string" },
+          "type": { "type": "object" },
+          "sender": { "$ref": "#/components/schemas/UserDto" },
+          "recipients": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RecipientsDto" }
+          }
+        },
+        "required": [
+          "body",
+          "created_at",
+          "deleted_at",
+          "id",
+          "is_deleted",
+          "payload",
+          "sender_id",
+          "title",
+          "updated_at",
+          "type",
+          "sender",
+          "recipients"
+        ]
+      },
+      "NotificationGetResponseDto": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "number", "example": 10, "nullable": false },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/NotificationDto" }
+          }
+        },
+        "required": ["count", "data"]
       }
     }
   }

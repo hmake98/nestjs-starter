@@ -4,14 +4,21 @@ import { GetPostsDto } from '../dtos/get.post.dto';
 import { UpdatePostDto } from '../dtos/update.post.dto';
 import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { IPostService } from '../interfaces/post.service.interface';
-import { Posts } from '@prisma/client';
-import { IGetResponse } from 'src/core/interfaces/response.interface';
+import {
+  CreatePostResponseDto,
+  GetPostsResponseDto,
+  UpdatePostResponseDto,
+} from '../dtos/post.response.dto';
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
 
 @Injectable()
 export class PostService implements IPostService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(userId: string, data: CreatePostDto): Promise<Posts> {
+  async create(
+    userId: string,
+    data: CreatePostDto,
+  ): Promise<CreatePostResponseDto> {
     try {
       const { content, title } = data;
       const user = await this.prismaService.users.findUnique({
@@ -30,25 +37,36 @@ export class PostService implements IPostService {
             },
           },
         },
+        include: {
+          author: true,
+          photos: true,
+        },
       });
     } catch (e) {
       throw e;
     }
   }
 
-  async delete(id: string): Promise<Posts> {
+  async delete(id: string): Promise<GenericResponseDto> {
     try {
       const post = await this.prismaService.posts.findUnique({ where: { id } });
       if (!post) {
         throw new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND);
       }
-      return this.prismaService.posts.delete({ where: { id } });
+      await this.prismaService.posts.update({
+        where: { id },
+        data: { deleted_at: new Date(), is_deleted: true },
+      });
+      return {
+        status: true,
+        message: 'posts.postDeleted',
+      };
     } catch (e) {
       throw e;
     }
   }
 
-  async getAll(params: GetPostsDto): Promise<IGetResponse<Posts>> {
+  async getAll(params: GetPostsDto): Promise<GetPostsResponseDto> {
     try {
       const { limit, page, search } = params;
       const skip = (page - 1) * limit;
@@ -81,6 +99,10 @@ export class PostService implements IPostService {
         },
         take: limit,
         skip: skip,
+        include: {
+          author: true,
+          photos: true,
+        },
       });
       return {
         count,
@@ -91,7 +113,10 @@ export class PostService implements IPostService {
     }
   }
 
-  async update(id: string, data: UpdatePostDto): Promise<Posts> {
+  async update(
+    id: string,
+    data: UpdatePostDto,
+  ): Promise<UpdatePostResponseDto> {
     try {
       const { content, title } = data;
       const post = await this.prismaService.posts.findUnique({ where: { id } });
@@ -103,6 +128,10 @@ export class PostService implements IPostService {
         data: {
           title,
           content,
+        },
+        include: {
+          author: true,
+          photos: true,
         },
       });
     } catch (e) {

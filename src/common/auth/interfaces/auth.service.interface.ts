@@ -1,9 +1,13 @@
+import { IAuthUser } from 'src/core/interfaces/request.interface';
 import { UserLoginDto } from '../dtos/auth.login.dto';
 import { UserCreateDto } from '../dtos/auth.signup.dto';
-import { IAuthResponse, IAuthTokenResponse, IAuthUser } from './auth.interface';
+import {
+  AuthRefreshResponseDto,
+  AuthResponseDto,
+} from '../dtos/auth.response.dto';
 
 export interface IAuthService {
-  login(data: UserLoginDto): Promise<IAuthResponse>;
-  signup(data: UserCreateDto): Promise<IAuthResponse>;
-  refreshTokens(payload: IAuthUser): Promise<IAuthTokenResponse>;
+  login(data: UserLoginDto): Promise<AuthResponseDto>;
+  signup(data: UserCreateDto): Promise<AuthResponseDto>;
+  refreshTokens(payload: IAuthUser): Promise<AuthRefreshResponseDto>;
 }

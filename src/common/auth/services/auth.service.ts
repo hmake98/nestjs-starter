@@ -7,23 +7,24 @@ import { UserLoginDto } from '../dtos/auth.login.dto';
 import { PrismaService } from '../../helper/services/prisma.service';
 import { EncryptionService } from '../../../common/helper/services/encryption.service';
 import { UserCreateDto } from '../dtos/auth.signup.dto';
-import { BullQueues } from '../../../app/app.constant';
+import { BullQueues } from 'src/common/notification/constants/notification.constants';
+import { EmailTemplates } from 'src/common/notification/constants/notification.enum';
 import {
-  IAuthResponse,
-  IAuthTokenResponse,
-  IAuthUser,
-} from '../interfaces/auth.interface';
+  AuthRefreshResponseDto,
+  AuthResponseDto,
+} from '../dtos/auth.response.dto';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly encryptionService: EncryptionService,
-    @InjectQueue(BullQueues.EMAIL)
+    @InjectQueue(BullQueues.EMAIL_QUEUE)
     private emailQueue: Queue,
   ) {}
 
-  public async login(data: UserLoginDto): Promise<IAuthResponse> {
+  public async login(data: UserLoginDto): Promise<AuthResponseDto> {
     try {
       const { email, password } = data;
       const user = await this.prismaService.users.findUnique({
@@ -49,7 +50,7 @@ export class AuthService implements IAuthService {
     }
   }
 
-  public async signup(data: UserCreateDto): Promise<IAuthResponse> {
+  public async signup(data: UserCreateDto): Promise<AuthResponseDto> {
     try {
       const { email, firstName, lastName, password } = data;
       const user = await this.prismaService.users.findUnique({
@@ -62,12 +63,23 @@ export class AuthService implements IAuthService {
         data: {
           email,
           password: this.encryptionService.createHash(password),
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
+          first_name: firstName?.trim(),
+          last_name: lastName?.trim(),
           role: Roles.USER,
         },
       });
-      this.emailQueue.add({ firstName, lastName, email }, { delay: 15000 });
+      this.emailQueue.add(
+        EmailTemplates.WELCOME_EMAIL,
+        {
+          data: {
+            email,
+            firstName,
+            lastName,
+          },
+          email,
+        },
+        { delay: 15000 },
+      );
       const tokens = await this.encryptionService.createJwtTokens({
         role: createdUser.role,
         userId: createdUser.id,
@@ -81,7 +93,9 @@ export class AuthService implements IAuthService {
     }
   }
 
-  public async refreshTokens(payload: IAuthUser): Promise<IAuthTokenResponse> {
+  public async refreshTokens(
+    payload: IAuthUser,
+  ): Promise<AuthRefreshResponseDto> {
     const tokens = await this.encryptionService.createJwtTokens({
       userId: payload.userId,
       role: payload.role,

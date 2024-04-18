@@ -1,7 +1,5 @@
-import {
-  IAuthTokenResponse,
-  IAuthUser,
-} from 'src/common/auth/interfaces/auth.interface';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
+import { IAuthTokenResponse } from './encryption.interface';
 
 export interface IEncryptionService {
   createJwtTokens(payload: IAuthUser): Promise<IAuthTokenResponse>;

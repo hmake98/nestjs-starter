@@ -17,12 +17,12 @@ import { UpdatePostDto } from '../dtos/update.post.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   CreatePostResponseDto,
-  DeletePostResponseDto,
   GetPostsResponseDto,
   UpdatePostResponseDto,
 } from '../dtos/post.response.dto';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
-import { IAuthUser } from 'src/common/auth/interfaces/auth.interface';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
 
 @ApiTags('posts')
 @Controller({
@@ -48,14 +48,14 @@ export class PostController {
 
   @ApiBearerAuth('accessToken')
   @DocResponse({
-    serialization: DeletePostResponseDto,
+    serialization: GenericResponseDto,
     httpStatus: 200,
   })
   @DocErrors([HttpStatus.NOT_FOUND])
   @Delete(':id')
   public async deletePost(
     @Param('id') postId: string,
-  ): Promise<DeletePostResponseDto> {
+  ): Promise<GenericResponseDto> {
     return this.postService.delete(postId);
   }
 

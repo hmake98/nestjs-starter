@@ -17,8 +17,8 @@ import {
 } from '../dtos/auth.response.dto';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
 import { AuthUser } from 'src/core/decorators/auth.user.decorator';
-import { IAuthUser } from '../interfaces/auth.interface';
 import { JwtRefreshGuard } from 'src/core/guards/jwt.refresh.guard';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
 
 @ApiTags('auth')
 @Controller({
@@ -55,7 +55,7 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   @DocErrors([HttpStatus.UNAUTHORIZED])
   @DocResponse({
-    serialization: AuthResponseDto,
+    serialization: AuthRefreshResponseDto,
     httpStatus: 200,
   })
   @Get('refresh-token')

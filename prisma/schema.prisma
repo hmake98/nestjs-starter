@@ -11,21 +11,23 @@ datasource db {
 }
 
 model Users {
-  id          String    @id @default(uuid())
-  email       String    @unique
-  password    String?
-  first_name  String?
-  last_name   String?
-  is_verified Boolean   @default(false)
-  phone       String?
-  role        Roles     @default(USER)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-  deleted_at  DateTime?
-  is_deleted  Boolean?
-  avatar      Files?    @relation(fields: [avatar_id], references: [id])
-  posts       Posts[]
-  avatar_id   String?
+  id                      String                   @id @default(uuid())
+  email                   String                   @unique
+  password                String?
+  first_name              String?
+  last_name               String?
+  is_verified             Boolean                  @default(false)
+  phone                   String?
+  role                    Roles                    @default(USER)
+  created_at              DateTime                 @default(now())
+  updated_at              DateTime                 @updatedAt
+  deleted_at              DateTime?
+  is_deleted              Boolean?
+  avatar                  Files?                   @relation(fields: [avatar_id], references: [id])
+  posts                   Posts[]
+  avatar_id               String?
+  notification_recipients NotificationRecipients[]
+  notification            Notification[]
 }
 
 model Files {
@@ -55,7 +57,38 @@ model Posts {
   author_id  String
 }
 
+model Notification {
+  id         String                   @id @default(uuid())
+  title      String
+  body       String
+  payload    Json?
+  type       NotificationType
+  sender     Users                    @relation(fields: [sender_id], references: [id])
+  recipients NotificationRecipients[]
+  is_deleted Boolean                  @default(false)
+  created_at DateTime                 @default(now())
+  updated_at DateTime                 @updatedAt
+  deleted_at DateTime?
+  sender_id  String
+}
+
+model NotificationRecipients {
+  id              String        @id @default(uuid())
+  user            Users         @relation(fields: [users_id], references: [id])
+  users_id        String
+  notification    Notification? @relation(fields: [notification_id], references: [id])
+  notification_id String?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+}
+
 enum Roles {
   USER
   ADMIN
+}
+
+enum NotificationType {
+  EMAIL
+  TEXT
+  IN_APP
 }

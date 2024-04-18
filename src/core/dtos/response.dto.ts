@@ -36,3 +36,17 @@ export class ResponseDto<T> {
   @Expose()
   data: T;
 }
+
+export class GenericResponseDto {
+  @ApiProperty({
+    example: true,
+    required: true,
+  })
+  status: boolean;
+
+  @ApiProperty({
+    example: 'record is deleted',
+    required: true,
+  })
+  message: string;
+}

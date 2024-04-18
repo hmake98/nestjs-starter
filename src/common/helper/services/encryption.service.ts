@@ -2,13 +2,13 @@ import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import { IEncryptionService } from '../interfaces/encryption.service.interface';
-import { IEncryptDataPayload } from '../interfaces/encryption.interface';
 import {
   IAuthTokenResponse,
-  IAuthUser,
-} from 'src/common/auth/interfaces/auth.interface';
+  IEncryptDataPayload,
+} from '../interfaces/encryption.interface';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
 
 @Injectable()
 export class EncryptionService implements IEncryptionService {

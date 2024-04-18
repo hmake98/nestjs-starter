@@ -6,3 +6,8 @@ export interface IRequest {
     userId: string;
   };
 }
+
+export interface IAuthUser {
+  userId: string;
+  role?: Roles;
+}

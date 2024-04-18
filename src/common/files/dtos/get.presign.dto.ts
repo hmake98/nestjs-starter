@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { FileModuleType } from 'src/app/app.enum';
+import { FileModuleType } from '../constants/files.enum';
 
 export class GetPresignDto {
   @ApiProperty({

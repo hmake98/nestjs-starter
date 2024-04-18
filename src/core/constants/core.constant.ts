@@ -31,3 +31,5 @@ export const HTTP_STATUS_MESSAGES = {
 };
 
 export const RESPONSE_SERIALIZATION_META_KEY = 'ResponseSerializationMetaKey';
+
+export const PUBLIC_ROUTE_KEY = 'PUBLIC';

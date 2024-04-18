@@ -19,10 +19,6 @@ export class UserResponseDto implements Users {
   password: string;
 }
 
-export class DeleteProfileResponseDto extends UserResponseDto {}
-
-export class UpdateProfileAdminResponseDto extends UserResponseDto {}
-
 export class GetProfileResponseDto extends UserResponseDto {}
 
 export class UpdateProfileResponseDto extends UserResponseDto {}

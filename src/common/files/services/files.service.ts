@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { IFilesServiceInterface } from '../interfaces/files.service.interface';
 import { GetPresignDto } from '../dtos/get.presign.dto';
-import { IFilesPresignPutResponse } from '../interfaces/files.interface';
+import { FilePutPresignResponseDto } from '../dtos/file.response.dto';
 
 @Injectable()
 export class FilesService implements IFilesServiceInterface {
@@ -25,7 +25,7 @@ export class FilesService implements IFilesServiceInterface {
   async getPresginPutObject(
     file: GetPresignDto,
     userId: string,
-  ): Promise<IFilesPresignPutResponse> {
+  ): Promise<FilePutPresignResponseDto> {
     try {
       const Key = `${userId}/${file.storeType}/${Date.now()}_${file.name}`;
       const command = new PutObjectCommand({

@@ -20,8 +20,3 @@ export enum FileModuleType {
   UserProfile = 'Profile',
   PostPictures = 'Posts',
 }
-
-// Email templates
-export enum EmailTemplates {
-  WELCOME_EMAIL = 'welcome',
-}
