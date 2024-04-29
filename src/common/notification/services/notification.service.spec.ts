@@ -4,7 +4,6 @@ import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { NotificationCreateDto } from '../dtos/create.notification.dto';
 import { NotificationGetDto } from '../dtos/get.notification.dto';
 import { NotificationDto } from '../dtos/notification.response.dto';
-import { Notification } from '@prisma/client';
 
 describe('NotificationService', () => {
   let notificationService: NotificationService;
