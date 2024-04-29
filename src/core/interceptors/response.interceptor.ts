@@ -39,7 +39,7 @@ export class ResponseInterceptor implements NestInterceptor {
 
     const data = plainToInstance(classSerialization, responseBody);
 
-    if (classSerialization.name === GenericResponseDto.name) {
+    if (classSerialization?.name === GenericResponseDto?.name) {
       const getData = data as GenericResponseDto;
       getData.message = this.i18nService.translate(data.message, {
         lang: request.headers['accept-language'] || 'en',
