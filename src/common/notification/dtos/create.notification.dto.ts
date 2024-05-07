@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import { NotificationType } from '@prisma/client';
+import { NotificationTypes } from '@prisma/client';
 import {
   IsArray,
   IsEnum,
@@ -49,11 +49,11 @@ export class NotificationCreateDto {
 
   @ApiProperty({
     description: 'notification type',
-    example: NotificationType,
+    example: NotificationTypes,
     required: true,
   })
   @IsString()
   @IsNotEmpty({ message: 'notification type is required' })
-  @IsEnum(NotificationType)
-  public type: NotificationType;
+  @IsEnum(NotificationTypes)
+  public type: NotificationTypes;
 }

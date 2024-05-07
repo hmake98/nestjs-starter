@@ -30,11 +30,11 @@ export class ResponseDto<T> {
 
   @ApiProperty({
     name: 'data',
-    required: true,
-    nullable: false,
+    required: false,
+    nullable: true,
   })
   @Expose()
-  data: T;
+  data?: T;
 }
 
 export class GenericResponseDto {

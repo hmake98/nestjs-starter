@@ -6,14 +6,22 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
+import { ResponseDto } from '../dtos/response.dto';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  private readonly isDebug: string;
   private readonly logger = new Logger(GlobalExceptionFilter.name);
 
-  constructor(private readonly i18nService: I18nService) {}
+  constructor(
+    private readonly i18nService: I18nService,
+    private readonly configService: ConfigService,
+  ) {
+    this.isDebug = this.configService.get('app.debug');
+  }
 
   catch(exception: unknown, host: ArgumentsHost) {
     const context = host.switchToHttp();
@@ -38,16 +46,23 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       statusCode,
       message,
       timestamp: new Date().toISOString(),
-    };
+    } as ResponseDto<null>;
+
+    let errorDetails: Record<string, any>;
 
     if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
-      const errorDetails = {
+      errorDetails = {
         ...errorResponse,
         stack: exception instanceof Error ? exception.stack : undefined,
       };
       this.logger.error(JSON.stringify(errorDetails));
     } else {
       this.logger.error(JSON.stringify(errorResponse));
+    }
+
+    if (this.isDebug === 'true') {
+      errorResponse['error'] =
+        exception instanceof Error ? exception.stack : undefined;
     }
 
     response.status(statusCode).json(errorResponse);

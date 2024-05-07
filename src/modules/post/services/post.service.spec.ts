@@ -8,10 +8,10 @@ describe('PostService', () => {
   let postService: PostService;
 
   const prismaServiceMock = {
-    users: {
+    user: {
       findUnique: jest.fn(),
     },
-    posts: {
+    post: {
       create: jest.fn(),
     },
   };
@@ -46,8 +46,8 @@ describe('PostService', () => {
         content: 'This is a test post',
       };
 
-      prismaServiceMock.users.findUnique.mockResolvedValueOnce({ id: userId });
-      prismaServiceMock.posts.create.mockResolvedValueOnce(postData);
+      prismaServiceMock.user.findUnique.mockResolvedValueOnce({ id: userId });
+      prismaServiceMock.post.create.mockResolvedValueOnce(postData);
 
       const result = await postService.create(userId, postData);
 
@@ -61,7 +61,7 @@ describe('PostService', () => {
         content: 'This is a test post',
       };
 
-      prismaServiceMock.users.findUnique.mockResolvedValueOnce(null);
+      prismaServiceMock.user.findUnique.mockResolvedValueOnce(null);
 
       await expect(postService.create(userId, postData)).rejects.toThrowError(
         new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),

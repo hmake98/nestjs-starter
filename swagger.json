@@ -49,7 +49,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.513Z"
+                          "example": "2024-05-07T08:26:25.096Z"
                         }
                       }
                     }
@@ -125,7 +125,7 @@
                         "statusCode": { "type": "number", "example": 400 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.513Z"
+                          "example": "2024-05-07T08:26:25.096Z"
                         }
                       }
                     }
@@ -186,7 +186,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.513Z"
+                          "example": "2024-05-07T08:26:25.096Z"
                         }
                       }
                     }
@@ -253,7 +253,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.513Z"
+                          "example": "2024-05-07T08:26:25.097Z"
                         }
                       }
                     }
@@ -307,7 +307,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.482Z"
+                          "example": "2024-05-07T08:26:25.043Z"
                         }
                       }
                     }
@@ -369,7 +369,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.483Z"
+                          "example": "2024-05-07T08:26:25.043Z"
                         }
                       }
                     }
@@ -430,7 +430,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.504Z"
+                          "example": "2024-05-07T08:26:25.093Z"
                         }
                       }
                     }
@@ -497,7 +497,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.504Z"
+                          "example": "2024-05-07T08:26:25.093Z"
                         }
                       }
                     }
@@ -666,7 +666,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.531Z"
+                          "example": "2024-05-07T08:26:25.107Z"
                         }
                       }
                     }
@@ -725,7 +725,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.531Z"
+                          "example": "2024-05-07T08:26:25.108Z"
                         }
                       }
                     }
@@ -746,7 +746,7 @@
                         "statusCode": { "type": "number", "example": 409 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.531Z"
+                          "example": "2024-05-07T08:26:25.108Z"
                         }
                       }
                     }
@@ -799,7 +799,7 @@
                         "statusCode": { "type": "number", "example": 401 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.531Z"
+                          "example": "2024-05-07T08:26:25.108Z"
                         }
                       }
                     }
@@ -822,7 +822,7 @@
             "required": true,
             "in": "query",
             "description": "file name",
-            "example": "cervus-in-absens",
+            "example": "convoco-turba-capitulus",
             "schema": { "type": "string" }
           },
           {
@@ -870,7 +870,7 @@
                         "statusCode": { "type": "number", "example": 500 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.576Z"
+                          "example": "2024-05-07T08:26:25.163Z"
                         }
                       }
                     }
@@ -932,7 +932,7 @@
                         "statusCode": { "type": "number", "example": 409 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.582Z"
+                          "example": "2024-05-07T08:26:25.165Z"
                         }
                       }
                     }
@@ -969,7 +969,7 @@
             "required": true,
             "in": "query",
             "description": "search",
-            "example": "ratione",
+            "example": "ancilla",
             "schema": { "type": "string" }
           }
         ],
@@ -1009,7 +1009,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.582Z"
+                          "example": "2024-05-07T08:26:25.166Z"
                         }
                       }
                     }
@@ -1070,7 +1070,7 @@
                         "statusCode": { "type": "number", "example": 404 },
                         "timestamp": {
                           "type": "string",
-                          "example": "2024-04-29T05:15:39.582Z"
+                          "example": "2024-05-07T08:26:25.166Z"
                         }
                       }
                     }
@@ -1114,14 +1114,14 @@
           "message": { "type": "string", "nullable": false },
           "timestamp": {
             "type": "string",
-            "example": "2024-04-29T05:15:39.481Z",
+            "example": "2024-05-07T08:26:25.042Z",
             "nullable": false
           },
-          "data": { "type": "object", "nullable": false }
+          "data": { "type": "object", "nullable": true }
         },
-        "required": ["statusCode", "message", "timestamp", "data"]
+        "required": ["statusCode", "message", "timestamp"]
       },
-      "UserDto": {
+      "UserResponseDto": {
         "type": "object",
         "properties": {
           "avatar_id": { "type": "string" },
@@ -1135,8 +1135,7 @@
           "last_name": { "type": "string" },
           "phone": { "type": "string" },
           "role": { "type": "object" },
-          "updated_at": { "format": "date-time", "type": "string" },
-          "password": { "type": "string" }
+          "updated_at": { "format": "date-time", "type": "string" }
         },
         "required": [
           "avatar_id",
@@ -1150,31 +1149,30 @@
           "last_name",
           "phone",
           "role",
-          "updated_at",
-          "password"
+          "updated_at"
         ]
       },
-      "FileDto": {
+      "FileResponseDto": {
         "type": "object",
         "properties": {
           "created_at": { "format": "date-time", "type": "string" },
           "deleted_at": { "format": "date-time", "type": "string" },
-          "file_name": { "type": "string" },
           "id": { "type": "string" },
+          "name": { "type": "string" },
+          "size": { "type": "string" },
+          "storage_key": { "type": "string" },
           "is_deleted": { "type": "boolean" },
-          "link": { "type": "string" },
-          "post_id": { "type": "string" },
           "type": { "type": "string" },
           "updated_at": { "format": "date-time", "type": "string" }
         },
         "required": [
           "created_at",
           "deleted_at",
-          "file_name",
           "id",
+          "name",
+          "size",
+          "storage_key",
           "is_deleted",
-          "link",
-          "post_id",
           "type",
           "updated_at"
         ]
@@ -1190,10 +1188,10 @@
           "is_deleted": { "type": "boolean" },
           "title": { "type": "string" },
           "updated_at": { "format": "date-time", "type": "string" },
-          "author": { "$ref": "#/components/schemas/UserDto" },
+          "author": { "$ref": "#/components/schemas/UserResponseDto" },
           "photos": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/FileDto" }
+            "items": { "$ref": "#/components/schemas/FileResponseDto" }
           }
         },
         "required": [
@@ -1215,12 +1213,12 @@
           "content": {
             "type": "string",
             "description": "post content",
-            "example": "Contego vigor voluptates amicitia suffoco deduco adficio iure tumultus cibus.\nSoleo curriculum subvenio voluptates sint certus velociter strues."
+            "example": "Cursim cattus sophismata cresco.\nVinculum amita canis et caterva ater demonstro thema iste."
           },
           "title": {
             "type": "string",
             "description": "post title",
-            "example": "paulatim odit tenuis"
+            "example": "adeptio crur aduro"
           }
         },
         "required": ["content", "title"]
@@ -1244,10 +1242,10 @@
           "is_deleted": { "type": "boolean" },
           "title": { "type": "string" },
           "updated_at": { "format": "date-time", "type": "string" },
-          "author": { "$ref": "#/components/schemas/UserDto" },
+          "author": { "$ref": "#/components/schemas/UserResponseDto" },
           "photos": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/FileDto" }
+            "items": { "$ref": "#/components/schemas/FileResponseDto" }
           }
         },
         "required": [
@@ -1285,10 +1283,10 @@
           "is_deleted": { "type": "boolean" },
           "title": { "type": "string" },
           "updated_at": { "format": "date-time", "type": "string" },
-          "author": { "$ref": "#/components/schemas/UserDto" },
+          "author": { "$ref": "#/components/schemas/UserResponseDto" },
           "photos": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/FileDto" }
+            "items": { "$ref": "#/components/schemas/FileResponseDto" }
           }
         },
         "required": [
@@ -1310,12 +1308,12 @@
           "content": {
             "type": "string",
             "description": "post content",
-            "example": "Contego vigor voluptates amicitia suffoco deduco adficio iure tumultus cibus.\nSoleo curriculum subvenio voluptates sint certus velociter strues."
+            "example": "Cursim cattus sophismata cresco.\nVinculum amita canis et caterva ater demonstro thema iste."
           },
           "title": {
             "type": "string",
             "description": "post title",
-            "example": "paulatim odit tenuis"
+            "example": "adeptio crur aduro"
           }
         },
         "required": ["content", "title"]
@@ -1334,8 +1332,7 @@
           "last_name": { "type": "string" },
           "phone": { "type": "string" },
           "role": { "type": "object" },
-          "updated_at": { "format": "date-time", "type": "string" },
-          "password": { "type": "string" }
+          "updated_at": { "format": "date-time", "type": "string" }
         },
         "required": [
           "avatar_id",
@@ -1349,8 +1346,7 @@
           "last_name",
           "phone",
           "role",
-          "updated_at",
-          "password"
+          "updated_at"
         ]
       },
       "UpdateProfileResponseDto": {
@@ -1367,8 +1363,7 @@
           "last_name": { "type": "string" },
           "phone": { "type": "string" },
           "role": { "type": "object" },
-          "updated_at": { "format": "date-time", "type": "string" },
-          "password": { "type": "string" }
+          "updated_at": { "format": "date-time", "type": "string" }
         },
         "required": [
           "avatar_id",
@@ -1382,8 +1377,7 @@
           "last_name",
           "phone",
           "role",
-          "updated_at",
-          "password"
+          "updated_at"
         ]
       },
       "UserUpdateDto": {
@@ -1392,69 +1386,36 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Birdie_Heaney82@yahoo.com"
+            "example": "Heidi_Schamberger73@gmail.com"
           },
           "firstName": {
             "type": "string",
             "description": "user first name",
-            "example": "Myrl"
+            "example": "Ilene"
           },
           "lastName": {
             "type": "string",
             "description": "user last name",
-            "example": "Ullrich"
+            "example": "Bahringer"
           },
           "profile": {
             "type": "string",
             "description": "user profile picture",
-            "example": "https://avatars.githubusercontent.com/u/9027664"
+            "example": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/338.jpg"
           }
         }
-      },
-      "UserResponseDto": {
-        "type": "object",
-        "properties": {
-          "avatar_id": { "type": "string" },
-          "created_at": { "format": "date-time", "type": "string" },
-          "deleted_at": { "format": "date-time", "type": "string" },
-          "email": { "type": "string" },
-          "first_name": { "type": "string" },
-          "id": { "type": "string" },
-          "is_deleted": { "type": "boolean" },
-          "is_verified": { "type": "boolean" },
-          "last_name": { "type": "string" },
-          "phone": { "type": "string" },
-          "role": { "type": "object" },
-          "updated_at": { "format": "date-time", "type": "string" },
-          "password": { "type": "string" }
-        },
-        "required": [
-          "avatar_id",
-          "created_at",
-          "deleted_at",
-          "email",
-          "first_name",
-          "id",
-          "is_deleted",
-          "is_verified",
-          "last_name",
-          "phone",
-          "role",
-          "updated_at",
-          "password"
-        ]
       },
       "AuthResponseDto": {
         "type": "object",
         "properties": {
           "accessToken": {
             "type": "string",
-            "example": "zfIzQNf5C8cv0rCDZtscJpwTCGZJha",
+            "example": "oudCdQBPa2HxKgRjyF50uL2ABGBHvq",
             "nullable": false
           },
           "refreshToken": {
             "type": "string",
-            "example": "JS1gzeIkU8HRFx6JTZhnLZrYt4ItaA",
+            "example": "6B3JeHmdjKh9swHN8lBHMWog4zorTM",
             "nullable": false
           },
           "user": {
@@ -1470,12 +1431,12 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Kirk_Collins-Schmitt@hotmail.com"
+            "example": "Sigurd.Quitzon98@yahoo.com"
           },
           "password": {
             "type": "string",
             "description": "user password",
-            "example": "uZzlY7_J06qnmCX"
+            "example": "zuQI84_QS9m5mYh"
           }
         },
         "required": ["email", "password"]
@@ -1486,22 +1447,22 @@
           "email": {
             "type": "string",
             "description": "user email address",
-            "example": "Kirk_Collins-Schmitt@hotmail.com"
+            "example": "Sigurd.Quitzon98@yahoo.com"
           },
           "password": {
             "type": "string",
             "description": "user password",
-            "example": "uZzlY7_J06qnmCX"
+            "example": "zuQI84_QS9m5mYh"
           },
           "firstName": {
             "type": "string",
             "description": "user first name",
-            "example": "Mollie"
+            "example": "Kelsie"
           },
           "lastName": {
             "type": "string",
             "description": "user last name",
-            "example": "Kulas"
+            "example": "Mills-Mueller"
           }
         },
         "required": ["email", "password"]
@@ -1511,12 +1472,12 @@
         "properties": {
           "accessToken": {
             "type": "string",
-            "example": "xjZ5p6SxSEQjcvYya9veEhSnEU0cvx",
+            "example": "A0tQ1xCmTBY4GGYUyGTKrzQYSLupCO",
             "nullable": false
           },
           "refreshToken": {
             "type": "string",
-            "example": "TPlHiG5f2E7R0GtEcSSuk9lRjGt2IB",
+            "example": "doXkEOr6bcGJSntM5QF5KW6MX90RCE",
             "nullable": false
           }
         },
@@ -1527,7 +1488,7 @@
         "properties": {
           "url": {
             "type": "string",
-            "example": "https://picsum.photos/seed/oZaPPA/640/480",
+            "example": "https://picsum.photos/seed/CTbHdK0GN/640/480",
             "nullable": false
           },
           "expiresIn": {
@@ -1544,18 +1505,9 @@
           "created_at": { "format": "date-time", "type": "string" },
           "id": { "type": "string" },
           "updated_at": { "format": "date-time", "type": "string" },
-          "user": { "$ref": "#/components/schemas/UserDto" },
-          "notification_id": { "type": "string" },
-          "users_id": { "type": "string" }
+          "user": { "$ref": "#/components/schemas/UserResponseDto" }
         },
-        "required": [
-          "created_at",
-          "id",
-          "updated_at",
-          "user",
-          "notification_id",
-          "users_id"
-        ]
+        "required": ["created_at", "id", "updated_at", "user"]
       },
       "NotificationCreateResponseDto": {
         "type": "object",
@@ -1570,7 +1522,7 @@
           "title": { "type": "string" },
           "updated_at": { "format": "date-time", "type": "string" },
           "type": { "type": "object" },
-          "sender": { "$ref": "#/components/schemas/UserDto" },
+          "sender": { "$ref": "#/components/schemas/UserResponseDto" },
           "recipients": {
             "type": "array",
             "items": { "$ref": "#/components/schemas/RecipientsDto" }
@@ -1597,12 +1549,12 @@
           "title": {
             "type": "string",
             "description": "title content",
-            "example": "Vigor tenetur suggero calcar administratio assentator.\nAperte adfectus vorax trans coerceo amita custodia."
+            "example": "Corona optio quam taedium.\nCarpo spero beneficium dignissimos convoco sumo caelestis arbor degusto cado."
           },
           "body": {
             "type": "string",
             "description": "notification body",
-            "example": "officia annus vester"
+            "example": "cresco ars creber"
           },
           "payload": {
             "type": "object",
@@ -1623,7 +1575,7 @@
         },
         "required": ["title", "body", "type"]
       },
-      "NotificationDto": {
+      "NotificationResponseDto": {
         "type": "object",
         "properties": {
           "body": { "type": "string" },
@@ -1636,7 +1588,7 @@
           "title": { "type": "string" },
           "updated_at": { "format": "date-time", "type": "string" },
           "type": { "type": "object" },
-          "sender": { "$ref": "#/components/schemas/UserDto" },
+          "sender": { "$ref": "#/components/schemas/UserResponseDto" },
           "recipients": {
             "type": "array",
             "items": { "$ref": "#/components/schemas/RecipientsDto" }
@@ -1663,7 +1615,7 @@
           "count": { "type": "number", "example": 10, "nullable": false },
           "data": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/NotificationDto" }
+            "items": { "$ref": "#/components/schemas/NotificationResponseDto" }
           }
         },
         "required": ["count", "data"]

@@ -1,18 +1,40 @@
 import { faker } from '@faker-js/faker';
-import { ApiProperty } from '@nestjs/swagger';
-import { Files } from '@prisma/client';
-import { Expose } from 'class-transformer';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { File } from '@prisma/client';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
 
-export class FileResponseDto implements Files {
-  id: string;
-  file_name: string;
-  link: string;
-  type: string;
-  post_id: string;
+export class FileResponseDto implements File {
+  @ApiProperty()
   created_at: Date;
+
+  @ApiProperty()
   deleted_at: Date;
+
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  size: string;
+
+  @ApiProperty()
+  storage_key: string;
+
+  @ApiProperty()
   is_deleted: boolean;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty()
   updated_at: Date;
+
+  @ApiHideProperty()
+  @Exclude()
+  post_id: string;
 }
 
 export class FileGetPresignResponseDto {
@@ -25,6 +47,9 @@ export class FileGetPresignResponseDto {
   url: string;
 
   @Expose()
+  @ApiProperty()
+  @Type(() => FileResponseDto)
+  @ValidateNested()
   file: FileResponseDto;
 }
 

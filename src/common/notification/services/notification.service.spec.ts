@@ -3,7 +3,7 @@ import { NotificationService } from './notification.service';
 import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { NotificationCreateDto } from '../dtos/create.notification.dto';
 import { NotificationGetDto } from '../dtos/get.notification.dto';
-import { NotificationDto } from '../dtos/notification.response.dto';
+import { NotificationResponseDto } from '../dtos/notification.response.dto';
 
 describe('NotificationService', () => {
   let notificationService: NotificationService;
@@ -63,7 +63,7 @@ describe('NotificationService', () => {
         created_at: new Date(),
         updated_at: new Date(),
         deleted_at: null,
-      } as NotificationDto;
+      } as NotificationResponseDto;
 
       prismaServiceMock.notification.create.mockResolvedValue(
         createdNotification,
@@ -124,7 +124,7 @@ describe('NotificationService', () => {
           updated_at: new Date(),
           deleted_at: null,
         },
-      ] as NotificationDto[];
+      ] as NotificationResponseDto[];
 
       prismaServiceMock.notification.count.mockResolvedValue(2);
       prismaServiceMock.notification.findMany.mockResolvedValue(notifications);

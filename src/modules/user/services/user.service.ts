@@ -19,13 +19,13 @@ export class UserService implements IUserService {
   ): Promise<UpdateProfileResponseDto> {
     try {
       const { email, firstName, lastName, profile } = data;
-      const user = await this.prismaService.users.findUnique({
+      const user = await this.prismaService.user.findUnique({
         where: { id: userId },
       });
       if (!user) {
         throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
       }
-      return this.prismaService.users.update({
+      return this.prismaService.user.update({
         where: {
           id: userId,
         },
@@ -35,8 +35,8 @@ export class UserService implements IUserService {
           last_name: lastName?.trim(),
           avatar: {
             create: {
-              file_name: `avatar_${Date.now()}`,
-              link: profile,
+              name: `avatar_${Date.now()}`,
+              storage_key: profile,
               type: FileMimeType.JPEG,
             },
           },
@@ -49,7 +49,7 @@ export class UserService implements IUserService {
 
   async deleteUser(userId: string): Promise<GenericResponseDto> {
     try {
-      const check = await this.prismaService.users.findUnique({
+      const check = await this.prismaService.user.findUnique({
         where: {
           id: userId,
         },
@@ -57,7 +57,7 @@ export class UserService implements IUserService {
       if (!check) {
         throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
       }
-      await this.prismaService.users.update({
+      await this.prismaService.user.update({
         data: {
           is_deleted: true,
           deleted_at: new Date(),
@@ -77,7 +77,7 @@ export class UserService implements IUserService {
 
   async getProfile(id: string): Promise<GetProfileResponseDto> {
     try {
-      const check = await this.prismaService.users.findUnique({
+      const check = await this.prismaService.user.findUnique({
         where: {
           id,
         },

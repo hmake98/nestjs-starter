@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
 import { UserResponseDto } from 'src/modules/user/dtos/user.response.dto';
 
 export class AuthResponseDto {
@@ -26,6 +27,8 @@ export class AuthResponseDto {
     nullable: false,
   })
   @Expose()
+  @Type(() => UserResponseDto)
+  @ValidateNested()
   user: UserResponseDto;
 }
 

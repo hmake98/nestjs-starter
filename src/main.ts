@@ -3,8 +3,13 @@ import express from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerInit from './swagger';
-import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import {
+  ClassSerializerInterceptor,
+  Logger,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app/app.module';
 import { useContainer } from 'class-validator';
@@ -28,11 +33,10 @@ async function bootstrap(): Promise<void> {
     'app.versioning.enable',
   );
   app.use(helmet());
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
     }),
   );
   app.use(

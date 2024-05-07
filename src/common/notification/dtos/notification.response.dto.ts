@@ -1,69 +1,82 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
   $Enums,
   Notification,
   NotificationRecipients,
   Prisma,
-  Users,
 } from '@prisma/client';
-import { Exclude, Expose, Transform, Type } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
 import { IGetResponse } from 'src/core/interfaces/response.interface';
-
-export class UserDto implements Users {
-  avatar_id: string;
-  created_at: Date;
-  deleted_at: Date;
-  email: string;
-  first_name: string;
-  id: string;
-  is_deleted: boolean;
-  is_verified: boolean;
-  last_name: string;
-  password: string;
-  phone: string;
-  role: $Enums.Roles;
-  updated_at: Date;
-}
+import { UserResponseDto } from 'src/modules/user/dtos/user.response.dto';
 
 export class RecipientsDto implements NotificationRecipients {
+  @ApiProperty()
   created_at: Date;
+
+  @ApiProperty()
   id: string;
+
+  @ApiProperty()
   updated_at: Date;
 
-  @Transform(({ value }) => value.user)
-  @Type(() => UserDto)
-  user: UserDto;
+  @ApiProperty()
+  @Type(() => UserResponseDto)
+  @ValidateNested()
+  user: UserResponseDto;
 
+  @ApiHideProperty()
   @Exclude()
   notification_id: string;
 
+  @ApiHideProperty()
   @Exclude()
   users_id: string;
 }
 
-export class NotificationDto implements Notification {
+export class NotificationResponseDto implements Notification {
+  @ApiProperty()
   body: string;
-  created_at: Date;
-  deleted_at: Date;
-  id: string;
-  is_deleted: boolean;
-  payload: Prisma.JsonValue;
-  sender_id: string;
-  title: string;
-  updated_at: Date;
-  type: $Enums.NotificationType;
 
-  @Transform(({ value }) => value.sender)
-  @Type(() => UserDto)
-  sender: UserDto;
+  @ApiProperty()
+  created_at: Date;
+
+  @ApiProperty()
+  deleted_at: Date;
+
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  is_deleted: boolean;
+
+  @ApiProperty()
+  payload: Prisma.JsonValue;
+
+  @ApiProperty()
+  sender_id: string;
+
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  updated_at: Date;
+
+  @ApiProperty()
+  type: $Enums.NotificationTypes;
+
+  @ApiProperty()
+  @Type(() => UserResponseDto)
+  @ValidateNested()
+  sender: UserResponseDto;
 
   recipients: RecipientsDto[];
 }
 
-export class NotificationCreateResponseDto extends NotificationDto {}
+export class NotificationCreateResponseDto extends NotificationResponseDto {}
 
 export class NotificationGetResponseDto
-  implements IGetResponse<NotificationDto>
+  implements IGetResponse<NotificationResponseDto>
 {
   @ApiProperty({
     example: 10,
@@ -74,9 +87,10 @@ export class NotificationGetResponseDto
   count: number;
 
   @ApiProperty({
-    example: NotificationDto,
+    example: NotificationResponseDto,
     required: true,
   })
-  @Expose()
-  data: NotificationDto[];
+  @Type(() => NotificationResponseDto)
+  @ValidateNested()
+  data: NotificationResponseDto[];
 }

@@ -17,5 +17,6 @@ export default registerAs(
         : 3000,
     },
     globalPrefix: '/api',
+    debug: process.env.APP_DEBUG,
   }),
 );

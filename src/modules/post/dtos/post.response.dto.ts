@@ -1,49 +1,45 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { $Enums, Files, Posts, Users } from '@prisma/client';
-import { Exclude, Expose } from 'class-transformer';
+import { Post } from '@prisma/client';
+import { Expose, Type } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
+import { FileResponseDto } from 'src/common/files/dtos/file.response.dto';
 import { IGetResponse } from 'src/core/interfaces/response.interface';
+import { UserResponseDto } from 'src/modules/user/dtos/user.response.dto';
 
-export class UserDto implements Users {
-  avatar_id: string;
-  created_at: Date;
-  deleted_at: Date;
-  email: string;
-  first_name: string;
-  id: string;
-  is_deleted: boolean;
-  is_verified: boolean;
-  last_name: string;
-  phone: string;
-  role: $Enums.Roles;
-  updated_at: Date;
-
-  @Exclude()
-  password: string;
-}
-
-export class FileDto implements Files {
-  created_at: Date;
-  deleted_at: Date;
-  file_name: string;
-  id: string;
-  is_deleted: boolean;
-  link: string;
-  post_id: string;
-  type: string;
-  updated_at: Date;
-}
-
-export class PostResponseDto implements Posts {
+export class PostResponseDto implements Post {
+  @ApiProperty()
   author_id: string;
+
+  @ApiProperty()
   content: string;
+
+  @ApiProperty()
   created_at: Date;
+
+  @ApiProperty()
   deleted_at: Date;
+
+  @ApiProperty()
   id: string;
+
+  @ApiProperty()
   is_deleted: boolean;
+
+  @ApiProperty()
   title: string;
+
+  @ApiProperty()
   updated_at: Date;
-  author: UserDto;
-  photos: FileDto[];
+
+  @ApiProperty()
+  @Type(() => UserResponseDto)
+  @ValidateNested()
+  author: UserResponseDto;
+
+  @ApiProperty()
+  @Type(() => FileResponseDto)
+  @ValidateNested()
+  photos: FileResponseDto[];
 }
 
 export class CreatePostResponseDto extends PostResponseDto {}
@@ -61,7 +57,8 @@ export class GetPostsResponseDto implements IGetResponse<PostResponseDto> {
     example: PostResponseDto,
     required: true,
   })
-  @Expose()
+  @Type(() => PostResponseDto)
+  @ValidateNested()
   data: PostResponseDto[];
 }
 export class UpdatePostResponseDto extends PostResponseDto {}

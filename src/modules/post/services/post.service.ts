@@ -21,13 +21,13 @@ export class PostService implements IPostService {
   ): Promise<CreatePostResponseDto> {
     try {
       const { content, title } = data;
-      const user = await this.prismaService.users.findUnique({
+      const user = await this.prismaService.user.findUnique({
         where: { id: userId },
       });
       if (!user) {
         throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
       }
-      return this.prismaService.posts.create({
+      return this.prismaService.post.create({
         data: {
           content,
           title,
@@ -49,11 +49,11 @@ export class PostService implements IPostService {
 
   async delete(id: string): Promise<GenericResponseDto> {
     try {
-      const post = await this.prismaService.posts.findUnique({ where: { id } });
+      const post = await this.prismaService.post.findUnique({ where: { id } });
       if (!post) {
         throw new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND);
       }
-      await this.prismaService.posts.update({
+      await this.prismaService.post.update({
         where: { id },
         data: { deleted_at: new Date(), is_deleted: true },
       });
@@ -70,7 +70,7 @@ export class PostService implements IPostService {
     try {
       const { limit, page, search } = params;
       const skip = (page - 1) * limit;
-      const count = await this.prismaService.posts.count({
+      const count = await this.prismaService.post.count({
         where: {
           ...(search && {
             title: {
@@ -85,7 +85,7 @@ export class PostService implements IPostService {
           is_deleted: false,
         },
       });
-      const data = await this.prismaService.posts.findMany({
+      const data = await this.prismaService.post.findMany({
         where: {
           ...(search && {
             title: {
@@ -121,11 +121,11 @@ export class PostService implements IPostService {
   ): Promise<UpdatePostResponseDto> {
     try {
       const { content, title } = data;
-      const post = await this.prismaService.posts.findUnique({ where: { id } });
+      const post = await this.prismaService.post.findUnique({ where: { id } });
       if (!post) {
         throw new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND);
       }
-      return this.prismaService.posts.update({
+      return this.prismaService.post.update({
         where: { id },
         data: {
           title,

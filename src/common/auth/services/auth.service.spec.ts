@@ -20,7 +20,7 @@ describe('AuthService', () => {
   };
 
   const prismaServiceMock = {
-    users: {
+    user: {
       findUnique: jest.fn(),
       create: jest.fn(),
     },
@@ -67,7 +67,7 @@ describe('AuthService', () => {
         email: 'nonexistent@example.com',
         password: 'password',
       };
-      jest.spyOn(prismaServiceMock.users, 'findUnique').mockResolvedValue(null);
+      jest.spyOn(prismaServiceMock.user, 'findUnique').mockResolvedValue(null);
 
       await expect(authService.login(loginDto)).rejects.toThrow(HttpException);
       await expect(authService.login(loginDto)).rejects.toThrowError(
@@ -86,7 +86,7 @@ describe('AuthService', () => {
         password: 'hashedpassword',
       };
       jest
-        .spyOn(prismaServiceMock.users, 'findUnique')
+        .spyOn(prismaServiceMock.user, 'findUnique')
         .mockResolvedValue(existingUser);
       jest.spyOn(encryptionServiceMock, 'match').mockReturnValue(false);
 
@@ -107,7 +107,7 @@ describe('AuthService', () => {
         password: 'hashedpassword',
       };
       jest
-        .spyOn(prismaServiceMock.users, 'findUnique')
+        .spyOn(prismaServiceMock.user, 'findUnique')
         .mockResolvedValue(existingUser);
       jest.spyOn(encryptionServiceMock, 'match').mockReturnValue(true);
       jest
@@ -130,7 +130,7 @@ describe('AuthService', () => {
         lastName: 'Doe',
         password: 'password',
       };
-      jest.spyOn(prismaServiceMock.users, 'findUnique').mockResolvedValue({});
+      jest.spyOn(prismaServiceMock.user, 'findUnique').mockResolvedValue({});
 
       await expect(authService.signup(signUpDto)).rejects.toThrow(
         HttpException,
@@ -148,9 +148,9 @@ describe('AuthService', () => {
         password: 'password',
       };
       const createdUser = { id: '1', role: Roles.USER };
-      jest.spyOn(prismaServiceMock.users, 'findUnique').mockResolvedValue(null);
+      jest.spyOn(prismaServiceMock.user, 'findUnique').mockResolvedValue(null);
       jest
-        .spyOn(prismaServiceMock.users, 'create')
+        .spyOn(prismaServiceMock.user, 'create')
         .mockResolvedValue(createdUser);
       jest
         .spyOn(encryptionServiceMock, 'createHash')

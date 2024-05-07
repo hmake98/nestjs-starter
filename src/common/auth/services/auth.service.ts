@@ -27,7 +27,7 @@ export class AuthService implements IAuthService {
   public async login(data: UserLoginDto): Promise<AuthResponseDto> {
     try {
       const { email, password } = data;
-      const user = await this.prismaService.users.findUnique({
+      const user = await this.prismaService.user.findUnique({
         where: { email },
       });
       if (!user) {
@@ -53,13 +53,13 @@ export class AuthService implements IAuthService {
   public async signup(data: UserCreateDto): Promise<AuthResponseDto> {
     try {
       const { email, firstName, lastName, password } = data;
-      const user = await this.prismaService.users.findUnique({
+      const user = await this.prismaService.user.findUnique({
         where: { email },
       });
       if (user) {
         throw new HttpException('users.userExists', HttpStatus.CONFLICT);
       }
-      const createdUser = await this.prismaService.users.create({
+      const createdUser = await this.prismaService.user.create({
         data: {
           email,
           password: this.encryptionService.createHash(password),
