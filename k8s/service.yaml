@@ -8,6 +8,6 @@ spec:
   type: NodePort
   ports:
     - protocol: TCP
-      port: 3000
-      targetPort: 3000
-      nodePort: 31110
+      port: 3001
+      targetPort: 3001
+      nodePort: 31230

@@ -1,7 +1,6 @@
 import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { writeFileSync } from 'fs';
 
 export default async function (app: INestApplication) {
   const configService = app.get(ConfigService);
@@ -29,8 +28,6 @@ export default async function (app: INestApplication) {
   const document = SwaggerModule.createDocument(app, documentBuild, {
     deepScanRoutes: true,
   });
-
-  writeFileSync('./swagger.json', JSON.stringify(document));
 
   SwaggerModule.setup(docPrefix, app, document, {
     explorer: true,
