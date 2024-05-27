@@ -1,5 +1,6 @@
 import { SetMetadata, applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+
 import { IResponseOptions } from '../interfaces/response.interface';
 import { ResponseDto } from '../dtos/response.dto';
 import {
@@ -52,7 +53,7 @@ export function DocResponse<T>(options: IResponseOptions<T>): MethodDecorator {
 export function DocErrors(options: number[]): MethodDecorator {
   const docs = [];
 
-  options.forEach(statusCode => {
+  options.forEach((statusCode) => {
     const schema: Record<string, any> = {
       allOf: [
         {

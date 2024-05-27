@@ -1,14 +1,16 @@
-import { Body, Controller, Get, HttpStatus, Post, Put } from '@nestjs/common';
-import { UserService } from '../services/user.service';
-import { AuthUser } from 'src/core/decorators/auth.user.decorator';
-import { UserUpdateDto } from '../dtos/user.update.dto';
+import { Body, Controller, Get, HttpStatus, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+import { AuthUser } from 'src/core/decorators/auth.user.decorator';
+import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
+
 import {
   GetProfileResponseDto,
   UpdateProfileResponseDto,
 } from '../dtos/user.response.dto';
-import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
-import { IAuthUser } from 'src/core/interfaces/request.interface';
+import { UserUpdateDto } from '../dtos/user.update.dto';
+import { UserService } from '../services/user.service';
 
 @ApiTags('user.users')
 @Controller({

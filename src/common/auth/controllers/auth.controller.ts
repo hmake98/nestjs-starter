@@ -6,19 +6,21 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { PublicRoute } from 'src/core/decorators/public.request.decorator';
-import { AuthService } from '../services/auth.service';
-import { UserLoginDto } from '../dtos/auth.login.dto';
-import { UserCreateDto } from '../dtos/auth.signup.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  AuthRefreshResponseDto,
-  AuthResponseDto,
-} from '../dtos/auth.response.dto';
+
+import { PublicRoute } from 'src/core/decorators/public.request.decorator';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
 import { AuthUser } from 'src/core/decorators/auth.user.decorator';
 import { JwtRefreshGuard } from 'src/core/guards/jwt.refresh.guard';
 import { IAuthUser } from 'src/core/interfaces/request.interface';
+
+import {
+  AuthRefreshResponseDto,
+  AuthResponseDto,
+} from '../dtos/auth.response.dto';
+import { UserCreateDto } from '../dtos/auth.signup.dto';
+import { UserLoginDto } from '../dtos/auth.login.dto';
+import { AuthService } from '../services/auth.service';
 
 @ApiTags('auth')
 @Controller({

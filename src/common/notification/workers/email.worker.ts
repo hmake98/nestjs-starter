@@ -2,6 +2,7 @@ import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
 import { MailerService } from '@nestjs-modules/mailer';
+
 import { BullQueues } from '../constants/notification.constants';
 import { EmailTemplates } from '../constants/notification.enum';
 
@@ -21,9 +22,9 @@ export class EmailWorker {
         template: EmailTemplates.WELCOME_EMAIL,
         context: data,
       })
-      .then(response => {
+      .then((response) => {
         this.logger.log('Welcome email sent: ', JSON.stringify(response));
       })
-      .catch(e => this.logger.error(e));
+      .catch((e) => this.logger.error(e));
   }
 }

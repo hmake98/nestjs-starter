@@ -1,9 +1,10 @@
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
+
 import { UserUpdateDto } from '../dtos/user.update.dto';
 import {
   GetProfileResponseDto,
   UpdateProfileResponseDto,
 } from '../dtos/user.response.dto';
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
 
 export interface IUserService {
   updateUser(

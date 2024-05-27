@@ -1,4 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
+
 import { CreatePostDto } from '../dtos/create.post.dto';
 import { GetPostsDto } from '../dtos/get.post.dto';
 import { UpdatePostDto } from '../dtos/update.post.dto';
@@ -9,7 +12,6 @@ import {
   GetPostsResponseDto,
   UpdatePostResponseDto,
 } from '../dtos/post.response.dto';
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
 
 @Injectable()
 export class PostService implements IPostService {

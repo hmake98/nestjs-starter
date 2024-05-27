@@ -6,13 +6,15 @@ import {
   Param,
   Put,
 } from '@nestjs/common';
-import { UserService } from '../services/user.service';
-import { UserUpdateDto } from '../dtos/user.update.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AllowedRoles } from 'src/core/decorators/role.decorator';
 import { Roles } from '@prisma/client';
+
+import { AllowedRoles } from 'src/core/decorators/role.decorator';
 import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
 import { GenericResponseDto } from 'src/core/dtos/response.dto';
+
+import { UserUpdateDto } from '../dtos/user.update.dto';
+import { UserService } from '../services/user.service';
 import { UpdateProfileResponseDto } from '../dtos/user.response.dto';
 
 @ApiTags('admin.users')

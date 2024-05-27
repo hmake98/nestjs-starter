@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
 import { EncryptionService } from './services/encryption.service';
 import { PrismaService } from './services/prisma.service';
 import { TaskService } from './services/task.service';
-import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [],

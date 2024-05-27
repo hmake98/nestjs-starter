@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
-import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { UserUpdateDto } from '../dtos/user.update.dto';
+
+import { PrismaService } from '../../src/common/helper/services/prisma.service';
+import { UserUpdateDto } from '../../src/modules/user/dtos/user.update.dto';
+import { UserService } from '../../src/modules/user/services/user.service';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -75,9 +76,7 @@ describe('UserService', () => {
 
       prismaServiceMock.user.findUnique.mockResolvedValueOnce(null);
 
-      await expect(
-        userService.updateUser(userId, userData),
-      ).rejects.toThrowError(
+      await expect(userService.updateUser(userId, userData)).rejects.toThrow(
         new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
       );
     });
@@ -120,7 +119,7 @@ describe('UserService', () => {
 
       prismaServiceMock.user.findUnique.mockResolvedValue(null);
 
-      await expect(userService.deleteUser(userId)).rejects.toThrowError(
+      await expect(userService.deleteUser(userId)).rejects.toThrow(
         new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
       );
 
@@ -157,7 +156,7 @@ describe('UserService', () => {
 
       prismaServiceMock.user.findUnique.mockResolvedValueOnce(null);
 
-      await expect(userService.getProfile(userId)).rejects.toThrowError(
+      await expect(userService.getProfile(userId)).rejects.toThrow(
         new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
       );
     });

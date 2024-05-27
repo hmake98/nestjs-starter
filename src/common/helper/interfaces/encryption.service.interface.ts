@@ -1,4 +1,5 @@
 import { IAuthUser } from 'src/core/interfaces/request.interface';
+
 import { IAuthTokenResponse } from './encryption.interface';
 
 export interface IEncryptionService {

@@ -1,9 +1,11 @@
+/* eslint-disable import/no-unresolved */
 import { Test, TestingModule } from '@nestjs/testing';
-import { FilesService } from './files.service';
-import { PrismaService } from '../../helper/services/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { FileModuleType } from '../constants/files.enum';
+
+import { FilesService } from '../../src/common/files/services/files.service';
+import { PrismaService } from '../../src/common/helper/services/prisma.service';
+import { FileModuleType } from '../../src/common/files/constants/files.enum';
 
 jest.mock('@aws-sdk/s3-request-presigner');
 jest.mock('@aws-sdk/client-s3');

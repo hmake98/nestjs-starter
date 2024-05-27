@@ -1,7 +1,8 @@
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
+
 import { CreatePostDto } from '../dtos/create.post.dto';
 import { GetPostsDto } from '../dtos/get.post.dto';
 import { UpdatePostDto } from '../dtos/update.post.dto';
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
 import {
   CreatePostResponseDto,
   GetPostsResponseDto,

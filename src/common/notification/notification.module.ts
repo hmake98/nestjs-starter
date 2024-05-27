@@ -1,14 +1,17 @@
-import { Module } from '@nestjs/common';
 import { join } from 'path';
-import { NotificationController } from './controllers/notification.controller';
-import { TextMessageService } from './services/text-message.service';
+
+import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EmailWorker } from './workers/email.worker';
 import { SES } from '@aws-sdk/client-ses';
-import { NotificationService } from './services/notification.service';
+
 import { HelperModule } from '../helper/helper.module';
+
+import { EmailWorker } from './workers/email.worker';
+import { NotificationService } from './services/notification.service';
+import { NotificationController } from './controllers/notification.controller';
+import { TextMessageService } from './services/text-message.service';
 
 @Module({
   controllers: [NotificationController],

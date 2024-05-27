@@ -1,4 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
+
 import { INotificationService } from '../interfaces/notification.service.interface';
 import { NotificationCreateDto } from '../dtos/create.notification.dto';
 import { NotificationGetDto } from '../dtos/get.notification.dto';
@@ -7,7 +10,6 @@ import {
   NotificationCreateResponseDto,
   NotificationGetResponseDto,
 } from '../dtos/notification.response.dto';
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
 
 @Injectable()
 export class NotificationService implements INotificationService {
@@ -30,7 +32,7 @@ export class NotificationService implements INotificationService {
           },
         },
         recipients: {
-          create: recipients.map(userId => ({
+          create: recipients.map((userId) => ({
             user: {
               connect: {
                 id: userId,

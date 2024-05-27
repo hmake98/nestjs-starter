@@ -5,7 +5,7 @@ metadata:
   labels:
     app: server
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: server
@@ -13,17 +13,58 @@ spec:
     metadata:
       labels:
         app: server
+      annotations:
+        sidecar.istio.io/inject: 'false'
     spec:
       containers:
         - name: nestjs-server
           image: nestjs-starter_server:latest
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - containerPort: 3001
           resources:
+            requests:
+              memory: '128Mi'
+              cpu: '500m'
             limits:
-              memory: "256Mi"
-              cpu: "1000m"
+              memory: '256Mi'
+              cpu: '1000m'
           envFrom:
             - secretRef:
                 name: nestjs-secret
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            failureThreshold: 30
+            periodSeconds: 10
+      restartPolicy: Always
+      nodeSelector:
+        kubernetes.io/hostname: 'desired-node-name'
+      tolerations:
+        - key: 'key'
+          operator: 'Equal'
+          value: 'value'
+          effect: 'NoSchedule'
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: 'app'
+                    operator: In
+                    values:
+                      - server
+              topologyKey: 'kubernetes.io/hostname'

@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Post } from '@prisma/client';
 import { Expose, Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
+
 import { FileResponseDto } from 'src/common/files/dtos/file.response.dto';
 import { IGetResponse } from 'src/core/interfaces/response.interface';
 import { UserResponseDto } from 'src/modules/user/dtos/user.response.dto';

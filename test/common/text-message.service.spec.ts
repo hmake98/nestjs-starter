@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TextMessageService } from './text-message.service';
 import { ConfigService } from '@nestjs/config';
 import { PublishCommand } from '@aws-sdk/client-sns';
+
+import { TextMessageService } from '../../src/common/notification/services/text-message.service';
 
 jest.mock('@aws-sdk/client-sns');
 

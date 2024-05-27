@@ -9,17 +9,19 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
+import { AuthUser } from 'src/core/decorators/auth.user.decorator';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
+
 import {
   NotificationCreateResponseDto,
   NotificationGetResponseDto,
 } from '../dtos/notification.response.dto';
-import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
 import { NotificationService } from '../services/notification.service';
 import { NotificationCreateDto } from '../dtos/create.notification.dto';
-import { AuthUser } from 'src/core/decorators/auth.user.decorator';
 import { NotificationGetDto } from '../dtos/get.notification.dto';
-import { IAuthUser } from 'src/core/interfaces/request.interface';
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
 
 @ApiTags('notifications')
 @Controller({

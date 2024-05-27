@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PostService } from './post.service';
-import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { CreatePostDto } from '../dtos/create.post.dto';
+
+import { PostService } from '../../src/modules/post/services/post.service';
+import { PrismaService } from '../../src/common/helper/services/prisma.service';
+import { CreatePostDto } from '../../src/modules/post/dtos/create.post.dto';
 
 describe('PostService', () => {
   let postService: PostService;
@@ -63,7 +64,7 @@ describe('PostService', () => {
 
       prismaServiceMock.user.findUnique.mockResolvedValueOnce(null);
 
-      await expect(postService.create(userId, postData)).rejects.toThrowError(
+      await expect(postService.create(userId, postData)).rejects.toThrow(
         new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
       );
     });

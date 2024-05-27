@@ -2,6 +2,7 @@ import { Queue } from 'bull';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Roles } from '@prisma/client';
 import { InjectQueue } from '@nestjs/bull';
+
 import { IAuthService } from '../interfaces/auth.service.interface';
 import { UserLoginDto } from '../dtos/auth.login.dto';
 import { PrismaService } from '../../helper/services/prisma.service';

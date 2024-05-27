@@ -1,16 +1,18 @@
+import { join } from 'path';
+
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { RolesGuard } from './guards/roles.guard';
-import { ResponseInterceptor } from './interceptors/response.interceptor';
-import { GlobalExceptionFilter } from './interceptors/exception.interceptor';
-import { LoggerMiddleware } from './middlewares/logger.middleware';
 import {
   AcceptLanguageResolver,
   HeaderResolver,
   I18nModule,
   QueryResolver,
 } from 'nestjs-i18n';
-import { join } from 'path';
+
+import { RolesGuard } from './guards/roles.guard';
+import { ResponseInterceptor } from './interceptors/response.interceptor';
+import { GlobalExceptionFilter } from './interceptors/exception.interceptor';
+import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { JwtAccessGuard } from './guards/jwt.access.guard';
 
 @Module({

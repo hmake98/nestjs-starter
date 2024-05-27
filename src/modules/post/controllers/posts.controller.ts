@@ -9,20 +9,22 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { PostService } from '../services/post.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 import { AuthUser } from 'src/core/decorators/auth.user.decorator';
+import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
+import { IAuthUser } from 'src/core/interfaces/request.interface';
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
+
+import { PostService } from '../services/post.service';
 import { CreatePostDto } from '../dtos/create.post.dto';
 import { GetPostsDto } from '../dtos/get.post.dto';
 import { UpdatePostDto } from '../dtos/update.post.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   CreatePostResponseDto,
   GetPostsResponseDto,
   UpdatePostResponseDto,
 } from '../dtos/post.response.dto';
-import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
-import { IAuthUser } from 'src/core/interfaces/request.interface';
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
 
 @ApiTags('posts')
 @Controller({

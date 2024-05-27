@@ -1,14 +1,16 @@
+/* eslint-disable import/no-unresolved */
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../../helper/services/prisma.service';
-import { EncryptionService } from '../../../common/helper/services/encryption.service';
 import { HttpException } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { UserCreateDto } from '../dtos/auth.signup.dto';
 import { Roles } from '@prisma/client';
 import { BullModule } from '@nestjs/bull';
-import { UserLoginDto } from '../dtos/auth.login.dto';
-import { BullQueues } from '../../../common/notification/constants/notification.constants';
+
+import { PrismaService } from '../../src/common/helper/services/prisma.service';
+import { EncryptionService } from '../../src/common/helper/services/encryption.service';
+import { AuthService } from '../../src/common/auth/services/auth.service';
+import { UserCreateDto } from '../../src/common/auth/dtos/auth.signup.dto';
+import { UserLoginDto } from '../../src/common/auth/dtos/auth.login.dto';
+import { BullQueues } from '../../src/common/notification/constants/notification.constants';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -70,7 +72,7 @@ describe('AuthService', () => {
       jest.spyOn(prismaServiceMock.user, 'findUnique').mockResolvedValue(null);
 
       await expect(authService.login(loginDto)).rejects.toThrow(HttpException);
-      await expect(authService.login(loginDto)).rejects.toThrowError(
+      await expect(authService.login(loginDto)).rejects.toThrow(
         'users.userNotFound',
       );
     });
@@ -91,7 +93,7 @@ describe('AuthService', () => {
       jest.spyOn(encryptionServiceMock, 'match').mockReturnValue(false);
 
       await expect(authService.login(loginDto)).rejects.toThrow(HttpException);
-      await expect(authService.login(loginDto)).rejects.toThrowError(
+      await expect(authService.login(loginDto)).rejects.toThrow(
         'auth.invalidPassword',
       );
     });
@@ -135,7 +137,7 @@ describe('AuthService', () => {
       await expect(authService.signup(signUpDto)).rejects.toThrow(
         HttpException,
       );
-      await expect(authService.signup(signUpDto)).rejects.toThrowError(
+      await expect(authService.signup(signUpDto)).rejects.toThrow(
         'users.userExists',
       );
     });

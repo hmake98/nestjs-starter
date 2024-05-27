@@ -2,7 +2,6 @@ import 'reflect-metadata';
 import express from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import swaggerInit from './swagger';
 import {
   ClassSerializerInterceptor,
   Logger,
@@ -11,9 +10,11 @@ import {
 } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { AppModule } from './app/app.module';
 import { useContainer } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
+
+import { AppModule } from './app/app.module';
+import swaggerInit from './swagger';
 
 async function bootstrap(): Promise<void> {
   const logger = new Logger();

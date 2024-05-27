@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { ConfigService } from '@nestjs/config';
+
 import { ITextMessageService } from '../interfaces/text-message.service.interface';
 
 @Injectable()

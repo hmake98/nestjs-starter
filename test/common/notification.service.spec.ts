@@ -1,9 +1,11 @@
+/* eslint-disable import/no-unresolved */
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotificationService } from './notification.service';
-import { PrismaService } from '../../../common/helper/services/prisma.service';
-import { NotificationCreateDto } from '../dtos/create.notification.dto';
-import { NotificationGetDto } from '../dtos/get.notification.dto';
-import { NotificationResponseDto } from '../dtos/notification.response.dto';
+
+import { NotificationService } from '../../src/common/notification/services/notification.service';
+import { PrismaService } from '../../src/common/helper/services/prisma.service';
+import { NotificationCreateDto } from '../../src/common/notification/dtos/create.notification.dto';
+import { NotificationGetDto } from '../../src/common/notification/dtos/get.notification.dto';
+import { NotificationResponseDto } from '../../src/common/notification/dtos/notification.response.dto';
 
 describe('NotificationService', () => {
   let notificationService: NotificationService;
