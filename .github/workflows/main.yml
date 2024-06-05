@@ -26,21 +26,3 @@ jobs:
 
       - name: Run Jest tests
         run: yarn test
-
-      - name: Create Coverage Badges
-        uses: jaywcjlove/coverage-badges-cli@main
-        with:
-          style: flat
-          source: coverage/coverage-summary.json
-          output: coverage/badges.svg
-          jsonPath: totals.percent_covered
-
-      - name: Commit coverage badge
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add .
-          git commit -m "Update coverage badge"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
