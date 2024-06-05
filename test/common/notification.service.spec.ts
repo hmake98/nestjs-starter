@@ -196,7 +196,7 @@ describe('NotificationService', () => {
       expect(prismaService.notification.update).toHaveBeenCalledWith({
         where: { id: notificationId },
         data: {
-          deleted_at: new Date(),
+          deleted_at: expect.any(Date),
           is_deleted: true,
         },
       });
