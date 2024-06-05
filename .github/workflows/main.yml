@@ -27,12 +27,16 @@ jobs:
       - name: Run Jest tests
         run: yarn test
 
-      - name: Generate coverage badge
-        run: yarn coverage:badge
+      - name: Create Coverage Badges
+        uses: jaywcjlove/coverage-badges-cli@main
+        with:
+          style: flat
+          source: coverage/coverage-summary.json
+          output: coverage/badges.svg
+          jsonPath: totals.percent_covered
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./coverage/badges.svg
-          publish_branch: gh-pages
+          publish_dir: ./build
