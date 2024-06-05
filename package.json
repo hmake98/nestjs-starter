@@ -21,7 +21,7 @@
     "lint:fix": "eslint --fix '{src,test}/**/*.ts'",
     "format": "prettier --write 'src/**/*.ts'",
     "coverage:badge": "coverage-badges",
-    "test": "jest --config test/jest.json --runInBand --passWithNoTests --forceExit"
+    "test": "jest --config test/jest.json --runInBand --passWithNoTests --forceExit && yarn coverage:badge"
   },
   "engines": {
     "node": ">=20.0.0"
