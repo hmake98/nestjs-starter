@@ -35,8 +35,12 @@ jobs:
           output: coverage/badges.svg
           jsonPath: totals.percent_covered
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+      - name: Commit coverage badge
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add coverage/badge.svg
+          git commit -m "Update coverage badge"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -5,9 +5,6 @@ dist/
 tmp/
 temp/
 
-# jest
-coverage
-
 # environment
 .env*
 !.env.example
