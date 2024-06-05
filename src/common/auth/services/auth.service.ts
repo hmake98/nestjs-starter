@@ -34,8 +34,11 @@ export class AuthService implements IAuthService {
       if (!user) {
         throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
       }
-      const match = this.encryptionService.match(user.password, password);
-      if (!match) {
+      const passwordMatched = await this.encryptionService.match(
+        user.password,
+        password,
+      );
+      if (!passwordMatched) {
         throw new HttpException('auth.invalidPassword', HttpStatus.NOT_FOUND);
       }
       const tokens = await this.encryptionService.createJwtTokens({
@@ -60,10 +63,11 @@ export class AuthService implements IAuthService {
       if (user) {
         throw new HttpException('users.userExists', HttpStatus.CONFLICT);
       }
+      const hashed = await this.encryptionService.createHash(password);
       const createdUser = await this.prismaService.user.create({
         data: {
           email,
-          password: this.encryptionService.createHash(password),
+          password: hashed,
           first_name: firstName?.trim(),
           last_name: lastName?.trim(),
           role: Roles.USER,

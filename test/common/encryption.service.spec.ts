@@ -1,11 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import * as argon2 from 'argon2';
+
+import { IAuthUser } from 'src/core/interfaces/request.interface';
 
 import { EncryptionService } from '../../src/common/helper/services/encryption.service';
 
 describe('EncryptionService', () => {
   let service: EncryptionService;
+
+  const mockJwtService = {
+    signAsync: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn(() => 'secret'),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -13,15 +24,11 @@ describe('EncryptionService', () => {
         EncryptionService,
         {
           provide: ConfigService,
-          useValue: {
-            get: jest.fn(() => 'secret'),
-          },
+          useValue: mockConfigService,
         },
         {
           provide: JwtService,
-          useValue: {
-            signAsync: jest.fn(),
-          },
+          useValue: mockJwtService,
         },
       ],
     }).compile();
@@ -33,61 +40,100 @@ describe('EncryptionService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create access token', async () => {
-    const payload = { userId: '123' };
-    const accessToken = 'generated-access-token';
-    jest.spyOn(service, 'createAccessToken').mockResolvedValue(accessToken);
+  describe('createJwtTokens', () => {
+    it('should return an object containing accessToken and refreshToken', async () => {
+      const mockAccessToken = 'mockAccessToken';
+      const mockRefreshToken = 'mockRefreshToken';
+      jest
+        .spyOn(service, 'createAccessToken')
+        .mockResolvedValue(mockAccessToken);
+      jest
+        .spyOn(service, 'createRefreshToken')
+        .mockResolvedValue(mockRefreshToken);
 
-    const result = await service.createAccessToken(payload);
+      const userPayload = {
+        userId: 1,
+        username: 'testuser',
+      } as unknown as IAuthUser;
+      const result = await service.createJwtTokens(userPayload);
 
-    expect(result).toBe(accessToken);
-    expect(service.createAccessToken).toHaveBeenCalledWith(payload);
+      expect(result).toEqual({
+        accessToken: mockAccessToken,
+        refreshToken: mockRefreshToken,
+      });
+    });
   });
 
-  it('should create refresh token', async () => {
-    const payload = { userId: '123' };
-    const refreshToken = 'generated-refresh-token';
-    jest.spyOn(service, 'createRefreshToken').mockResolvedValue(refreshToken);
+  describe('createAccessToken', () => {
+    it('should return a valid JWT token with correct payload', async () => {
+      const mockToken = 'mockToken';
+      mockJwtService.signAsync.mockResolvedValue(mockToken);
 
-    const result = await service.createRefreshToken(payload);
+      const userPayload = {
+        userId: 1,
+        role: 'USER',
+      } as unknown as IAuthUser;
+      const token = await service.createAccessToken(userPayload);
 
-    expect(result).toBe(refreshToken);
-    expect(service.createRefreshToken).toHaveBeenCalledWith(payload);
+      expect(mockJwtService.signAsync).toHaveBeenCalledWith(
+        userPayload,
+        expect.any(Object),
+      );
+      expect(token).toBe(mockToken);
+    });
   });
 
-  it('should create JWT tokens', async () => {
-    const payload = { userId: '123' };
-    const accessToken = 'generated-access-token';
-    const refreshToken = 'generated-refresh-token';
-    jest.spyOn(service, 'createAccessToken').mockResolvedValue(accessToken);
-    jest.spyOn(service, 'createRefreshToken').mockResolvedValue(refreshToken);
+  describe('createRefreshToken', () => {
+    it('should return a valid JWT token with correct payload', async () => {
+      const mockToken = 'mockToken';
+      mockJwtService.signAsync.mockResolvedValue(mockToken);
 
-    const result = await service.createJwtTokens(payload);
+      const userPayload = {
+        userId: 1,
+        role: 'USER',
+      } as unknown as IAuthUser;
+      const token = await service.createRefreshToken(userPayload);
 
-    expect(result.accessToken).toBe(accessToken);
-    expect(result.refreshToken).toBe(refreshToken);
-    expect(service.createAccessToken).toHaveBeenCalledWith(payload);
-    expect(service.createRefreshToken).toHaveBeenCalledWith(payload);
+      expect(mockJwtService.signAsync).toHaveBeenCalledWith(
+        userPayload,
+        expect.any(Object),
+      );
+      expect(token).toBe(mockToken);
+    });
   });
 
-  it('should create hash', () => {
-    const password = 'password';
-    const hash = service.createHash(password);
-    expect(hash).not.toBeNull();
-    expect(hash).not.toBe(password);
+  describe('createHash', () => {
+    it('should return a hash string', async () => {
+      const mockPassword = 'password';
+      const hash = await service.createHash(mockPassword);
+      expect(hash).toBeDefined();
+      expect(typeof hash).toBe('string');
+    });
   });
 
-  it('should match password with hash', () => {
-    const password = 'password';
-    const hash = service.createHash(password);
-    const match = service.match(hash, password);
-    expect(match).toBe(true);
+  describe('match', () => {
+    it('should return true when given correct hash and password', async () => {
+      const mockPassword = 'password';
+      const hash = await argon2.hash(mockPassword);
+      const matchResult = await service.match(hash, mockPassword);
+      expect(matchResult).toBe(true);
+    });
+
+    it('should return false when given incorrect hash or password', async () => {
+      const correctPassword = 'password';
+      const incorrectPassword = 'incorrectPassword';
+      const hash = await argon2.hash(correctPassword);
+      const matchResult = await service.match(hash, incorrectPassword);
+      expect(matchResult).toBe(false);
+    });
   });
 
-  it('should encrypt and decrypt text', () => {
-    const text = 'hello world';
-    const encrypted = service.encrypt(text);
-    const decrypted = service.decrypt(encrypted);
-    expect(decrypted).toBe(text);
+  describe('encrypt and decrypt', () => {
+    it('should encrypt and decrypt data successfully', () => {
+      const plaintext = 'Hello, world!';
+      const encryptedData = service.encrypt(plaintext);
+      const decryptedData = service.decrypt(encryptedData);
+      expect(decryptedData).toBe(plaintext);
+    });
   });
 });

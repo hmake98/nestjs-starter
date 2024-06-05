@@ -1,11 +1,34 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Post } from '@prisma/client';
-import { Expose, Type } from 'class-transformer';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { Post, PostImages } from '@prisma/client';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 
-import { FileResponseDto } from 'src/common/files/dtos/file.response.dto';
 import { IGetResponse } from 'src/core/interfaces/response.interface';
 import { UserResponseDto } from 'src/modules/user/dtos/user.response.dto';
+
+export class PostImagesResponseDto implements PostImages {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  image: string;
+
+  @ApiProperty()
+  created_at: Date;
+
+  @ApiProperty()
+  updated_at: Date;
+
+  @ApiProperty()
+  deleted_at: Date;
+
+  @ApiProperty()
+  is_deleted: boolean;
+
+  @ApiHideProperty()
+  @Exclude()
+  post_id: string;
+}
 
 export class PostResponseDto implements Post {
   @ApiProperty()
@@ -38,9 +61,9 @@ export class PostResponseDto implements Post {
   author: UserResponseDto;
 
   @ApiProperty()
-  @Type(() => FileResponseDto)
+  @Type(() => PostImagesResponseDto)
   @ValidateNested()
-  photos: FileResponseDto[];
+  images: PostImagesResponseDto[];
 }
 
 export class CreatePostResponseDto extends PostResponseDto {}

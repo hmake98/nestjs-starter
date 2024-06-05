@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
-import * as bcrypt from 'bcrypt';
+import * as argon2 from 'argon2';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -69,12 +69,12 @@ export class EncryptionService implements IEncryptionService {
     });
   }
 
-  public createHash(password: string): string {
-    return bcrypt.hashSync(password, 10);
+  public createHash(password: string): Promise<string> {
+    return argon2.hash(password);
   }
 
-  public match(hash: string, password: string): boolean {
-    return bcrypt.compareSync(password, hash);
+  public match(hash: string, password: string): Promise<boolean> {
+    return argon2.verify(hash, password);
   }
 
   public encrypt(text: string): IEncryptDataPayload {

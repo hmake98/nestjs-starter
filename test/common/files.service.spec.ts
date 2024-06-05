@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
+import { GetPresignDto } from 'src/common/files/dtos/get.presign.dto';
+
 import { FilesService } from '../../src/common/files/services/files.service';
 import { PrismaService } from '../../src/common/helper/services/prisma.service';
 import { FileModuleType } from '../../src/common/files/constants/files.enum';
@@ -63,8 +65,9 @@ describe('FilesService', () => {
   it('should generate a presigned URL successfully', async () => {
     const getPresignDto = {
       storeType: FileModuleType.UserProfile,
-      name: 'testfile.txt',
-    };
+      fileName: 'testfile.txt',
+      contentType: 'image/png',
+    } as GetPresignDto;
     const userId = '123';
     const expectedUrl = 'http://example.com/presigned-url';
 
@@ -80,8 +83,9 @@ describe('FilesService', () => {
   it('should handle errors when generating a presigned PUT URL', async () => {
     const getPresignDto = {
       storeType: FileModuleType.UserProfile,
-      name: 'testfile.txt',
-    };
+      fileName: 'testfile.txt',
+      contentType: 'image/png',
+    } as GetPresignDto;
     const userId = '123';
 
     getSignedUrlMock.mockRejectedValue(

@@ -22,46 +22,43 @@ model User {
   created_at              DateTime                 @default(now())
   updated_at              DateTime                 @updatedAt
   deleted_at              DateTime?
-  is_deleted              Boolean?
-  avatar                  File?                    @relation(fields: [avatar_id], references: [id])
+  is_deleted              Boolean                  @default(false)
+  avatar                  String?
   posts                   Post[]
-  avatar_id               String?
   notification_recipients NotificationRecipients[]
   notification            Notification[]
 
   @@map("users")
 }
 
-model File {
-  id          String    @id @default(uuid())
-  name        String
-  storage_key String
-  type        String
-  size        String?
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-  deleted_at  DateTime?
-  is_deleted  Boolean?
-  users       User[]
-  post        Post?     @relation(fields: [post_id], references: [id])
-  post_id     String?
-
-  @@map("files")
-}
-
 model Post {
-  id         String    @id @default(uuid())
+  id         String       @id @default(uuid())
   title      String
   content    String
-  photos     File[]
-  author     User      @relation(fields: [author_id], references: [id])
+  images     PostImages[]
+  author     User         @relation(fields: [author_id], references: [id])
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  deleted_at DateTime?
+  is_deleted Boolean      @default(false)
+  author_id  String
+
+  @@index([author_id])
+  @@map("posts")
+}
+
+model PostImages {
+  id         String    @id @default(uuid())
+  image      String
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
-  is_deleted Boolean?
-  author_id  String
+  is_deleted Boolean   @default(false)
+  post       Post?     @relation(fields: [post_id], references: [id])
+  post_id    String?
 
-  @@map("posts")
+  @@index([post_id])
+  @@map("posts_images")
 }
 
 model Notification {
@@ -78,6 +75,7 @@ model Notification {
   deleted_at DateTime?
   sender_id  String
 
+  @@index([sender_id])
   @@map("notifications")
 }
 
@@ -91,6 +89,18 @@ model NotificationRecipients {
   updated_at      DateTime      @updatedAt
 
   @@map("notification_recipients")
+}
+
+enum FileType {
+  MP3
+  MP4
+  JPEG
+  JPG
+  CSV
+  WAV
+  PNG
+  JSON
+  MKV
 }
 
 enum Roles {

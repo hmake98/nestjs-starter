@@ -22,7 +22,7 @@ export class PostService implements IPostService {
     data: CreatePostDto,
   ): Promise<CreatePostResponseDto> {
     try {
-      const { content, title } = data;
+      const { content, title, images } = data;
       const user = await this.prismaService.user.findUnique({
         where: { id: userId },
       });
@@ -33,6 +33,11 @@ export class PostService implements IPostService {
         data: {
           content,
           title,
+          images: {
+            create: images.map((key) => ({
+              image: key,
+            })),
+          },
           author: {
             connect: {
               id: userId,
@@ -41,7 +46,7 @@ export class PostService implements IPostService {
         },
         include: {
           author: true,
-          photos: true,
+          images: true,
         },
       });
     } catch (e) {
@@ -105,7 +110,7 @@ export class PostService implements IPostService {
         skip: Number(skip),
         include: {
           author: true,
-          photos: true,
+          images: true,
         },
       });
       return {
@@ -122,20 +127,41 @@ export class PostService implements IPostService {
     data: UpdatePostDto,
   ): Promise<UpdatePostResponseDto> {
     try {
-      const { content, title } = data;
-      const post = await this.prismaService.post.findUnique({ where: { id } });
+      const { content, title, images } = data;
+
+      const post = await this.prismaService.post.findUnique({
+        where: { id },
+        include: { images: true },
+      });
+
       if (!post) {
         throw new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND);
       }
+      const currentImages = post.images.map((image) => image.image);
+
+      const imagesToDelete = currentImages.filter(
+        (image) => !images.includes(image),
+      );
+      const imagesToAdd = images.filter(
+        (image) => !currentImages.includes(image),
+      );
       return this.prismaService.post.update({
         where: { id },
         data: {
           title,
           content,
+          images: {
+            deleteMany: {
+              image: { in: imagesToDelete },
+            },
+            create: imagesToAdd.map((key) => ({
+              image: key,
+            })),
+          },
         },
         include: {
           author: true,
-          photos: true,
+          images: true,
         },
       });
     } catch (e) {

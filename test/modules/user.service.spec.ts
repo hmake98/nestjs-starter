@@ -44,17 +44,14 @@ describe('UserService', () => {
         email: 'test@example.com',
         firstName: 'John',
         lastName: 'Doe',
-        profile: 'https://example.com/avatar.png',
+        avatar: 'https://example.com/avatar.png',
       };
       const updatedUser = {
         id: userId,
         email: userData.email,
         first_name: userData.firstName,
         last_name: userData.lastName,
-        avatar: {
-          file_name: 'avatar_123456789',
-          link: userData.profile,
-        },
+        avatar: userData.avatar,
       };
 
       prismaServiceMock.user.findUnique.mockResolvedValueOnce({ id: userId });
@@ -71,7 +68,7 @@ describe('UserService', () => {
         email: 'test@example.com',
         firstName: 'John',
         lastName: 'Doe',
-        profile: 'https://example.com/avatar.png',
+        avatar: 'https://example.com/avatar.png',
       };
 
       prismaServiceMock.user.findUnique.mockResolvedValueOnce(null);

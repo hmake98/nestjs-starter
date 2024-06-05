@@ -32,10 +32,10 @@ export class UserUpdateDto {
 
   @ApiProperty({
     description: 'user profile picture',
-    example: faker.image.avatar(),
+    example: 'storagekey',
     required: false,
   })
   @IsString()
   @IsOptional()
-  public profile?: string;
+  public avatar?: string;
 }

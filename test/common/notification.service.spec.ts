@@ -1,24 +1,20 @@
-/* eslint-disable import/no-unresolved */
 import { Test, TestingModule } from '@nestjs/testing';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { Notification } from '@prisma/client';
 
-import { NotificationService } from '../../src/common/notification/services/notification.service';
-import { PrismaService } from '../../src/common/helper/services/prisma.service';
-import { NotificationCreateDto } from '../../src/common/notification/dtos/create.notification.dto';
-import { NotificationGetDto } from '../../src/common/notification/dtos/get.notification.dto';
-import { NotificationResponseDto } from '../../src/common/notification/dtos/notification.response.dto';
+import { GenericResponseDto } from 'src/core/dtos/response.dto';
+import { NotificationService } from 'src/common/notification/services/notification.service';
+import { PrismaService } from 'src/common/helper/services/prisma.service';
+import {
+  NotificationCreateResponseDto,
+  NotificationGetResponseDto,
+} from 'src/common/notification/dtos/notification.response.dto';
+import { NotificationCreateDto } from 'src/common/notification/dtos/create.notification.dto';
+import { NotificationGetDto } from 'src/common/notification/dtos/get.notification.dto';
 
 describe('NotificationService', () => {
-  let notificationService: NotificationService;
-
-  const prismaServiceMock = {
-    notification: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-      count: jest.fn(),
-      update: jest.fn(),
-      findUnique: jest.fn(),
-    },
-  };
+  let service: NotificationService;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,147 +22,202 @@ describe('NotificationService', () => {
         NotificationService,
         {
           provide: PrismaService,
-          useValue: prismaServiceMock,
+          useValue: {
+            notification: {
+              create: jest.fn(),
+              findMany: jest.fn(),
+              count: jest.fn(),
+              findUnique: jest.fn(),
+              update: jest.fn(),
+            },
+          },
         },
       ],
     }).compile();
 
-    notificationService = module.get<NotificationService>(NotificationService);
+    service = module.get<NotificationService>(NotificationService);
+    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {
-    expect(notificationService).toBeDefined();
+    expect(service).toBeDefined();
   });
 
   describe('createNotification', () => {
     it('should create a notification', async () => {
-      const userId = 'user-id';
-      const notificationCreateDto: NotificationCreateDto = {
+      const userId = 'user1';
+      const data = {
         title: 'Test Title',
         body: 'Test Body',
         payload: {},
-        recipients: ['recipient-id-1', 'recipient-id-2'],
+        recipients: ['user2'],
         type: 'EMAIL',
-      };
-      const createdNotification = {
-        id: 'notification-id',
+      } as unknown as NotificationCreateDto;
+      const expectedResult = {
+        id: 'notification1',
         title: 'Test Title',
         body: 'Test Body',
         payload: {},
         type: 'EMAIL',
-        sender: {
-          id: userId,
-          email: 'user@example.com',
-          first_name: 'John',
-          last_name: 'Doe',
+        sender: { id: userId },
+        recipients: [{ user: { id: 'user2' } }],
+      } as unknown as NotificationCreateResponseDto;
+
+      jest
+        .spyOn(prismaService.notification, 'create')
+        .mockResolvedValue(expectedResult);
+
+      const result = await service.createNotification(userId, data);
+      expect(result).toEqual(expectedResult);
+      expect(prismaService.notification.create).toHaveBeenCalledWith({
+        data: {
+          title: data.title.trim(),
+          body: data.body.trim(),
+          payload: data.payload,
+          type: data.type,
+          sender: {
+            connect: {
+              id: userId,
+            },
+          },
+          recipients: {
+            create: data.recipients.map((recipientId) => ({
+              user: {
+                connect: {
+                  id: recipientId,
+                },
+              },
+            })),
+          },
         },
-        recipients: [],
-        is_deleted: false,
-        created_at: new Date(),
-        updated_at: new Date(),
-        deleted_at: null,
-      } as NotificationResponseDto;
-
-      prismaServiceMock.notification.create.mockResolvedValue(
-        createdNotification,
-      );
-
-      const result = await notificationService.createNotification(
-        userId,
-        notificationCreateDto,
-      );
-      expect(result).toEqual(createdNotification);
-      expect(prismaServiceMock.notification.create).toHaveBeenCalledWith(
-        expect.any(Object),
-      );
+        include: {
+          sender: true,
+          recipients: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      });
     });
   });
 
   describe('getNotifications', () => {
-    it('should get notifications', async () => {
-      const notificationGetDto: NotificationGetDto = {
+    it('should return a list of notifications', async () => {
+      const params = {
         limit: 10,
         page: 1,
-        search: 'test',
+        search: 'Test',
+      } as unknown as NotificationGetDto;
+      const expectedResult = {
+        count: 1,
+        data: [
+          {
+            id: 'notification1',
+            title: 'Test Title',
+            body: 'Test Body',
+            payload: {},
+            type: 'INFO',
+            sender: { id: 'user1' },
+            recipients: [{ user: { id: 'user2' } }],
+          },
+        ],
+      } as unknown as NotificationGetResponseDto;
+
+      jest.spyOn(prismaService.notification, 'count').mockResolvedValue(1);
+      jest
+        .spyOn(prismaService.notification, 'findMany')
+        .mockResolvedValue(expectedResult.data);
+
+      const result = await service.getNotifications(params);
+      expect(result).toEqual(expectedResult);
+      expect(prismaService.notification.count).toHaveBeenCalledWith({
+        where: {
+          title: { contains: params.search, mode: 'insensitive' },
+          body: { contains: params.search, mode: 'insensitive' },
+        },
+      });
+      expect(prismaService.notification.findMany).toHaveBeenCalledWith({
+        where: {
+          title: { contains: params.search, mode: 'insensitive' },
+          body: { contains: params.search, mode: 'insensitive' },
+        },
+        take: params.limit,
+        skip: 0,
+        include: {
+          sender: true,
+          recipients: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      });
+    });
+
+    it('should throw an HttpException when an error occurs', async () => {
+      const params: NotificationGetDto = {
+        limit: 10,
+        page: 1,
+        search: 'Test',
       };
-      const notifications = [
-        {
-          id: 'notification-id-1',
-          title: 'Test Title 1',
-          body: 'Test Body 1',
-          payload: {},
-          type: 'EMAIL',
-          sender: {
-            id: 'user-id-1',
-            email: 'user1@example.com',
-            first_name: 'John',
-            last_name: 'Doe',
-          },
-          recipients: [],
-          is_deleted: false,
-          created_at: new Date(),
-          updated_at: new Date(),
-          deleted_at: null,
-        },
-        {
-          id: 'notification-id-2',
-          title: 'Test Title 2',
-          body: 'Test Body 2',
-          payload: {},
-          type: 'TEXT',
-          sender: {
-            id: 'user-id-2',
-            email: 'user2@example.com',
-            first_name: 'Jane',
-            last_name: 'Doe',
-          },
-          recipients: [],
-          is_deleted: false,
-          created_at: new Date(),
-          updated_at: new Date(),
-          deleted_at: null,
-        },
-      ] as NotificationResponseDto[];
 
-      prismaServiceMock.notification.count.mockResolvedValue(2);
-      prismaServiceMock.notification.findMany.mockResolvedValue(notifications);
+      jest
+        .spyOn(prismaService.notification, 'count')
+        .mockRejectedValue(new Error('Test Error'));
 
-      const result =
-        await notificationService.getNotifications(notificationGetDto);
-      expect(result.count).toBe(2);
-      expect(result.data).toEqual(notifications);
-      expect(prismaServiceMock.notification.count).toHaveBeenCalledWith(
-        expect.any(Object),
-      );
-      expect(prismaServiceMock.notification.findMany).toHaveBeenCalledWith(
-        expect.any(Object),
+      await expect(service.getNotifications(params)).rejects.toThrow(
+        expect.any(Error),
       );
     });
   });
 
   describe('deleteNotification', () => {
     it('should delete a notification', async () => {
-      const notificationId = 'notification-id';
-
-      prismaServiceMock.notification.findUnique.mockResolvedValue({
-        id: notificationId,
-      });
-
-      prismaServiceMock.notification.update.mockResolvedValue({
+      const notificationId = 'notification1';
+      const checkResult = { id: notificationId } as unknown as Notification;
+      const expectedResult: GenericResponseDto = {
         status: true,
         message: 'notifications.notificationDeleted',
-      });
+      };
 
-      const result =
-        await notificationService.deleteNotification(notificationId);
+      jest
+        .spyOn(prismaService.notification, 'findUnique')
+        .mockResolvedValue(checkResult);
+      jest
+        .spyOn(prismaService.notification, 'update')
+        .mockResolvedValue(undefined);
 
-      expect(result).toEqual({
-        status: true,
-        message: 'notifications.notificationDeleted',
+      const result = await service.deleteNotification(notificationId);
+      expect(result).toEqual(expectedResult);
+      expect(prismaService.notification.findUnique).toHaveBeenCalledWith({
+        where: { id: notificationId },
       });
-      expect(prismaServiceMock.notification.update).toHaveBeenCalledWith(
-        expect.any(Object),
+      expect(prismaService.notification.update).toHaveBeenCalledWith({
+        where: { id: notificationId },
+        data: {
+          deleted_at: new Date(),
+          is_deleted: true,
+        },
+      });
+    });
+
+    it('should throw an exception if notification not found', async () => {
+      const notificationId = 'notification1';
+
+      jest
+        .spyOn(prismaService.notification, 'findUnique')
+        .mockResolvedValue(null);
+
+      await expect(service.deleteNotification(notificationId)).rejects.toThrow(
+        new HttpException(
+          'notifications.notificationNotFound',
+          HttpStatus.NOT_FOUND,
+        ),
       );
+      expect(prismaService.notification.findUnique).toHaveBeenCalledWith({
+        where: { id: notificationId },
+      });
     });
   });
 });

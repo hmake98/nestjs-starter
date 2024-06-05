@@ -16,6 +16,14 @@ import { AppController } from './app.controller';
 @Module({
   controllers: [AppController],
   imports: [
+    TerminusModule,
+    CoreModule,
+    CommonModule,
+    HelperModule,
+    ScheduleModule.forRoot(),
+    PostModule,
+    UserModule,
+
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -26,13 +34,6 @@ import { AppController } from './app.controller';
       }),
       inject: [ConfigService],
     }),
-    TerminusModule,
-    CoreModule,
-    CommonModule,
-    HelperModule,
-    ScheduleModule.forRoot(),
-    PostModule,
-    UserModule,
   ],
   providers: [ConfigService],
 })

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -20,4 +20,13 @@ export class CreatePostDto {
   @IsString()
   @IsNotEmpty({ message: 'title is not provided' })
   public title: string;
+
+  @ApiProperty({
+    description: 'post pictures',
+    example: ['storagekey', 'storagekey'],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  public images?: string[];
 }

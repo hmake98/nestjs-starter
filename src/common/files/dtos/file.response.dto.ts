@@ -1,61 +1,10 @@
-import { faker } from '@faker-js/faker';
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { File } from '@prisma/client';
-import { Exclude, Expose, Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
-
-export class FileResponseDto implements File {
-  @ApiProperty()
-  created_at: Date;
-
-  @ApiProperty()
-  deleted_at: Date;
-
-  @ApiProperty()
-  id: string;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  size: string;
-
-  @ApiProperty()
-  storage_key: string;
-
-  @ApiProperty()
-  is_deleted: boolean;
-
-  @ApiProperty()
-  type: string;
-
-  @ApiProperty()
-  updated_at: Date;
-
-  @ApiHideProperty()
-  @Exclude()
-  post_id: string;
-}
-
-export class FileGetPresignResponseDto {
-  @ApiProperty({
-    example: faker.image.url(),
-    required: true,
-    nullable: false,
-  })
-  @Expose()
-  url: string;
-
-  @Expose()
-  @ApiProperty()
-  @Type(() => FileResponseDto)
-  @ValidateNested()
-  file: FileResponseDto;
-}
+import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class FilePutPresignResponseDto {
   @ApiProperty({
-    example: faker.image.url(),
+    example:
+      'https://s3.amazonaws.com/finance-department-bucket/2022/tax-certificate.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA3SGQVQG7FGA6KKA6%2F20221104%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20221104T140227Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=b228dbec8c1008c80c162e1210e4503dceead1e4d4751b4d9787314fd6da4d55',
     required: true,
     nullable: false,
   })

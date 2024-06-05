@@ -4,7 +4,7 @@ import { Exclude } from 'class-transformer';
 
 export class UserResponseDto implements User {
   @ApiProperty()
-  avatar_id: string;
+  avatar: string;
 
   @ApiProperty()
   created_at: Date;

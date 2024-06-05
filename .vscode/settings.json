@@ -7,7 +7,7 @@
   ],
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "always"
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -32,5 +32,8 @@
   },
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

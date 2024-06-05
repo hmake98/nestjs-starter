@@ -3,7 +3,6 @@ import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
 import { UserUpdateDto } from '../dtos/user.update.dto';
 import { PrismaService } from '../../../common/helper/services/prisma.service';
 import { IUserService } from '../interfaces/user.service.interface';
-import { FileMimeType } from '../../../common/files/constants/files.enum';
 import { GenericResponseDto } from '../../../core/dtos/response.dto';
 import {
   GetProfileResponseDto,
@@ -19,7 +18,7 @@ export class UserService implements IUserService {
     data: UserUpdateDto,
   ): Promise<UpdateProfileResponseDto> {
     try {
-      const { email, firstName, lastName, profile } = data;
+      const { email, firstName, lastName, avatar } = data;
       const user = await this.prismaService.user.findUnique({
         where: { id: userId },
       });
@@ -34,13 +33,7 @@ export class UserService implements IUserService {
           email: email?.trim(),
           first_name: firstName?.trim(),
           last_name: lastName?.trim(),
-          avatar: {
-            create: {
-              name: `avatar_${Date.now()}`,
-              storage_key: profile,
-              type: FileMimeType.JPEG,
-            },
-          },
+          avatar,
         },
       });
     } catch (e) {

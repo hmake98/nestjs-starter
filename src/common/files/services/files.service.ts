@@ -24,14 +24,15 @@ export class FilesService implements IFilesServiceInterface {
   }
 
   async getPresginPutObject(
-    file: GetPresignDto,
+    { fileName, storeType, contentType }: GetPresignDto,
     userId: string,
   ): Promise<FilePutPresignResponseDto> {
     try {
-      const Key = `${userId}/${file.storeType}/${Date.now()}_${file.name}`;
+      const Key = `${userId}/${storeType}/${Date.now()}_${fileName}`;
       const command = new PutObjectCommand({
         Bucket: this.configService.get('aws.s3.bucket'),
         Key,
+        ContentType: contentType,
       });
       const url = await getSignedUrl(this.s3Client, command, {
         expiresIn: this.configService.get('aws.s3.linkExpire'),

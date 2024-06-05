@@ -49,11 +49,13 @@ export class NotificationCreateDto {
 
   @ApiProperty({
     description: 'notification type',
-    example: NotificationTypes,
+    example: NotificationTypes.EMAIL,
     required: true,
+    enum: NotificationTypes,
   })
-  @IsString()
   @IsNotEmpty({ message: 'notification type is required' })
-  @IsEnum(NotificationTypes)
+  @IsEnum(NotificationTypes, {
+    message: 'notification type should be enum value',
+  })
   public type: NotificationTypes;
 }
