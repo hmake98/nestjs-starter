@@ -1,7 +1,7 @@
 # NestJS Starter Boilerplate 
 [![CodeQL](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql) 
 [![Run Tests](https://github.com/hmake98/nestjs-starter/actions/workflows/main.yml/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/main.yml)
-[![Coverage](https://hmake98.github.io/nestjs-starter/badges/coverage.svg)](https://github.com/hmake98/nestjs-starter/actions)
+![Coverage](https://github.com/hmake98/nestjs-starter/blob/gh-pages/badge.svg)
 
 
 ## Installation
