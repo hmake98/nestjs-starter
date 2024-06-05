@@ -128,7 +128,7 @@ describe('PostService', () => {
       });
       expect(prismaService.post.update).toHaveBeenCalledWith({
         where: { id: postId },
-        data: { deleted_at: new Date(), is_deleted: true },
+        data: { deleted_at: expect.any(Date), is_deleted: true },
       });
     });
 

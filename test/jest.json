@@ -6,6 +6,7 @@
   "testMatch": ["<rootDir>/test/**/*.spec.ts"],
   "collectCoverage": true,
   "coverageDirectory": "coverage",
+  "coverageReporters": ["lcov", "json-summary"],
   "collectCoverageFrom": [],
   "coverageThreshold": {
     "global": {
