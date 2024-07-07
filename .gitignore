@@ -4,6 +4,7 @@ node_modules/
 dist/
 tmp/
 temp/
+coverage/
 
 # environment
 .env*
