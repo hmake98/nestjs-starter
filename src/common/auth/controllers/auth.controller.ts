@@ -31,10 +31,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @PublicRoute()
-  @DocErrors([HttpStatus.NOT_FOUND])
+  @DocErrors([HttpStatus.NOT_FOUND, HttpStatus.BAD_REQUEST])
   @DocResponse({
     serialization: AuthResponseDto,
-    httpStatus: 201,
+    httpStatus: 200,
   })
   @Post('login')
   public login(@Body() payload: UserLoginDto): Promise<AuthResponseDto> {

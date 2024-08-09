@@ -1,14 +1,15 @@
 import { SetMetadata, applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { I18nService } from 'nestjs-i18n';
 
 import { IResponseOptions } from '../interfaces/response.interface';
 import { ResponseDto } from '../dtos/response.dto';
-import {
-  HTTP_STATUS_MESSAGES,
-  RESPONSE_SERIALIZATION_META_KEY,
-} from '../constants/core.constant';
+import { RESPONSE_SERIALIZATION_META_KEY } from '../constants/core.constant';
 
-export function DocResponse<T>(options: IResponseOptions<T>): MethodDecorator {
+export function DocResponse<T>(
+  options: IResponseOptions<T>,
+  i18n: I18nService,
+): MethodDecorator {
   const docs = [];
 
   const schema: Record<string, any> = {
@@ -17,7 +18,10 @@ export function DocResponse<T>(options: IResponseOptions<T>): MethodDecorator {
       {
         properties: {
           message: {
-            example: HTTP_STATUS_MESSAGES[options.httpStatus],
+            example: i18n.translate(`http.status.${options.httpStatus}`, {
+              lang: 'en',
+              defaultValue: 'Operation completed.',
+            }),
           },
           statusCode: {
             type: 'number',
@@ -29,11 +33,8 @@ export function DocResponse<T>(options: IResponseOptions<T>): MethodDecorator {
   };
 
   if (options.serialization) {
-    schema.properties = {
-      ...schema.properties,
-      data: {
-        $ref: getSchemaPath(options.serialization),
-      },
+    schema.allOf[1].properties.data = {
+      $ref: getSchemaPath(options.serialization),
     };
     docs.push(ApiExtraModels(options.serialization));
   }
@@ -41,7 +42,10 @@ export function DocResponse<T>(options: IResponseOptions<T>): MethodDecorator {
   return applyDecorators(
     ApiExtraModels(ResponseDto<T>),
     ApiResponse({
-      description: HTTP_STATUS_MESSAGES[options.httpStatus],
+      description: i18n.translate(`http.status.${options.httpStatus}`, {
+        lang: 'en',
+        defaultValue: 'Operation completed.',
+      }),
       status: options.httpStatus,
       schema,
     }),
@@ -50,37 +54,38 @@ export function DocResponse<T>(options: IResponseOptions<T>): MethodDecorator {
   );
 }
 
-export function DocErrors(options: number[]): MethodDecorator {
-  const docs = [];
-
-  options.forEach((statusCode) => {
+export function DocErrors(
+  options: number[],
+  i18n: I18nService,
+): MethodDecorator {
+  const docs = options.map((statusCode) => {
     const schema: Record<string, any> = {
-      allOf: [
-        {
-          properties: {
-            message: {
-              example: HTTP_STATUS_MESSAGES[statusCode],
-            },
-            statusCode: {
-              type: 'number',
-              example: statusCode,
-            },
-            timestamp: {
-              type: 'string',
-              example: new Date().toISOString(),
-            },
-          },
+      properties: {
+        message: {
+          example: i18n.translate(`http.status.${statusCode}`, {
+            lang: 'en',
+            defaultValue: 'Operation completed.',
+          }),
         },
-      ],
+        statusCode: {
+          type: 'number',
+          example: statusCode,
+        },
+        timestamp: {
+          type: 'string',
+          example: new Date().toISOString(),
+        },
+      },
     };
 
-    docs.push(
-      ApiResponse({
-        description: HTTP_STATUS_MESSAGES[statusCode],
-        status: statusCode,
-        schema,
+    return ApiResponse({
+      description: i18n.translate(`http.status.${statusCode}`, {
+        lang: 'en',
+        defaultValue: 'Operation completed.',
       }),
-    );
+      status: statusCode,
+      schema,
+    });
   });
 
   return applyDecorators(...docs);

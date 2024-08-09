@@ -1,4 +1,10 @@
 {
-  "postNotFound": "Post not found.",
-  "postDeleted": "Post is deleted."
+  "success": {
+    "postFetched": "Posts fetched successfully.",
+    "postUpdated": "Posts updated successfully."
+  },
+  "error": {
+    "postNotFound": "Post not found.",
+    "postDeleted": "Post is deleted."
+  }
 }

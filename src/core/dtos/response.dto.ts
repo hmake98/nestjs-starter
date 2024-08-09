@@ -42,7 +42,7 @@ export class GenericResponseDto {
     example: true,
     required: true,
   })
-  status: boolean;
+  success: boolean;
 
   @ApiProperty({
     example: 'string',

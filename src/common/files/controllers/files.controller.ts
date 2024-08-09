@@ -28,6 +28,6 @@ export class FilesController {
     @AuthUser() user: IAuthUser,
     @Query() params: GetPresignDto,
   ): Promise<FilePutPresignResponseDto> {
-    return this.fileService.getPresginPutObject(params, user.userId);
+    return this.fileService.getPresginUrlPutObject(params, user.userId);
   }
 }

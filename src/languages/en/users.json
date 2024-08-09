@@ -1,5 +1,8 @@
 {
-  "userNotFound": "User not found.",
-  "userExists": "User already exists.",
-  "userDeleted": "User is deleted."
+  "success": {},
+  "error": {
+    "userNotFound": "User not found.",
+    "userAlreadyExists": "User already exists.",
+    "userDeleted": "User is deleted."
+  }
 }

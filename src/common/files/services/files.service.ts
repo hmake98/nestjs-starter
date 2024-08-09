@@ -23,7 +23,7 @@ export class FilesService implements IFilesServiceInterface {
     this.expiresIn = this.configService.get('aws.s3.linkExpire');
   }
 
-  async getPresginPutObject(
+  async getPresginUrlPutObject(
     { fileName, storeType, contentType }: GetPresignDto,
     userId: string,
   ): Promise<FilePutPresignResponseDto> {

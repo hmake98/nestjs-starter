@@ -39,7 +39,7 @@ export class AuthService implements IAuthService {
         password,
       );
       if (!passwordMatched) {
-        throw new HttpException('auth.invalidPassword', HttpStatus.NOT_FOUND);
+        throw new HttpException('auth.invalidPassword', HttpStatus.BAD_REQUEST);
       }
       const tokens = await this.encryptionService.createJwtTokens({
         role: user.role,
@@ -101,10 +101,9 @@ export class AuthService implements IAuthService {
   public async refreshTokens(
     payload: IAuthUser,
   ): Promise<AuthRefreshResponseDto> {
-    const tokens = await this.encryptionService.createJwtTokens({
+    return this.encryptionService.createJwtTokens({
       userId: payload.userId,
       role: payload.role,
     });
-    return tokens;
   }
 }

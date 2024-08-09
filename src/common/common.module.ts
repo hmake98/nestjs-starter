@@ -6,10 +6,9 @@ import configs from '../config';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { HelperModule } from './helper/helper.module';
-import { NotificationModule } from './notification/notification.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
-  controllers: [],
   imports: [
     ConfigModule.forRoot({
       load: configs,
@@ -20,9 +19,8 @@ import { NotificationModule } from './notification/notification.module';
     }),
     AuthModule,
     FilesModule,
-    NotificationModule,
     HelperModule,
+    DatabaseModule,
   ],
-  providers: [],
 })
 export class CommonModule {}

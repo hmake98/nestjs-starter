@@ -1,5 +1,5 @@
 // File store type for bucket
-export enum FileModuleType {
-  UserProfile = 'Profile',
+export enum FileStoreType {
+  UserProfiles = 'Profiles',
   PostPictures = 'Posts',
 }

@@ -7,6 +7,7 @@ import { TerminusModule } from '@nestjs/terminus';
 import { CommonModule } from 'src/common/common.module';
 import { CoreModule } from 'src/core/core.module';
 import { HelperModule } from 'src/common/helper/helper.module';
+import { WorkerModule } from 'src/workers/worker.module';
 
 import { PostModule } from '../modules/post/post.module';
 import { UserModule } from '../modules/user/user.module';
@@ -17,13 +18,16 @@ import { AppController } from './app.controller';
   controllers: [AppController],
   imports: [
     TerminusModule,
+
     CoreModule,
     CommonModule,
     HelperModule,
-    ScheduleModule.forRoot(),
+    WorkerModule,
+
     PostModule,
     UserModule,
 
+    ScheduleModule.forRoot(),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
