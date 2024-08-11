@@ -1,88 +1,158 @@
+import { faker } from '@faker-js/faker';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { Post, PostImages } from '@prisma/client';
-import { Exclude, Expose, Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
+import { $Enums, Post, PostImage } from '@prisma/client';
+import { Exclude, Type } from 'class-transformer';
+import { IsDate, IsEnum, IsString, IsUUID, ValidateNested } from 'class-validator';
 
-import { IGetResponse } from 'src/core/interfaces/response.interface';
 import { UserResponseDto } from 'src/modules/user/dtos/user.response.dto';
 
-export class PostImagesResponseDto implements PostImages {
-  @ApiProperty()
+export class PostImagesResponseDto implements Partial<PostImage> {
+  @ApiProperty({
+    description: 'Unique identifier of the image',
+    example: faker.string.uuid(),
+  })
+  @IsUUID()
   id: string;
 
-  @ApiProperty()
-  image: string;
+  @ApiProperty({
+    description: 'Storage key of the image',
+    example: faker.system.filePath(),
+  })
+  @IsString()
+  key: string;
 
-  @ApiProperty()
-  created_at: Date;
+  @ApiProperty({
+    description: 'Creation date of the image',
+    example: faker.date.past().toISOString(),
+  })
+  @IsDate()
+  createdAt: Date;
 
-  @ApiProperty()
-  updated_at: Date;
+  @ApiProperty({
+    description: 'Last update date of the image',
+    example: faker.date.recent().toISOString(),
+  })
+  @IsDate()
+  updatedAt: Date;
 
-  @ApiProperty()
-  deleted_at: Date;
-
-  @ApiProperty()
-  is_deleted: boolean;
+  @ApiProperty({
+    description: 'Deletion date of the image',
+    required: false,
+    nullable: true,
+    example: faker.date.future().toISOString(),
+  })
+  @IsDate()
+  deletedAt: Date | null;
 
   @ApiHideProperty()
   @Exclude()
-  post_id: string;
+  postId: string;
 }
 
-export class PostResponseDto implements Post {
-  @ApiProperty()
-  author_id: string;
+export class PostResponseDto implements Partial<Post> {
+  @ApiProperty({
+    enum: $Enums.PostStatus,
+    description: 'Current status of the post',
+    example: faker.helpers.arrayElement(Object.values($Enums.PostStatus)),
+  })
+  @IsEnum($Enums.PostStatus)
+  status: $Enums.PostStatus;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'ID of the post author',
+    example: faker.string.uuid(),
+  })
+  @IsUUID()
+  authorId: string;
+
+  @ApiProperty({
+    description: 'Content of the post',
+    example: faker.lorem.paragraphs(),
+  })
+  @IsString()
   content: string;
 
-  @ApiProperty()
-  created_at: Date;
+  @ApiProperty({
+    description: 'Creation date of the post',
+    example: faker.date.past().toISOString(),
+  })
+  @IsDate()
+  @Type(() => Date)
+  createdAt: Date;
 
-  @ApiProperty()
-  deleted_at: Date;
+  @ApiProperty({
+    description: 'Deletion date of the post',
+    required: false,
+    nullable: true,
+    example: faker.date.future().toISOString(),
+  })
+  @IsDate()
+  @Type(() => Date)
+  deletedAt: Date | null;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Unique identifier of the post',
+    example: faker.string.uuid(),
+  })
+  @IsUUID()
   id: string;
 
-  @ApiProperty()
-  is_deleted: boolean;
-
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Title of the post',
+    example: faker.lorem.sentence(),
+  })
+  @IsString()
   title: string;
 
-  @ApiProperty()
-  updated_at: Date;
+  @ApiProperty({
+    description: 'Last update date of the post',
+    example: faker.date.recent().toISOString(),
+  })
+  @IsDate()
+  @Type(() => Date)
+  updatedAt: Date;
 
-  @ApiProperty()
-  @Type(() => UserResponseDto)
+  @ApiProperty({
+    description: 'Author details',
+    type: () => UserResponseDto,
+    example: {
+      id: faker.string.uuid(),
+      email: faker.internet.email(),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      createdAt: faker.date.past().toISOString(),
+      updatedAt: faker.date.recent().toISOString(),
+    },
+  })
   @ValidateNested()
+  @Type(() => UserResponseDto)
   author: UserResponseDto;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Images associated with the post',
+    type: [PostImagesResponseDto],
+    example: [
+      {
+        id: faker.string.uuid(),
+        key: faker.system.filePath(),
+        createdAt: faker.date.past().toISOString(),
+        updatedAt: faker.date.recent().toISOString(),
+        deletedAt: null,
+      },
+      {
+        id: faker.string.uuid(),
+        key: faker.system.filePath(),
+        createdAt: faker.date.past().toISOString(),
+        updatedAt: faker.date.recent().toISOString(),
+        deletedAt: faker.date.future().toISOString(),
+      },
+    ],
+  })
+  @ValidateNested({ each: true })
   @Type(() => PostImagesResponseDto)
-  @ValidateNested()
   images: PostImagesResponseDto[];
 }
 
 export class CreatePostResponseDto extends PostResponseDto {}
 
-export class GetPostsResponseDto implements IGetResponse<PostResponseDto> {
-  @ApiProperty({
-    example: 10,
-    required: true,
-    nullable: false,
-  })
-  @Expose()
-  count: number;
-
-  @ApiProperty({
-    example: PostResponseDto,
-    required: true,
-  })
-  @Type(() => PostResponseDto)
-  @ValidateNested()
-  data: PostResponseDto[];
-}
 export class UpdatePostResponseDto extends PostResponseDto {}

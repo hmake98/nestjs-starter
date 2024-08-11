@@ -1,22 +1,27 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Post, User } from '@prisma/client';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
-import { PostService } from 'src/modules/post/services/post.service';
-import { PrismaService } from 'src/common/helper/services/prisma.service';
+import { PrismaService } from 'src/common/database/services/prisma.service';
 import { CreatePostDto } from 'src/modules/post/dtos/create.post.dto';
-import {
-  CreatePostResponseDto,
-  GetPostsResponseDto,
-  UpdatePostResponseDto,
-} from 'src/modules/post/dtos/post.response.dto';
 import { GetPostsDto } from 'src/modules/post/dtos/get.post.dto';
 import { UpdatePostDto } from 'src/modules/post/dtos/update.post.dto';
+import { PostService } from 'src/modules/post/services/post.service';
 
 describe('PostService', () => {
   let service: PostService;
-  let prismaService: PrismaService;
+
+  const mockPrismaService = {
+    user: {
+      findUnique: jest.fn(),
+    },
+    post: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      count: jest.fn(),
+      findMany: jest.fn(),
+    },
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,24 +29,16 @@ describe('PostService', () => {
         PostService,
         {
           provide: PrismaService,
-          useValue: {
-            post: {
-              create: jest.fn(),
-              findMany: jest.fn(),
-              count: jest.fn(),
-              findUnique: jest.fn(),
-              update: jest.fn(),
-            },
-            user: {
-              findUnique: jest.fn(),
-            },
-          },
+          useValue: mockPrismaService,
         },
       ],
     }).compile();
 
     service = module.get<PostService>(PostService);
-    prismaService = module.get<PrismaService>(PrismaService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -49,38 +46,30 @@ describe('PostService', () => {
   });
 
   describe('create', () => {
-    it('should create a post', async () => {
-      const userId = 'user1';
-      const data = {
-        content: 'Test Content',
-        title: 'Test Title',
-        images: ['image1', 'image2'],
-      } as unknown as CreatePostDto;
-      const user = { id: userId } as User;
-      const expectedResult = {
-        id: 'post1',
-        content: 'Test Content',
-        title: 'Test Title',
-        author: user,
-        images: [{ image: 'image1' }, { image: 'image2' }],
-      } as unknown as CreatePostResponseDto;
+    const createPostDto: CreatePostDto = {
+      title: 'Test Post',
+      content: 'Test Content',
+      images: ['image1.jpg', 'image2.jpg'],
+    };
 
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(user);
-      jest
-        .spyOn(prismaService.post, 'create')
-        .mockResolvedValue(expectedResult);
+    it('should create a post successfully', async () => {
+      const userId = 'user-123';
+      const mockUser = { id: userId };
+      const mockCreatedPost = { id: 'post-123', ...createPostDto, author: mockUser };
 
-      const result = await service.create(userId, data);
-      expect(result).toEqual(expectedResult);
-      expect(prismaService.user.findUnique).toHaveBeenCalledWith({
-        where: { id: userId },
-      });
-      expect(prismaService.post.create).toHaveBeenCalledWith({
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.post.create.mockResolvedValue(mockCreatedPost);
+
+      const result = await service.create(userId, createPostDto);
+
+      expect(result).toEqual(mockCreatedPost);
+      expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockPrismaService.post.create).toHaveBeenCalledWith({
         data: {
-          content: data.content,
-          title: data.title,
+          content: createPostDto.content,
+          title: createPostDto.title,
           images: {
-            create: data.images.map((key) => ({ image: key })),
+            create: createPostDto.images.map(key => ({ key })),
           },
           author: {
             connect: { id: userId },
@@ -93,161 +82,207 @@ describe('PostService', () => {
       });
     });
 
-    it('should throw an exception if user not found', async () => {
-      const userId = 'user1';
-      const data: CreatePostDto = {
+    it('should throw an error if user is not found', async () => {
+      const userId = 'non-existent-user';
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+
+      await expect(service.create(userId, createPostDto)).rejects.toThrow(
+        new HttpException('users.errors.userNotFound', HttpStatus.NOT_FOUND),
+      );
+    });
+
+    it('should catch and rethrow errors during post creation', async () => {
+      const userId = 'user-123';
+      const createPostDto: CreatePostDto = {
+        title: 'Test Post',
         content: 'Test Content',
-        title: 'Test Title',
-        images: ['image1', 'image2'],
+        images: ['image1.jpg', 'image2.jpg'],
       };
 
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null);
+      mockPrismaService.user.findUnique.mockResolvedValue({ id: userId });
+      mockPrismaService.post.create.mockRejectedValue(new Error('Database error during creation'));
 
-      await expect(service.create(userId, data)).rejects.toThrow(
-        new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
+      await expect(service.create(userId, createPostDto)).rejects.toThrow(
+        'Database error during creation',
       );
+
+      expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({ where: { id: userId } });
+      expect(mockPrismaService.post.create).toHaveBeenCalled();
+    });
+
+    it('should handle database errors', async () => {
+      const userId = 'user-123';
+      mockPrismaService.user.findUnique.mockResolvedValue({ id: userId });
+      mockPrismaService.post.create.mockRejectedValue(new Error('Database error'));
+
+      await expect(service.create(userId, createPostDto)).rejects.toThrow('Database error');
     });
   });
 
   describe('delete', () => {
-    it('should delete a post', async () => {
-      const postId = 'post1';
-      const post = { id: postId } as Post;
-      const expectedResult: GenericResponseDto = {
-        status: true,
-        message: 'posts.postDeleted',
-      };
+    const postId = 'post-123';
+    const userId = 'user-123';
 
-      jest.spyOn(prismaService.post, 'findUnique').mockResolvedValue(post);
-      jest.spyOn(prismaService.post, 'update').mockResolvedValue(undefined);
+    it('should delete a post successfully', async () => {
+      const mockPost = { id: postId, authorId: userId };
+      mockPrismaService.post.findUnique.mockResolvedValue(mockPost);
+      mockPrismaService.post.update.mockResolvedValue({ ...mockPost, deletedAt: new Date() });
 
-      const result = await service.delete(postId);
-      expect(result).toEqual(expectedResult);
-      expect(prismaService.post.findUnique).toHaveBeenCalledWith({
-        where: { id: postId },
+      const result = await service.delete(userId, postId);
+
+      expect(result).toEqual({
+        success: true,
+        message: 'posts.success.postDeleted',
       });
-      expect(prismaService.post.update).toHaveBeenCalledWith({
+      expect(mockPrismaService.post.findUnique).toHaveBeenCalledWith({
         where: { id: postId },
-        data: { deleted_at: expect.any(Date), is_deleted: true },
+        select: { authorId: true },
+      });
+      expect(mockPrismaService.post.update).toHaveBeenCalledWith({
+        where: { id: postId },
+        data: { deletedAt: expect.any(Date) },
       });
     });
 
-    it('should throw an exception if post not found', async () => {
-      const postId = 'post1';
+    it('should throw an error if post is not found', async () => {
+      mockPrismaService.post.findUnique.mockResolvedValue(null);
 
-      jest.spyOn(prismaService.post, 'findUnique').mockResolvedValue(null);
-
-      await expect(service.delete(postId)).rejects.toThrow(
-        new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND),
+      await expect(service.delete(userId, postId)).rejects.toThrow(
+        new HttpException('posts.errors.postNotFound', HttpStatus.NOT_FOUND),
       );
+    });
+
+    it('should throw an error if user is not the author', async () => {
+      const mockPost = { id: postId, authorId: 'different-user' };
+      mockPrismaService.post.findUnique.mockResolvedValue(mockPost);
+
+      await expect(service.delete(userId, postId)).rejects.toThrow(
+        new HttpException('auth.errors.insufficientPermissions', HttpStatus.FORBIDDEN),
+      );
+    });
+
+    it('should handle database errors', async () => {
+      mockPrismaService.post.findUnique.mockRejectedValue(new Error('Database error'));
+
+      await expect(service.delete(userId, postId)).rejects.toThrow('Database error');
     });
   });
 
   describe('getAll', () => {
-    it('should return a list of posts', async () => {
-      const params = {
-        limit: 10,
-        page: 1,
-        search: 'Test',
-      } as unknown as GetPostsDto;
-      const expectedResult = {
-        count: 1,
-        data: [
-          {
-            id: 'post1',
-            content: 'Test Content',
-            title: 'Test Title',
-            author: { id: 'user1' },
-            images: [{ image: 'image1' }, { image: 'image2' }],
-          },
-        ],
-      } as unknown as GetPostsResponseDto;
+    const getPostsDto: GetPostsDto = {
+      limit: 10,
+      page: 1,
+      search: 'test',
+    };
 
-      jest.spyOn(prismaService.post, 'count').mockResolvedValue(1);
-      jest
-        .spyOn(prismaService.post, 'findMany')
-        .mockResolvedValue(expectedResult.data);
+    it('should return paginated posts with search', async () => {
+      const mockPosts = [{ id: 'post-1', title: 'Test Post' }];
+      const mockCount = 1;
 
-      const result = await service.getAll(params);
-      expect(result).toEqual(expectedResult);
-      expect(prismaService.post.count).toHaveBeenCalledWith({
-        where: {
-          title: { contains: params.search, mode: 'insensitive' },
-          content: { contains: params.search, mode: 'insensitive' },
-          is_deleted: false,
+      mockPrismaService.post.count.mockResolvedValue(mockCount);
+      mockPrismaService.post.findMany.mockResolvedValue(mockPosts);
+
+      const result = await service.getAll(getPostsDto);
+
+      expect(result).toEqual({
+        metadata: {
+          totalItems: mockCount,
+          itemsPerPage: getPostsDto.limit,
+          totalPages: 1,
+          currentPage: getPostsDto.page,
         },
+        items: mockPosts,
       });
-      expect(prismaService.post.findMany).toHaveBeenCalledWith({
-        where: {
-          title: { contains: params.search, mode: 'insensitive' },
-          content: { contains: params.search, mode: 'insensitive' },
-          is_deleted: false,
-        },
-        take: params.limit,
-        skip: (params.page - 1) * params.limit,
-        include: {
-          author: true,
-          images: true,
-        },
+
+      const expectedWhereClause = {
+        OR: [
+          { title: { contains: getPostsDto.search, mode: 'insensitive' } },
+          { content: { contains: getPostsDto.search, mode: 'insensitive' } },
+        ],
+      };
+
+      expect(mockPrismaService.post.count).toHaveBeenCalledWith({ where: expectedWhereClause });
+      expect(mockPrismaService.post.findMany).toHaveBeenCalledWith({
+        where: expectedWhereClause,
+        take: getPostsDto.limit,
+        skip: 0,
+        include: { author: true, images: true },
+        orderBy: { createdAt: 'desc' },
       });
     });
 
-    it('should throw an HttpException when an error occurs', async () => {
-      const params: GetPostsDto = {
-        limit: 10,
-        page: 1,
-        search: 'Test',
-      };
+    it('should return paginated posts without search', async () => {
+      const getPostsDtoNoSearch: GetPostsDto = { limit: 10, page: 1 };
+      const mockPosts = [{ id: 'post-1', title: 'Test Post' }];
+      const mockCount = 1;
 
-      jest.spyOn(prismaService.post, 'count').mockRejectedValue(new Error());
+      mockPrismaService.post.count.mockResolvedValue(mockCount);
+      mockPrismaService.post.findMany.mockResolvedValue(mockPosts);
 
-      await expect(service.getAll(params)).rejects.toThrow(expect.any(Error));
+      const result = await service.getAll(getPostsDtoNoSearch);
+
+      expect(result).toEqual({
+        metadata: {
+          totalItems: mockCount,
+          itemsPerPage: getPostsDtoNoSearch.limit,
+          totalPages: 1,
+          currentPage: getPostsDtoNoSearch.page,
+        },
+        items: mockPosts,
+      });
+
+      expect(mockPrismaService.post.count).toHaveBeenCalledWith({ where: {} });
+      expect(mockPrismaService.post.findMany).toHaveBeenCalledWith({
+        where: {},
+        take: getPostsDtoNoSearch.limit,
+        skip: 0,
+        include: { author: true, images: true },
+        orderBy: { createdAt: 'desc' },
+      });
+    });
+
+    it('should handle database errors', async () => {
+      mockPrismaService.post.count.mockRejectedValue(new Error('Database error'));
+
+      await expect(service.getAll(getPostsDto)).rejects.toThrow('Database error');
     });
   });
 
   describe('update', () => {
-    it('should update a post', async () => {
-      const postId = 'post1';
-      const data = {
-        content: 'Updated Content',
-        title: 'Updated Title',
-        images: ['image1', 'image3'],
-      } as UpdatePostDto;
-      const post = {
-        id: postId,
-        content: 'Old Content',
-        title: 'Old Title',
-        images: [{ image: 'image1' }, { image: 'image2' }],
-      } as unknown as Post;
-      const expectedResult = {
-        id: postId,
-        content: 'Updated Content',
-        title: 'Updated Title',
-        author: { id: 'user1' },
-        images: [{ image: 'image1' }, { image: 'image3' }],
-      } as unknown as UpdatePostResponseDto;
+    const postId = 'post-123';
+    const userId = 'user-123';
+    const updatePostDto: UpdatePostDto = {
+      title: 'Updated Title',
+      content: 'Updated Content',
+      images: ['newimage.jpg'],
+    };
 
-      jest.spyOn(prismaService.post, 'findUnique').mockResolvedValue(post);
-      jest
-        .spyOn(prismaService.post, 'update')
-        .mockResolvedValue(expectedResult);
+    it('should update a post successfully', async () => {
+      const mockPost = {
+        id: postId,
+        authorId: userId,
+        images: [{ key: 'oldimage.jpg' }],
+      };
+      const updatedPost = { ...mockPost, ...updatePostDto };
 
-      const result = await service.update(postId, data);
-      expect(result).toEqual(expectedResult);
-      expect(prismaService.post.findUnique).toHaveBeenCalledWith({
+      mockPrismaService.post.findUnique.mockResolvedValue(mockPost);
+      mockPrismaService.post.update.mockResolvedValue(updatedPost);
+
+      const result = await service.update(userId, postId, updatePostDto);
+
+      expect(result).toEqual(updatedPost);
+      expect(mockPrismaService.post.findUnique).toHaveBeenCalledWith({
         where: { id: postId },
         include: { images: true },
       });
-      expect(prismaService.post.update).toHaveBeenCalledWith({
+      expect(mockPrismaService.post.update).toHaveBeenCalledWith({
         where: { id: postId },
         data: {
-          title: data.title,
-          content: data.content,
+          title: updatePostDto.title,
+          content: updatePostDto.content,
           images: {
-            deleteMany: {
-              image: { in: ['image2'] },
-            },
-            create: [{ image: 'image3' }],
+            deleteMany: { key: { in: ['oldimage.jpg'] } },
+            create: [{ key: 'newimage.jpg' }],
           },
         },
         include: {
@@ -257,19 +292,56 @@ describe('PostService', () => {
       });
     });
 
-    it('should throw an exception if post not found', async () => {
-      const postId = 'post1';
-      const data: UpdatePostDto = {
-        content: 'Updated Content',
+    it('should throw an error if post is not found', async () => {
+      mockPrismaService.post.findUnique.mockResolvedValue(null);
+
+      await expect(service.update(userId, postId, updatePostDto)).rejects.toThrow(
+        new HttpException('posts.errors.postNotFound', HttpStatus.NOT_FOUND),
+      );
+    });
+
+    it('should throw an error if user is not the author', async () => {
+      const mockPost = { id: postId, authorId: 'different-user', images: [] };
+      mockPrismaService.post.findUnique.mockResolvedValue(mockPost);
+
+      await expect(service.update(userId, postId, updatePostDto)).rejects.toThrow(
+        new HttpException('auth.errors.insufficientPermissions', HttpStatus.FORBIDDEN),
+      );
+    });
+
+    it('should handle database errors', async () => {
+      mockPrismaService.post.findUnique.mockRejectedValue(new Error('Database error'));
+
+      await expect(service.update(userId, postId, updatePostDto)).rejects.toThrow('Database error');
+    });
+
+    it('should catch and rethrow errors during post update', async () => {
+      const postId = 'post-123';
+      const userId = 'user-123';
+      const updatePostDto: UpdatePostDto = {
         title: 'Updated Title',
-        images: ['image1', 'image3'],
+        content: 'Updated Content',
+        images: ['newimage.jpg'],
       };
 
-      jest.spyOn(prismaService.post, 'findUnique').mockResolvedValue(null);
+      const mockPost = {
+        id: postId,
+        authorId: userId,
+        images: [{ key: 'oldimage.jpg' }],
+      };
 
-      await expect(service.update(postId, data)).rejects.toThrow(
-        new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND),
+      mockPrismaService.post.findUnique.mockResolvedValue(mockPost);
+      mockPrismaService.post.update.mockRejectedValue(new Error('Database error during update'));
+
+      await expect(service.update(userId, postId, updatePostDto)).rejects.toThrow(
+        'Database error during update',
       );
+
+      expect(mockPrismaService.post.findUnique).toHaveBeenCalledWith({
+        where: { id: postId },
+        include: { images: true },
+      });
+      expect(mockPrismaService.post.update).toHaveBeenCalled();
     });
   });
 });

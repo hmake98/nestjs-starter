@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { EncryptionService } from './services/encryption.service';
+import { AwsModule } from '../aws/aws.module';
+
+import { HelperEmailService } from './services/helper.email.service';
+import { HelperEncryptionService } from './services/helper.encryption.service';
 
 @Module({
-  providers: [JwtService, EncryptionService],
-  exports: [EncryptionService],
+  imports: [AwsModule],
+  providers: [JwtService, HelperEncryptionService, HelperEmailService],
+  exports: [HelperEncryptionService, HelperEmailService],
 })
 export class HelperModule {}

@@ -4,9 +4,6 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "plugins": ["@nestjs/swagger"],
-    "assets": [
-      { "include": "languages/**/*", "watchAssets": true },
-      { "include": "templates/**/*" }
-    ]
+    "assets": [{ "include": "languages/**/*", "watchAssets": true }]
   }
 }

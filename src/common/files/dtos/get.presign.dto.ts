@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
-import { FileStoreType } from '../constants/files.enum';
+import { ENUM_FILE_STORE } from 'src/app/app.constant';
 
 export class GetPresignDto {
   @ApiProperty({
@@ -16,15 +16,15 @@ export class GetPresignDto {
 
   @ApiProperty({
     description: 'file store type',
-    example: FileStoreType.UserProfiles,
+    example: ENUM_FILE_STORE.USER_PROFILES,
     required: true,
-    enum: FileStoreType,
+    enum: ENUM_FILE_STORE,
   })
-  @IsEnum(FileStoreType, {
+  @IsEnum(ENUM_FILE_STORE, {
     message: 'store type should be enum value',
   })
   @IsNotEmpty({ message: 'store type is required.' })
-  storeType: FileStoreType;
+  storeType: ENUM_FILE_STORE;
 
   @ApiProperty({
     description: 'content type',

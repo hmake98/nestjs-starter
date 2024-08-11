@@ -1,8 +1,8 @@
-import { Roles } from '@prisma/client';
+import { Role } from '@prisma/client';
 
 export interface IAuthUser {
   userId: string;
-  role: Roles;
+  role: Role;
 }
 
 export interface IRequest {

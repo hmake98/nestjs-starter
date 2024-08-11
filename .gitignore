@@ -7,8 +7,8 @@ temp/
 coverage/
 
 # environment
-.env*
-!.env.example
+.env
+!.env.docker
 config.yaml
 config.yml
 yarn-error.log

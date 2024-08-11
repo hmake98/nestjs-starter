@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "required": "{property} is required",
+    "invalidEmail": "Invalid email format",
+    "passwordLength": "Password must be between {min} and {max} characters",
+    "passwordComplexity": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    "mustBeString": "{property} must be a string",
+    "lengthBetween": "{property} must be between {min} and {max} characters",
+    "isString": "{property} must be a string",
+    "isNotEmpty": "{property} is required",
+    "minLength": "{property} must be at least {constraints.0} characters long",
+    "maxLength": "{property} must not exceed {constraints.0} characters",
+    "isArray": "{property} must be an array",
+    "arrayMaxSize": "{property} must contain no more than {constraints.0} elements",
+    "each": "Each value in {property} {constraints.0}"
+  }
+}

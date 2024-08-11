@@ -12,10 +12,10 @@ export class FilePutPresignResponseDto {
   url: string;
 
   @ApiProperty({
-    example: '1200',
+    example: 1200,
     required: true,
     nullable: false,
   })
   @Expose()
-  expiresIn: string;
+  expiresIn: number;
 }

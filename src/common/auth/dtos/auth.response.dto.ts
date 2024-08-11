@@ -1,31 +1,37 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 import { UserResponseDto } from 'src/modules/user/dtos/user.response.dto';
 
-export class AuthResponseDto {
+export class TokenDto {
   @ApiProperty({
-    example: faker.string.alphanumeric(30),
+    description: 'JWT access token',
+    example: faker.string.alphanumeric({ length: 64 }),
     required: true,
-    nullable: false,
   })
   @Expose()
+  @IsString()
+  @IsNotEmpty()
   accessToken: string;
 
   @ApiProperty({
-    example: faker.string.alphanumeric(30),
+    description: 'JWT refresh token',
+    example: faker.string.alphanumeric({ length: 64 }),
     required: true,
-    nullable: false,
   })
   @Expose()
+  @IsString()
+  @IsNotEmpty()
   refreshToken: string;
+}
 
+export class AuthResponseDto extends TokenDto {
   @ApiProperty({
-    example: UserResponseDto,
+    description: 'User information',
+    type: () => UserResponseDto,
     required: true,
-    nullable: false,
   })
   @Expose()
   @Type(() => UserResponseDto)
@@ -33,20 +39,4 @@ export class AuthResponseDto {
   user: UserResponseDto;
 }
 
-export class AuthRefreshResponseDto {
-  @ApiProperty({
-    example: faker.string.alphanumeric(30),
-    required: true,
-    nullable: false,
-  })
-  @Expose()
-  accessToken: string;
-
-  @ApiProperty({
-    example: faker.string.alphanumeric(30),
-    required: true,
-    nullable: false,
-  })
-  @Expose()
-  refreshToken: string;
-}
+export class AuthRefreshResponseDto extends TokenDto {}

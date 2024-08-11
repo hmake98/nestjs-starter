@@ -1,26 +1,38 @@
+version: '3.8'
+
 services:
   postgres:
     image: postgres:latest
     ports:
       - '5432:5432'
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=master123
-      - POSTGRES_DB=postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master123}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     volumes:
-      - pg_data:/var/lib/postgresql
+      - pg_data:/var/lib/postgresql/data
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:latest
-    restart: always
     ports:
       - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning
     volumes:
       - redis_data:/data
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   server:
     build:
       context: .
@@ -29,15 +41,22 @@ services:
     ports:
       - '3001:3001'
     env_file:
-      - ./.env.docker
+      - .env.docker
     networks:
       - backend
     volumes:
       - .:/app
       - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 networks:
   backend:
     driver: bridge
+
 volumes:
   pg_data:
     driver: local

@@ -4,7 +4,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Nest Framework",
+      "name": "Debug NestJS",
       "args": ["${workspaceFolder}/src/main.ts"],
       "runtimeArgs": [
         "--nolazy",
@@ -14,9 +14,12 @@
         "tsconfig-paths/register"
       ],
       "sourceMaps": true,
-      "envFile": "${workspaceFolder}/.development.env",
+      "envFile": "${workspaceFolder}/.env",
       "cwd": "${workspaceRoot}",
-      "console": "integratedTerminal"
-    }
+      "console": "integratedTerminal",
+      "restart": true,
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "skipFiles": ["<node_internals>/**"],
+    },
   ]
 }

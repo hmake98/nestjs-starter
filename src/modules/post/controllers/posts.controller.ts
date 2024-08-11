@@ -8,39 +8,48 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { AuthUser } from 'src/core/decorators/auth.user.decorator';
-import { DocErrors, DocResponse } from 'src/core/decorators/response.decorator';
+import {
+  DocErrors,
+  DocGenericResponse,
+  DocPaginatedResponse,
+  DocResponse,
+} from 'src/core/decorators/response.decorator';
+import { ApiGenericResponseDto, ApiPaginatedDataDto } from 'src/core/dtos/response.dto';
 import { IAuthUser } from 'src/core/interfaces/request.interface';
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
 
-import { PostService } from '../services/post.service';
 import { CreatePostDto } from '../dtos/create.post.dto';
 import { GetPostsDto } from '../dtos/get.post.dto';
-import { UpdatePostDto } from '../dtos/update.post.dto';
 import {
   CreatePostResponseDto,
-  GetPostsResponseDto,
+  PostResponseDto,
   UpdatePostResponseDto,
 } from '../dtos/post.response.dto';
+import { UpdatePostDto } from '../dtos/update.post.dto';
+import { PostService } from '../services/post.service';
 
 @ApiTags('posts')
 @Controller({
   version: '1',
-  path: '/posts',
+  path: 'posts',
 })
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth('accessToken')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @ApiBearerAuth('accessToken')
+  @Post()
+  @ApiOperation({ summary: 'Create a new post' })
   @DocResponse({
     serialization: CreatePostResponseDto,
-    httpStatus: 201,
+    httpStatus: HttpStatus.CREATED,
   })
-  @DocErrors([HttpStatus.NOT_FOUND])
-  @Post()
+  @DocErrors([HttpStatus.BAD_REQUEST, HttpStatus.UNAUTHORIZED])
   public async createPost(
     @AuthUser() user: IAuthUser,
     @Body() payload: CreatePostDto,
@@ -48,44 +57,44 @@ export class PostController {
     return this.postService.create(user.userId, payload);
   }
 
-  @ApiBearerAuth('accessToken')
-  @DocResponse({
-    serialization: GenericResponseDto,
-    httpStatus: 200,
-  })
-  @DocErrors([HttpStatus.NOT_FOUND])
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a post' })
+  @ApiParam({ name: 'id', description: 'Post ID' })
+  @DocGenericResponse()
+  @DocErrors([HttpStatus.NOT_FOUND, HttpStatus.UNAUTHORIZED])
   public async deletePost(
+    @AuthUser() { userId }: IAuthUser,
     @Param('id') postId: string,
-  ): Promise<GenericResponseDto> {
-    return this.postService.delete(postId);
+  ): Promise<ApiGenericResponseDto> {
+    return this.postService.delete(userId, postId);
   }
 
-  @ApiBearerAuth('accessToken')
-  @DocResponse({
-    serialization: GetPostsResponseDto,
-    httpStatus: 200,
-  })
-  @DocErrors([HttpStatus.BAD_REQUEST])
   @Get()
+  @ApiOperation({ summary: 'Get all posts' })
+  @DocPaginatedResponse({
+    serialization: PostResponseDto,
+    httpStatus: HttpStatus.OK,
+  })
+  @DocErrors([HttpStatus.BAD_REQUEST, HttpStatus.UNAUTHORIZED])
   public async getPosts(
-    @AuthUser() _user: IAuthUser,
     @Query() params: GetPostsDto,
-  ): Promise<GetPostsResponseDto> {
+  ): Promise<ApiPaginatedDataDto<PostResponseDto>> {
     return this.postService.getAll(params);
   }
 
-  @ApiBearerAuth('accessToken')
+  @Put(':id')
+  @ApiOperation({ summary: 'Update a post' })
+  @ApiParam({ name: 'id', description: 'Post ID' })
   @DocResponse({
     serialization: UpdatePostResponseDto,
-    httpStatus: 200,
+    httpStatus: HttpStatus.OK,
   })
-  @DocErrors([HttpStatus.NOT_FOUND])
-  @Put(':id')
+  @DocErrors([HttpStatus.NOT_FOUND, HttpStatus.UNAUTHORIZED])
   public async updatePost(
+    @AuthUser() { userId }: IAuthUser,
     @Param('id') postId: string,
     @Body() payload: UpdatePostDto,
   ): Promise<UpdatePostResponseDto> {
-    return this.postService.update(postId, payload);
+    return this.postService.update(userId, postId, payload);
   }
 }

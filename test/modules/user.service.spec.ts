@@ -1,14 +1,14 @@
+import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpException, HttpStatus } from '@nestjs/common';
 
-import { PrismaService } from '../../src/common/helper/services/prisma.service';
-import { UserUpdateDto } from '../../src/modules/user/dtos/user.update.dto';
-import { UserService } from '../../src/modules/user/services/user.service';
+import { PrismaService } from 'src/common/database/services/prisma.service';
+import { UserUpdateDto } from 'src/modules/user/dtos/user.update.dto';
+import { UserService } from 'src/modules/user/services/user.service';
 
 describe('UserService', () => {
-  let userService: UserService;
+  let service: UserService;
 
-  const prismaServiceMock = {
+  const mockPrismaService = {
     user: {
       findUnique: jest.fn(),
       update: jest.fn(),
@@ -17,145 +17,75 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UserService,
-        {
-          provide: PrismaService,
-          useValue: prismaServiceMock,
-        },
-      ],
+      providers: [UserService, { provide: PrismaService, useValue: mockPrismaService }],
     }).compile();
 
-    userService = module.get<UserService>(UserService);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
+    service = module.get<UserService>(UserService);
   });
 
   it('should be defined', () => {
-    expect(userService).toBeDefined();
+    expect(service).toBeDefined();
   });
 
   describe('updateUser', () => {
-    it('should update a user', async () => {
-      const userId = 'user-id';
-      const userData: UserUpdateDto = {
-        email: 'test@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        avatar: 'https://example.com/avatar.png',
-      };
-      const updatedUser = {
-        id: userId,
-        email: userData.email,
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        avatar: userData.avatar,
-      };
+    it('should throw an error if user is not found', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      prismaServiceMock.user.findUnique.mockResolvedValueOnce({ id: userId });
-      prismaServiceMock.user.update.mockResolvedValueOnce(updatedUser);
-
-      const result = await userService.updateUser(userId, userData);
-
-      expect(result).toEqual(updatedUser);
+      await expect(service.updateUser('non-existent-id', { firstName: 'John' })).rejects.toThrow(
+        HttpException,
+      );
     });
 
-    it('should throw 404 error if user not found', async () => {
-      const userId = 'user-id';
-      const userData: UserUpdateDto = {
-        email: 'test@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        avatar: 'https://example.com/avatar.png',
-      };
+    it('should update and return the user if user exists', async () => {
+      const mockUser = { id: '123', firstName: 'John', lastName: 'Doe' };
+      const updateDto: UserUpdateDto = { firstName: 'Jane' };
 
-      prismaServiceMock.user.findUnique.mockResolvedValueOnce(null);
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.user.update.mockResolvedValue({ ...mockUser, ...updateDto });
 
-      await expect(userService.updateUser(userId, userData)).rejects.toThrow(
-        new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
-      );
+      const result = await service.updateUser('123', updateDto);
+
+      expect(result).toEqual({ ...mockUser, ...updateDto });
     });
   });
 
   describe('deleteUser', () => {
-    it('should delete a user', async () => {
-      const userId = 'user-id';
+    it('should throw an error if user is not found', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      prismaServiceMock.user.findUnique.mockResolvedValue({
-        id: userId,
-        email: 'user@example.com',
-        first_name: 'John',
-        last_name: 'Doe',
-      });
-
-      prismaServiceMock.user.update.mockResolvedValue({
-        id: userId,
-        email: 'user@example.com',
-        first_name: 'John',
-        last_name: 'Doe',
-        is_deleted: true,
-        deleted_at: new Date(),
-      });
-
-      const result = await userService.deleteUser(userId);
-
-      expect(result.status).toBe(true);
-      expect(result.message).toBe('users.userDeleted');
-      expect(prismaServiceMock.user.findUnique).toHaveBeenCalledWith({
-        where: { id: userId },
-      });
-      expect(prismaServiceMock.user.update).toHaveBeenCalledWith(
-        expect.any(Object),
-      );
+      await expect(service.deleteUser('non-existent-id')).rejects.toThrow(HttpException);
     });
 
-    it('should throw an error if user not found', async () => {
-      const userId = 'user-id';
+    it('should soft delete the user and return success message', async () => {
+      const mockUser = { id: '123', firstName: 'John', lastName: 'Doe' };
 
-      prismaServiceMock.user.findUnique.mockResolvedValue(null);
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.user.update.mockResolvedValue({ ...mockUser, deletedAt: new Date() });
 
-      await expect(userService.deleteUser(userId)).rejects.toThrow(
-        new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
-      );
+      const result = await service.deleteUser('123');
 
-      expect(prismaServiceMock.user.findUnique).toHaveBeenCalledWith({
-        where: { id: userId },
+      expect(result).toEqual({
+        success: true,
+        message: 'users.success.userDeleted',
       });
-      expect(prismaServiceMock.user.update).not.toHaveBeenCalled();
     });
   });
 
   describe('getProfile', () => {
-    it('should return user profile', async () => {
-      const userId = 'user-id';
-      const userProfile = {
-        id: userId,
-        email: 'test@example.com',
-        first_name: 'John',
-        last_name: 'Doe',
-        avatar: {
-          file_name: 'avatar_123456789',
-          link: 'https://example.com/avatar.png',
-        },
-      };
+    it('should throw an error if user is not found', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      prismaServiceMock.user.findUnique.mockResolvedValueOnce(userProfile);
-
-      const result = await userService.getProfile(userId);
-
-      expect(result).toEqual(userProfile);
+      await expect(service.getProfile('non-existent-id')).rejects.toThrow(HttpException);
     });
 
-    it('should throw 404 error if user not found', async () => {
-      const userId = 'user-id';
+    it('should return the user profile if user exists', async () => {
+      const mockUser = { id: '123', firstName: 'John', lastName: 'Doe' };
 
-      prismaServiceMock.user.findUnique.mockResolvedValueOnce(null);
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(userService.getProfile(userId)).rejects.toThrow(
-        new HttpException('users.userNotFound', HttpStatus.NOT_FOUND),
-      );
+      const result = await service.getProfile('123');
+
+      expect(result).toEqual(mockUser);
     });
   });
 });

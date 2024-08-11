@@ -1,30 +1,41 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class GetPostsDto {
   @ApiProperty({
-    description: 'limit',
+    description: 'Number of posts to return per page',
     example: 10,
     required: true,
+    type: Number,
   })
-  @IsString()
-  @IsNotEmpty({ message: 'limit is required' })
+  @IsInt({ message: i18nValidationMessage('validation.isInt') })
+  @Min(1, { message: i18nValidationMessage('validation.min') })
+  @Max(100, { message: i18nValidationMessage('validation.max') })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.isNotEmpty') })
+  @Type(() => Number)
   public limit: number;
 
   @ApiProperty({
-    description: 'page',
+    description: 'Page number',
     example: 1,
     required: true,
+    type: Number,
   })
-  @IsString()
-  @IsNotEmpty({ message: 'page is required' })
+  @IsInt({ message: i18nValidationMessage('validation.isInt') })
+  @Min(1, { message: i18nValidationMessage('validation.min') })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.isNotEmpty') })
+  @Type(() => Number)
   public page: number;
 
   @ApiProperty({
-    description: 'search',
+    description: 'Search term for filtering posts',
     required: false,
+    type: String,
   })
-  @IsString()
+  @IsString({ message: i18nValidationMessage('validation.isString') })
   @IsOptional()
+  @Transform(({ value }) => value?.trim())
   public search?: string;
 }

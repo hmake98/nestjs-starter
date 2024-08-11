@@ -10,11 +10,13 @@ export default registerAs(
       prefix: 'v',
       version: process.env.HTTP_VERSION ?? '1',
     },
+    throttle: {
+      ttl: 60,
+      limit: 10,
+    },
     http: {
       host: process.env.HTTP_HOST ?? 'localhost',
-      port: process.env.HTTP_PORT
-        ? Number.parseInt(process.env.HTTP_PORT)
-        : 3000,
+      port: process.env.HTTP_PORT ? Number.parseInt(process.env.HTTP_PORT) : 3000,
     },
     globalPrefix: '/api',
     debug: process.env.APP_DEBUG,

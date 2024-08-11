@@ -1,16 +1,12 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable, map } from 'rxjs';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { I18nService } from 'nestjs-i18n';
+import { Observable, map } from 'rxjs';
 
-import { RESPONSE_SERIALIZATION_META_KEY } from '../constants/core.constant';
-import { GenericResponseDto } from '../dtos/response.dto';
+import { RESPONSE_SERIALIZATION_META_KEY } from 'src/app/app.constant';
+
+import { ApiGenericResponseDto } from '../dtos/response.dto';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -21,7 +17,7 @@ export class ResponseInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map((responseBody) => {
+      map(responseBody => {
         const ctx = context.switchToHttp();
         const response = ctx.getResponse();
         const request = ctx.getRequest();
@@ -40,22 +36,18 @@ export class ResponseInterceptor implements NestInterceptor {
         const baseResponse = {
           statusCode,
           timestamp: new Date().toISOString(),
-          message: this.i18nService.translate(`http.${statusCode}`, {
+          message: this.i18nService.translate(`http.success.${statusCode}`, {
             lang,
             defaultValue: 'Operation completed.',
           }),
           data,
         };
 
-        if (classSerialization?.name === GenericResponseDto.name) {
-          const genericData = data as GenericResponseDto;
-          genericData.message = this.i18nService.translate(
-            genericData.message,
-            {
-              lang,
-              defaultValue: 'Operation successful.',
-            },
-          );
+        if (classSerialization?.name === ApiGenericResponseDto.name) {
+          data.message = this.i18nService.translate(data.message, {
+            lang,
+            defaultValue: 'Operation completed.',
+          });
         }
 
         return baseResponse;

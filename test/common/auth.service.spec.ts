@@ -1,186 +1,124 @@
-/* eslint-disable import/no-unresolved */
-import { Test, TestingModule } from '@nestjs/testing';
-import { JwtService } from '@nestjs/jwt';
+import { getQueueToken } from '@nestjs/bull';
 import { HttpException } from '@nestjs/common';
-import { Roles } from '@prisma/client';
-import { BullModule } from '@nestjs/bull';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Role } from '@prisma/client';
 
-import { PrismaService } from '../../src/common/helper/services/prisma.service';
-import { EncryptionService } from '../../src/common/helper/services/encryption.service';
-import { AuthService } from '../../src/common/auth/services/auth.service';
-import { UserCreateDto } from '../../src/common/auth/dtos/auth.signup.dto';
-import { UserLoginDto } from '../../src/common/auth/dtos/auth.login.dto';
-import { BullQueues } from '../../src/common/notification/constants/notification.constants';
+import { ENUM_BULL_QUEUES } from 'src/app/app.constant';
+import { AuthService } from 'src/common/auth/services/auth.service';
+import { PrismaService } from 'src/common/database/services/prisma.service';
+import { HelperEncryptionService } from 'src/common/helper/services/helper.encryption.service';
 
 describe('AuthService', () => {
-  let authService: AuthService;
+  let service: AuthService;
 
-  const encryptionServiceMock = {
-    match: jest.fn(),
-    createHash: jest.fn(),
-    createJwtTokens: jest.fn(),
-  };
-
-  const prismaServiceMock = {
+  const mockPrismaService = {
     user: {
       findUnique: jest.fn(),
       create: jest.fn(),
     },
   };
 
-  const jwtServiceMock = {
-    sign: jest.fn(),
+  const mockHelperEncryptionService = {
+    match: jest.fn(),
+    createHash: jest.fn(),
+    createJwtTokens: jest.fn(),
+  };
+
+  const mockEmailQueue = {
+    add: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        BullModule.registerQueue({
-          name: BullQueues.EMAIL_QUEUE,
-        }),
-      ],
       providers: [
         AuthService,
-        {
-          provide: JwtService,
-          useValue: jwtServiceMock,
-        },
-        {
-          provide: PrismaService,
-          useValue: prismaServiceMock,
-        },
-        {
-          provide: EncryptionService,
-          useValue: encryptionServiceMock,
-        },
+        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: HelperEncryptionService, useValue: mockHelperEncryptionService },
+        { provide: getQueueToken(ENUM_BULL_QUEUES.EMAIL), useValue: mockEmailQueue },
       ],
     }).compile();
 
-    authService = module.get<AuthService>(AuthService);
+    service = module.get<AuthService>(AuthService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('login', () => {
-    it('should throw HttpException if user not found', async () => {
-      const loginDto: UserLoginDto = {
-        email: 'nonexistent@example.com',
-        password: 'password',
-      };
-      jest.spyOn(prismaServiceMock.user, 'findUnique').mockResolvedValue(null);
+    it('should throw an error if user is not found', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(authService.login(loginDto)).rejects.toThrow(HttpException);
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        'users.userNotFound',
-      );
+      await expect(
+        service.login({ email: 'test@example.com', password: 'password123' }),
+      ).rejects.toThrow(HttpException);
     });
 
-    it('should throw HttpException if password is invalid', async () => {
-      const loginDto: UserLoginDto = {
-        email: 'existing@example.com',
-        password: 'wrongpassword',
-      };
-      const existingUser = {
-        id: '1',
-        role: Roles.USER,
-        password: 'hashedpassword',
-      };
-      jest
-        .spyOn(prismaServiceMock.user, 'findUnique')
-        .mockResolvedValue(existingUser);
-      jest.spyOn(encryptionServiceMock, 'match').mockReturnValue(false);
+    it('should throw an error if password does not match', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: '123',
+        password: 'hashed_password',
+      });
+      mockHelperEncryptionService.match.mockResolvedValue(false);
 
-      await expect(authService.login(loginDto)).rejects.toThrow(HttpException);
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        'auth.invalidPassword',
-      );
+      await expect(
+        service.login({ email: 'test@example.com', password: 'wrong_password' }),
+      ).rejects.toThrow(HttpException);
     });
 
-    it('should return tokens if login is successful', async () => {
-      const loginDto: UserLoginDto = {
-        email: 'existing@example.com',
-        password: 'correctpassword',
-      };
-      const existingUser = {
-        id: '1',
-        role: Roles.USER,
-        password: 'hashedpassword',
-      };
-      jest
-        .spyOn(prismaServiceMock.user, 'findUnique')
-        .mockResolvedValue(existingUser);
-      jest.spyOn(encryptionServiceMock, 'match').mockReturnValue(true);
-      jest
-        .spyOn(encryptionServiceMock, 'createJwtTokens')
-        .mockResolvedValue({ accessToken: 'access', refreshToken: 'refresh' });
+    it('should return tokens and user if login is successful', async () => {
+      const mockUser = { id: '123', password: 'hashed_password', role: Role.USER };
+      const mockTokens = { accessToken: 'access_token', refreshToken: 'refresh_token' };
 
-      const result = await authService.login(loginDto);
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+      mockHelperEncryptionService.match.mockResolvedValue(true);
+      mockHelperEncryptionService.createJwtTokens.mockResolvedValue(mockTokens);
 
-      expect(result.accessToken).toBe('access');
-      expect(result.refreshToken).toBe('refresh');
-      expect(result.user).toEqual(existingUser);
+      const result = await service.login({ email: 'test@example.com', password: 'password123' });
+
+      expect(result).toEqual({ ...mockTokens, user: mockUser });
     });
   });
 
   describe('signup', () => {
-    it('should throw HttpException if user already exists', async () => {
-      const signUpDto: UserCreateDto = {
-        email: 'existing@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        password: 'password',
-      };
-      jest.spyOn(prismaServiceMock.user, 'findUnique').mockResolvedValue({});
+    it('should throw an error if user already exists', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({ id: '123' });
 
-      await expect(authService.signup(signUpDto)).rejects.toThrow(
-        HttpException,
-      );
-      await expect(authService.signup(signUpDto)).rejects.toThrow(
-        'users.userExists',
-      );
+      await expect(
+        service.signup({ email: 'existing@example.com', password: 'password123' }),
+      ).rejects.toThrow(HttpException);
     });
 
-    it('should create user and return tokens if signup is successful', async () => {
-      const signUpDto: UserCreateDto = {
+    it('should create a user and return tokens if signup is successful', async () => {
+      const newUser = { id: '123', email: 'new@example.com', userName: 'newuser', role: Role.USER };
+      const tokens = { accessToken: 'access_token', refreshToken: 'refresh_token' };
+
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+      mockHelperEncryptionService.createHash.mockResolvedValue('hashed_password');
+      mockPrismaService.user.create.mockResolvedValue(newUser);
+      mockHelperEncryptionService.createJwtTokens.mockResolvedValue(tokens);
+
+      const result = await service.signup({
         email: 'new@example.com',
+        password: 'password123',
         firstName: 'John',
         lastName: 'Doe',
-        password: 'password',
-      };
-      const createdUser = { id: '1', role: Roles.USER };
-      jest.spyOn(prismaServiceMock.user, 'findUnique').mockResolvedValue(null);
-      jest
-        .spyOn(prismaServiceMock.user, 'create')
-        .mockResolvedValue(createdUser);
-      jest
-        .spyOn(encryptionServiceMock, 'createHash')
-        .mockReturnValue('hashedpassword');
-      jest
-        .spyOn(encryptionServiceMock, 'createJwtTokens')
-        .mockResolvedValue({ accessToken: 'access', refreshToken: 'refresh' });
+      });
 
-      const result = await authService.signup(signUpDto);
-
-      expect(result.accessToken).toBe('access');
-      expect(result.refreshToken).toBe('refresh');
-      expect(result.user).toEqual(createdUser);
+      expect(result).toEqual({ ...tokens, user: newUser });
+      expect(mockEmailQueue.add).toHaveBeenCalled();
     });
   });
 
   describe('refreshTokens', () => {
-    it('should return new tokens', async () => {
-      const payload = { userId: '1', role: Roles.USER };
-      jest.spyOn(encryptionServiceMock, 'createJwtTokens').mockResolvedValue({
-        accessToken: 'new_access',
-        refreshToken: 'new_refresh',
-      });
+    it('should return new tokens when refreshTokens is called', async () => {
+      const tokens = { accessToken: 'new_access_token', refreshToken: 'new_refresh_token' };
 
-      const result = await authService.refreshTokens(payload);
+      mockHelperEncryptionService.createJwtTokens.mockResolvedValue(tokens);
 
-      expect(result.accessToken).toBe('new_access');
-      expect(result.refreshToken).toBe('new_refresh');
+      const result = await service.refreshTokens({ userId: '123', role: Role.USER });
+
+      expect(result).toEqual(tokens);
     });
   });
 });

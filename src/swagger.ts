@@ -2,25 +2,48 @@ import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-export default async function (app: INestApplication) {
-  const configService = app.get(ConfigService);
-  const logger = app.get(Logger);
+interface SwaggerConfig {
+  name: string;
+  description: string;
+  version: string;
+  prefix: string;
+}
 
-  const docName: string = configService.get<string>('doc.name');
-  const docDesc: string = configService.get<string>('doc.description');
-  const docVersion: string = configService.get<string>('doc.version');
-  const docPrefix: string = configService.get<string>('doc.prefix');
+export default async function setupSwagger(app: INestApplication): Promise<void> {
+  const configService = app.get(ConfigService);
+  const logger = new Logger('SwaggerSetup');
+
+  const swaggerConfig: SwaggerConfig = {
+    name: configService.get<string>('doc.name', 'API Documentation'),
+    description: configService.get<string>('doc.description', 'API Description'),
+    version: configService.get<string>('doc.version', '1.0'),
+    prefix: configService.get<string>('doc.prefix', 'api'),
+  };
 
   const documentBuild = new DocumentBuilder()
-    .setTitle(docName)
-    .setDescription(docDesc)
-    .setVersion(docVersion)
+    .setTitle(swaggerConfig.name)
+    .setDescription(swaggerConfig.description)
+    .setVersion(swaggerConfig.version)
     .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'accessToken',
+        description: 'Enter your access token',
+        in: 'header',
+      },
       'accessToken',
     )
     .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'refreshToken',
+        description: 'Enter your refresh token',
+        in: 'header',
+      },
       'refreshToken',
     )
     .build();
@@ -29,9 +52,9 @@ export default async function (app: INestApplication) {
     deepScanRoutes: true,
   });
 
-  SwaggerModule.setup(docPrefix, app, document, {
+  SwaggerModule.setup(swaggerConfig.prefix, app, document, {
     explorer: true,
-    customSiteTitle: docName,
+    customSiteTitle: swaggerConfig.name,
     swaggerOptions: {
       docExpansion: 'none',
       persistAuthorization: true,
@@ -40,8 +63,9 @@ export default async function (app: INestApplication) {
       tagsSorter: 'alpha',
       tryItOutEnabled: true,
       filter: true,
+      withCredentials: true,
     },
   });
 
-  logger.log(`Docs will serve on ${docPrefix}`, 'NestApplication');
+  logger.log(`Swagger documentation available at /${swaggerConfig.prefix}`);
 }

@@ -1,47 +1,43 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 
-import { GenericResponseDto } from 'src/core/dtos/response.dto';
+import { PrismaService } from 'src/common/database/services/prisma.service';
+import { ApiGenericResponseDto, ApiPaginatedDataDto } from 'src/core/dtos/response.dto';
 
 import { CreatePostDto } from '../dtos/create.post.dto';
 import { GetPostsDto } from '../dtos/get.post.dto';
-import { UpdatePostDto } from '../dtos/update.post.dto';
-import { PrismaService } from '../../../common/helper/services/prisma.service';
-import { IPostService } from '../interfaces/post.service.interface';
 import {
   CreatePostResponseDto,
-  GetPostsResponseDto,
+  PostResponseDto,
   UpdatePostResponseDto,
 } from '../dtos/post.response.dto';
+import { UpdatePostDto } from '../dtos/update.post.dto';
+import { IPostService } from '../interfaces/post.service.interface';
 
 @Injectable()
 export class PostService implements IPostService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(
-    userId: string,
-    data: CreatePostDto,
-  ): Promise<CreatePostResponseDto> {
+  async create(userId: string, data: CreatePostDto): Promise<CreatePostResponseDto> {
+    const { content, title, images } = data;
+
     try {
-      const { content, title, images } = data;
       const user = await this.prismaService.user.findUnique({
         where: { id: userId },
       });
+
       if (!user) {
-        throw new HttpException('users.userNotFound', HttpStatus.NOT_FOUND);
+        throw new HttpException('users.errors.userNotFound', HttpStatus.NOT_FOUND);
       }
-      return this.prismaService.post.create({
+
+      return await this.prismaService.post.create({
         data: {
           content,
           title,
           images: {
-            create: images.map((key) => ({
-              image: key,
-            })),
+            create: images?.map(key => ({ key })),
           },
           author: {
-            connect: {
-              id: userId,
-            },
+            connect: { id: userId },
           },
         },
         include: {
@@ -49,114 +45,118 @@ export class PostService implements IPostService {
           images: true,
         },
       });
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      throw error;
     }
   }
 
-  async delete(id: string): Promise<GenericResponseDto> {
+  async delete(userId: string, id: string): Promise<ApiGenericResponseDto> {
     try {
-      const post = await this.prismaService.post.findUnique({ where: { id } });
+      const post = await this.prismaService.post.findUnique({
+        where: { id },
+        select: { authorId: true },
+      });
+
       if (!post) {
-        throw new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND);
+        throw new HttpException('posts.errors.postNotFound', HttpStatus.NOT_FOUND);
       }
+
+      if (post.authorId !== userId) {
+        throw new HttpException('auth.errors.insufficientPermissions', HttpStatus.FORBIDDEN);
+      }
+
       await this.prismaService.post.update({
         where: { id },
-        data: { deleted_at: new Date(), is_deleted: true },
+        data: { deletedAt: new Date() },
       });
+
       return {
-        status: true,
-        message: 'posts.postDeleted',
+        success: true,
+        message: 'posts.success.postDeleted',
       };
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      throw error;
     }
   }
 
-  async getAll(params: GetPostsDto): Promise<GetPostsResponseDto> {
+  async getAll(params: GetPostsDto): Promise<ApiPaginatedDataDto<PostResponseDto>> {
+    const { limit, page, search } = params;
+    const skip = (page - 1) * limit;
+
     try {
-      const { limit, page, search } = params;
-      const skip = (page - 1) * limit;
-      const count = await this.prismaService.post.count({
-        where: {
-          ...(search && {
-            title: {
-              contains: search,
-              mode: 'insensitive',
-            },
-            content: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          }),
-          is_deleted: false,
-        },
-      });
-      const data = await this.prismaService.post.findMany({
-        where: {
-          ...(search && {
-            title: {
-              contains: search,
-              mode: 'insensitive',
-            },
-            content: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          }),
-          is_deleted: false,
-        },
-        take: Number(limit),
-        skip: Number(skip),
-        include: {
-          author: true,
-          images: true,
-        },
-      });
+      const [count, data] = await Promise.all([
+        this.prismaService.post.count({
+          where: search
+            ? {
+                OR: [
+                  { title: { contains: search, mode: 'insensitive' } },
+                  { content: { contains: search, mode: 'insensitive' } },
+                ],
+              }
+            : {},
+        }),
+        this.prismaService.post.findMany({
+          where: search
+            ? {
+                OR: [
+                  { title: { contains: search, mode: 'insensitive' } },
+                  { content: { contains: search, mode: 'insensitive' } },
+                ],
+              }
+            : {},
+          take: limit,
+          skip,
+          include: {
+            author: true,
+            images: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        }),
+      ]);
+
       return {
-        count,
-        data,
+        metadata: {
+          totalItems: count,
+          itemsPerPage: limit,
+          totalPages: Math.ceil(count / limit),
+          currentPage: page,
+        },
+        items: data,
       };
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      throw error;
     }
   }
 
-  async update(
-    id: string,
-    data: UpdatePostDto,
-  ): Promise<UpdatePostResponseDto> {
-    try {
-      const { content, title, images } = data;
+  async update(userId: string, id: string, data: UpdatePostDto): Promise<UpdatePostResponseDto> {
+    const { content, title, images } = data;
 
+    try {
       const post = await this.prismaService.post.findUnique({
         where: { id },
         include: { images: true },
       });
 
       if (!post) {
-        throw new HttpException('posts.postNotFound', HttpStatus.NOT_FOUND);
+        throw new HttpException('posts.errors.postNotFound', HttpStatus.NOT_FOUND);
       }
-      const currentImages = post.images.map((image) => image.image);
 
-      const imagesToDelete = currentImages.filter(
-        (image) => !images.includes(image),
-      );
-      const imagesToAdd = images.filter(
-        (image) => !currentImages.includes(image),
-      );
-      return this.prismaService.post.update({
+      if (post.authorId !== userId) {
+        throw new HttpException('auth.errors.insufficientPermissions', HttpStatus.FORBIDDEN);
+      }
+
+      const currentImages = post.images.map(image => image.key);
+      const imagesToDelete = currentImages.filter(image => !images?.includes(image));
+      const imagesToAdd = images?.filter(image => !currentImages.includes(image));
+
+      return await this.prismaService.post.update({
         where: { id },
         data: {
           title,
           content,
           images: {
-            deleteMany: {
-              image: { in: imagesToDelete },
-            },
-            create: imagesToAdd.map((key) => ({
-              image: key,
-            })),
+            deleteMany: { key: { in: imagesToDelete } },
+            create: imagesToAdd.map(key => ({ key })),
           },
         },
         include: {
@@ -164,8 +164,8 @@ export class PostService implements IPostService {
           images: true,
         },
       });
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      throw error;
     }
   }
 }

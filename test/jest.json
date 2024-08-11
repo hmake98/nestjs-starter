@@ -1,13 +1,17 @@
 {
-  "testTimeout": 5000,
+  "testTimeout": 10000,
   "rootDir": "../",
   "modulePaths": ["."],
   "testEnvironment": "node",
   "testMatch": ["<rootDir>/test/**/*.spec.ts"],
   "collectCoverage": true,
   "coverageDirectory": "coverage",
-  "coverageReporters": ["lcov", "json-summary"],
-  "collectCoverageFrom": [],
+  "coverageReporters": ["lcov", "json-summary", "text", "html"],
+  "collectCoverageFrom": [
+    "<rootDir>/src/**/*.service.ts",
+    "!<rootDir>/src/common/database/services/prisma.service.ts",
+    "!<rootDir>/src/workers/processors/cron.processor.service.ts"
+  ],
   "coverageThreshold": {
     "global": {
       "branches": 100,

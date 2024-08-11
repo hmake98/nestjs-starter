@@ -15,6 +15,8 @@ module.exports = {
         'perf', // A code change that improves performance
         'revert', // Reverts a previous commit
         'ci', // Changes to our CI configuration files and scripts
+        'build', // Changes that affect the build system or external dependencies
+        'i18n', // Internationalization and localization
       ],
     ],
     'scope-enum': [
@@ -30,7 +32,21 @@ module.exports = {
         'chore',
         'build',
         'deps',
+        'auth',
+        'db',
+        'ui',
+        'perf',
+        'security',
       ],
     ],
+    'scope-empty': [2, 'never'],
+    'subject-case': [
+      2,
+      'always',
+      ['sentence-case', 'lower-case', 'start-case'],
+    ],
+    'body-leading-blank': [1, 'always'],
+    'footer-leading-blank': [1, 'always'],
+    'header-max-length': [2, 'always', 72],
   },
 };

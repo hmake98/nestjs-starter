@@ -11,105 +11,61 @@ datasource db {
 }
 
 model User {
-  id                      String                   @id @default(uuid())
-  email                   String                   @unique
-  password                String?
-  first_name              String?
-  last_name               String?
-  is_verified             Boolean                  @default(false)
-  phone                   String?
-  role                    Roles                    @default(USER)
-  created_at              DateTime                 @default(now())
-  updated_at              DateTime                 @updatedAt
-  deleted_at              DateTime?
-  is_deleted              Boolean                  @default(false)
-  avatar                  String?
-  posts                   Post[]
-  notification_recipients NotificationRecipients[]
-  notification            Notification[]
+  id         String    @id @default(uuid())
+  userName   String    @unique
+  email      String    @unique
+  password   String
+  firstName  String?   @map("first_name")
+  lastName   String?   @map("last_name")
+  isVerified Boolean   @default(false) @map("is_verified")
+  phone      String?
+  role       Role      @default(USER)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+  avatar     String?
+  posts      Post[]
 
   @@map("users")
 }
 
 model Post {
-  id         String       @id @default(uuid())
-  title      String
-  content    String
-  images     PostImages[]
-  author     User         @relation(fields: [author_id], references: [id])
-  created_at DateTime     @default(now())
-  updated_at DateTime     @updatedAt
-  deleted_at DateTime?
-  is_deleted Boolean      @default(false)
-  author_id  String
+  id        String      @id @default(uuid())
+  title     String      @db.VarChar(255)
+  content   String      @db.Text
+  status    PostStatus  @default(DRAFT)
+  images    PostImage[]
+  author    User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String      @map("author_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  deletedAt DateTime?   @map("deleted_at")
 
-  @@index([author_id])
+  @@index([authorId])
   @@map("posts")
 }
 
-model PostImages {
-  id         String    @id @default(uuid())
-  image      String
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  deleted_at DateTime?
-  is_deleted Boolean   @default(false)
-  post       Post?     @relation(fields: [post_id], references: [id])
-  post_id    String?
+model PostImage {
+  id        String    @id @default(uuid())
+  key       String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String    @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  @@index([post_id])
-  @@map("posts_images")
+  @@index([postId])
+  @@map("post_images")
 }
 
-model Notification {
-  id         String                   @id @default(uuid())
-  title      String
-  body       String
-  payload    Json?
-  type       NotificationTypes
-  sender     User                     @relation(fields: [sender_id], references: [id])
-  recipients NotificationRecipients[]
-  is_deleted Boolean                  @default(false)
-  created_at DateTime                 @default(now())
-  updated_at DateTime                 @updatedAt
-  deleted_at DateTime?
-  sender_id  String
-
-  @@index([sender_id])
-  @@map("notifications")
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
-model NotificationRecipients {
-  id              String        @id @default(uuid())
-  user            User          @relation(fields: [users_id], references: [id])
-  users_id        String
-  notification    Notification? @relation(fields: [notification_id], references: [id])
-  notification_id String?
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
-
-  @@map("notification_recipients")
-}
-
-enum FileType {
-  MP3
-  MP4
-  JPEG
-  JPG
-  CSV
-  WAV
-  PNG
-  JSON
-  MKV
-}
-
-enum Roles {
+enum Role {
   USER
   ADMIN
-}
-
-enum NotificationTypes {
-  EMAIL
-  TEXT
-  IN_APP
+  DEVELOPER
 }

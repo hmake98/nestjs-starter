@@ -5,10 +5,13 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
+
+import { IApiErrorResponse } from '../interfaces/response.interface';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -23,26 +26,57 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+    const lang = request.headers['accept-language'] || 'en';
 
     const statusCode =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const translationKey =
-      exception instanceof HttpException && exception.message
-        ? exception.message
-        : 'http.500';
+    let message = 'An unexpected error occurred.';
+    let validationMessages: string[] | undefined;
 
-    const message = this.i18nService.translate(translationKey, {
-      lang: request.headers['accept-language'] || 'en',
-    });
+    if (exception instanceof BadRequestException) {
+      const exceptionResponse = exception.getResponse() as any;
+      const exceptionMessage = exceptionResponse.message || message;
 
-    const errorResponse = {
+      if (Array.isArray(exceptionMessage)) {
+        validationMessages = exceptionMessage.map(msg => {
+          const [key, paramsString] = msg.split('|');
+          const params = paramsString ? JSON.parse(paramsString) : {};
+          return this.i18nService.translate(key, { lang, args: params }) as string;
+        });
+        message = this.i18nService.translate(`http.errors.${statusCode}`, {
+          lang,
+          defaultValue: message,
+        }) as string;
+      } else {
+        message = this.i18nService.translate(exceptionMessage, {
+          lang,
+          defaultValue: exceptionMessage,
+        }) as string;
+      }
+    } else if (exception instanceof HttpException) {
+      message = this.i18nService.translate(exception.message, {
+        lang,
+        defaultValue: exception.message,
+      }) as string;
+    } else {
+      message = this.i18nService.translate(`http.errors.${statusCode}`, {
+        lang,
+        defaultValue: message,
+      }) as string;
+    }
+
+    const errorResponse: IApiErrorResponse = {
       statusCode,
       message,
       timestamp: new Date().toISOString(),
     };
+
+    if (validationMessages) {
+      errorResponse.error = validationMessages;
+    } else if (this.configService.get<string>('app.debug') === 'true') {
+      errorResponse.error = exception instanceof Error ? exception.stack : undefined;
+    }
 
     if (statusCode === HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(
@@ -51,11 +85,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       );
     } else {
       this.logger.warn(`HTTP Exception: ${JSON.stringify(errorResponse)}`);
-    }
-
-    if (this.configService.get<string>('app.debug') === 'true') {
-      errorResponse['error'] =
-        exception instanceof Error ? exception.stack : undefined;
     }
 
     response.status(statusCode).json(errorResponse);

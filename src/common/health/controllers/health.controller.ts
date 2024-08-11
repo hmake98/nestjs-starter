@@ -6,20 +6,18 @@ import { PublicRoute } from 'src/core/decorators/public.request.decorator';
 
 @Controller({
   version: VERSION_NEUTRAL,
-  path: '/',
+  path: '/health',
 })
-export class AppController {
+export class HealthController {
   constructor(
     private readonly healthCheckService: HealthCheckService,
     private readonly prismaService: PrismaService,
   ) {}
 
-  @Get('/health')
+  @Get()
   @HealthCheck()
   @PublicRoute()
   public async getHealth() {
-    return this.healthCheckService.check([
-      () => this.prismaService.isHealthy(),
-    ]);
+    return this.healthCheckService.check([() => this.prismaService.isHealthy()]);
   }
 }

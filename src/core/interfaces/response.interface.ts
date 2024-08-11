@@ -7,9 +7,27 @@ export interface IPaginationMetadata {
   totalPages: number;
 }
 
-export interface IGetResponse<T> {
-  data: T[];
+interface IApiBaseResponse {
+  statusCode: number;
+  message: string;
+  timestamp: string;
+}
+
+export interface IApiSuccessResponse<T> extends IApiBaseResponse {
+  data: T;
+}
+
+export interface IApiPaginatedData<T> {
+  items: T[];
   metadata: IPaginationMetadata;
+}
+
+export interface IApiPaginatedResponse<T> extends IApiBaseResponse {
+  data: IApiPaginatedData<T>;
+}
+
+export interface IApiErrorResponse extends IApiBaseResponse {
+  error?: string | string[] | Record<string, unknown>;
 }
 
 export interface IGenericResponse {
@@ -17,7 +35,7 @@ export interface IGenericResponse {
   message: string;
 }
 
-export interface IResponseOptions<T> {
+export interface IResponseDocOptions<T> {
   serialization?: ClassConstructor<T>;
   httpStatus: number;
 }
