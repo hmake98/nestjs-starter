@@ -2,6 +2,13 @@
 [![CodeQL](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql) 
 [![Run Tests](https://github.com/hmake98/nestjs-starter/actions/workflows/main.yml/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/main.yml)
 
+Features: <br>
+✅ Basic Authentication <br>
+📚 Swagger API Documentation <br>
+🐳 Containerized with Docker <br>
+☸️ Kubernetes Configuration <br>
+🧪 Testing Setup <br>
+
 ## Installation
 
 ```bash
@@ -41,12 +48,6 @@ yarn build
 ```bash
 # unit tests
 $ yarn test
-
-# e2e tests
-$ yarn test:e2e
-
-# test coverage
-$ yarn test:cov
 ```
 
 ## Swagger Documentation
