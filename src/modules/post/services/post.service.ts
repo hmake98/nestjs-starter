@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 
 import { PrismaService } from 'src/common/database/services/prisma.service';
 import { ApiGenericResponseDto, ApiPaginatedDataDto } from 'src/core/dtos/response.dto';

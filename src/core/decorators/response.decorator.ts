@@ -1,7 +1,10 @@
 import { SetMetadata, applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
-import { RESPONSE_SERIALIZATION_META_KEY } from 'src/app/app.constant';
+import {
+  HTTP_STATUS_MESSAGES_SWAGGER,
+  RESPONSE_SERIALIZATION_META_KEY,
+} from 'src/app/app.constant';
 
 import {
   ApiPaginationMetadataDto,
@@ -12,26 +15,8 @@ import {
 } from '../dtos/response.dto';
 import { IResponseDocOptions } from '../interfaces/response.interface';
 
-const HTTP_STATUS_MESSAGES: Record<number, string> = {
-  200: 'OK',
-  201: 'Created',
-  202: 'Accepted',
-  204: 'No Content',
-  206: 'Partial Content',
-  400: 'Bad Request',
-  401: 'Unauthorized',
-  403: 'Forbidden',
-  404: 'Not Found',
-  405: 'Method Not Allowed',
-  409: 'Conflict',
-  500: 'Internal Server Error',
-  501: 'Not Implemented',
-  502: 'Bad Gateway',
-  503: 'Service Unavailable',
-};
-
 function getStatusCodeMessage(statusCode: number): string {
-  return HTTP_STATUS_MESSAGES[statusCode] || 'Operation completed';
+  return HTTP_STATUS_MESSAGES_SWAGGER[statusCode] || 'Operation completed';
 }
 
 export function DocResponse<T>(options: IResponseDocOptions<T>): MethodDecorator {
