@@ -2,10 +2,10 @@ name: Deploy NestJS to Amazon ECS
 
 on:
   push:
-    branches:
-      - develop # for dev environment
-      - staging # for staging environment
-      - master # for production environment
+    # branches:
+    #   - develop # for dev environment
+    #   - staging # for staging environment
+    #   - master # for production environment
 
 env:
   AWS_REGION: us-east-1 # Change this to your AWS region

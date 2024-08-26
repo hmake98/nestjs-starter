@@ -9,12 +9,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [18.x, 20.x]
       fail-fast: false
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -45,16 +45,4 @@ jobs:
         run: yarn lint
 
       - name: Run tests
-        run: yarn test 
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-
-      - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage
-          path: coverage/
+        run: yarn test

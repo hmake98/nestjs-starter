@@ -55,7 +55,6 @@ export class AuthService implements IAuthService {
         user,
       };
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -106,7 +105,6 @@ export class AuthService implements IAuthService {
         user: createdUser,
       };
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }

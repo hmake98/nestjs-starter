@@ -1,6 +1,6 @@
 # NestJS Starter Boilerplate 
 [![CodeQL](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql) 
-[![Run Tests](https://github.com/hmake98/nestjs-starter/actions/workflows/main.yml/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/main.yml)
+[![Run Tests](https://github.com/hmake98/nestjs-starter/actions/workflows/tests.yml/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/main.yml)
 
 Features: <br>
 ✅ Basic Authentication <br>
