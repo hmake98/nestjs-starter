@@ -2,30 +2,29 @@
 FROM node:20-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache --virtual .build-deps alpine-sdk python3
+RUN apk add --no-cache --virtual .build-deps \
+  alpine-sdk \
+  python3 \
+  make \
+  g++
 
 WORKDIR /app
 
-# Copy package files
+# Install dependencies based on the package files
 COPY package.json yarn.lock ./
 
-# Install dependencies
-RUN yarn install --frozen-lockfile --production=false
+# Install dependencies (including devDependencies for building)
+RUN yarn install --frozen-lockfile
 
-# Copy Prisma schema
-COPY prisma ./prisma
-
-# Generate Prisma client
-RUN yarn generate
-
-# Copy source files
+# Copy the rest of the application source code
 COPY . .
 
-# Build the application
-RUN yarn build
+# Generate Prisma client and build the application
+RUN yarn prisma generate && yarn build
 
-# Remove dev dependencies
-RUN yarn install --frozen-lockfile --production=true
+# Remove build dependencies and devDependencies
+RUN yarn install --production --frozen-lockfile && \
+    apk del .build-deps
 
 # Production stage
 FROM node:20-alpine
@@ -33,30 +32,27 @@ FROM node:20-alpine
 # Install runtime dependencies
 RUN apk add --no-cache dumb-init
 
-# Set working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy built artifacts and dependencies from builder stage
+# Copy necessary files and directories from the builder stage
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/yarn.lock ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
-# Create a non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Ensure node_modules and other critical directories have correct permissions
+RUN chown -R node:node /app
 
-# Change ownership of the app directory
-RUN chown -R appuser:appgroup /app
+# Switch to a non-root user for better security
+USER node
 
-# Switch to non-root user
-USER appuser
-
-# Expose the port the app runs on
+# Expose the port your application will run on
 EXPOSE 3001
 
-# Use dumb-init as the entrypoint
+# Use dumb-init as the entrypoint to handle signals properly
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-# Start the application
+# Start the application using Yarn
 CMD ["yarn", "start"]
