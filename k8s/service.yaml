@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nestjs-starter-service
+  name: starter-service
   labels:
     app: server
-    service: nestjs-api
+    service: api
 spec:
   selector:
     app: server
@@ -14,7 +14,7 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 3001
-      nodePort: 31230
+      nodePort: 32230
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:

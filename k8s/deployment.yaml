@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nestjs-server-deployment
+  name: server-deployment
   labels:
     app: server
     version: v1
@@ -19,9 +19,9 @@ spec:
         sidecar.istio.io/inject: 'false'
     spec:
       containers:
-        - name: nestjs-server
-          image: nestjs-starter_server:latest
-          imagePullPolicy: IfNotPresent
+        - name: server
+          image: starter_server:latest
+          imagePullPolicy: Never
           ports:
             - name: http
               containerPort: 3001
@@ -34,7 +34,14 @@ spec:
               cpu: '1000m'
           envFrom:
             - secretRef:
-                name: nestjs-secret
+                name: secret
+          env:
+            - name: REDIS_HOST
+              value: 'redis.default.svc.cluster.local'
+            - name: REDIS_PORT
+              value: '6379'
+            - name: DATABASE_URL
+              value: 'postgresql://postgres:master123@postgres.default.svc.cluster.local:5432/postgres'
           livenessProbe:
             httpGet:
               path: /api/health
