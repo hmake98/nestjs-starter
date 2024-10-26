@@ -1,11 +1,11 @@
 {
-  "success": {
-    "userDetailsFetched": "User details retrieved successfully",
-    "userDeleted": "User deleted successfully",
-    "userUpdated": "User updated successfully"
-  },
-  "errors": {
-    "userNotFound": "User not found in database",
-    "userExists": "User with provided email/username already exists"
-  }
+    "success": {
+        "userDetailsFetched": "User details retrieved successfully",
+        "userDeleted": "User deleted successfully",
+        "userUpdated": "User updated successfully"
+    },
+    "error": {
+        "userNotFound": "User not found in database",
+        "userExists": "User with provided email/username already exists"
+    }
 }

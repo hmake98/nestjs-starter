@@ -6,7 +6,7 @@ import { DatabaseModule } from '../database/database.module';
 import { HealthController } from './controllers/health.controller';
 
 @Module({
-  controllers: [HealthController],
-  imports: [TerminusModule, DatabaseModule],
+    controllers: [HealthController],
+    imports: [TerminusModule, DatabaseModule],
 })
 export class HealthModule {}

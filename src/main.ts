@@ -4,80 +4,67 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { useContainer } from 'class-validator';
+import compression from 'compression';
 import express from 'express';
 import helmet from 'helmet';
 
 import { AppModule } from './app/app.module';
+import { APP_ENVIRONMENT } from './app/enums/app.enum';
+import { LoggerService } from './common/logger/services/logger.service';
 import setupSwagger from './swagger';
 
 async function bootstrap(): Promise<void> {
-  const logger = new Logger('Bootstrap');
-
-  try {
     const server = express();
-    const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
-      cors: true,
-      logger: ['error', 'warn', 'log'],
-    });
 
-    server.get('/', (req, res) => {
-      res.status(200).json({
-        success: true,
-        timestamp: new Date().toISOString(),
-        message: 'Hello, welcome to nestjs starter!',
-      });
-    });
+    try {
+        const app = await NestFactory.create(
+            AppModule,
+            new ExpressAdapter(server),
+            {
+                bufferLogs: true,
+                logger: false,
+            }
+        );
 
-    const configService = app.get(ConfigService);
+        const config = app.get(ConfigService);
+        const env = config.get<string>('app.env');
+        const isLocal = env === APP_ENVIRONMENT.LOCAL;
 
-    // App configuration
-    const host = configService.get<string>('app.http.host', 'localhost');
-    const port = configService.get<number>('app.http.port', 3000);
-    const globalPrefix = configService.get<string>('app.globalPrefix', 'api');
-    const versioningPrefix = configService.get<string>('app.versioning.prefix', 'v');
-    const version = configService.get<string>('app.versioning.version', '1');
-    const versionEnable = configService.get<boolean>('app.versioning.enable', true);
+        if (isLocal) {
+            app.useLogger(new Logger());
+        } else {
+            const cloudLogger = app.get(LoggerService);
+            app.useLogger(cloudLogger);
+        }
 
-    // Security
-    app.use(helmet());
+        const logger = isLocal ? new Logger() : app.get(LoggerService);
+        const host = config.getOrThrow<string>('app.http.host');
+        const port = config.getOrThrow<number>('app.http.port');
 
-    // Global pipes
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        transform: true,
-        forbidNonWhitelisted: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-    );
+        // Basic middleware
+        app.use(helmet());
+        app.use(compression());
+        app.enableCors(config.get('app.cors'));
 
-    // Prefix and versioning
-    app.setGlobalPrefix(globalPrefix);
-    if (versionEnable) {
-      app.enableVersioning({
-        type: VersioningType.URI,
-        defaultVersion: version,
-        prefix: versioningPrefix,
-      });
+        // Validation and API settings
+        app.useGlobalPipes(new ValidationPipe({ transform: true }));
+        app.setGlobalPrefix('api');
+        app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+        useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
+        // Swagger for non-production environments
+        if (env !== APP_ENVIRONMENT.PRODUCTION) {
+            setupSwagger(app);
+        }
+
+        // Start server
+        await app.listen(port, host);
+        logger.log(`🚀 Server running on: ${await app.getUrl()}`);
+        logger.log(`📖 Docs served on: ${await app.getUrl()}/docs`);
+    } catch (error) {
+        console.error('Failed to start:', error);
+        process.exit(1);
     }
-
-    // Setup DI container for class-validator
-    useContainer(app.select(AppModule), { fallbackOnErrors: true });
-
-    // Swagger setup
-    await setupSwagger(app);
-
-    await app.listen(port, host);
-    logger.log(`🚀 Server is running on: ${await app.getUrl()}`);
-  } catch (error) {
-    logger.error(`Error starting server: ${error.message}`, error.stack);
-    process.exit(1);
-  }
 }
 
-bootstrap().catch(error => {
-  console.error('Unhandled error during bootstrap:', error);
-  process.exit(1);
-});
+bootstrap();

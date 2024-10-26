@@ -1,10 +1,10 @@
 {
-  "success": {
-    "postFetched": "Posts retrieved successfully",
-    "postUpdated": "Post updated successfully",
-    "postDeleted": "Post deleted successfully"
-  },
-  "errors": {
-    "postNotFound": "Post not found in database"
-  }
+    "success": {
+        "postFetched": "Posts retrieved successfully",
+        "postUpdated": "Post updated successfully",
+        "postDeleted": "Post deleted successfully"
+    },
+    "error": {
+        "postNotFound": "Post not found in database"
+    }
 }

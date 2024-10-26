@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { HelperModule } from 'src/common/helper/helper.module';
 
-import { CronProcessorWorkerService } from './processors/cron.processor.service';
-import { EmailProcessorWorkerService } from './processors/email.processor.service';
+import { CronProcessorWorker } from './processors/cron.processor';
+import { EmailProcessorWorker } from './processors/email.processor';
 
 @Module({
-  imports: [HelperModule],
-  providers: [CronProcessorWorkerService, EmailProcessorWorkerService],
-  exports: [CronProcessorWorkerService, EmailProcessorWorkerService],
+    imports: [HelperModule, ScheduleModule.forRoot()],
+    providers: [CronProcessorWorker, EmailProcessorWorker],
+    exports: [CronProcessorWorker, EmailProcessorWorker],
 })
 export class WorkerModule {}

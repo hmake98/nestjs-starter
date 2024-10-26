@@ -1,15 +1,23 @@
 import {
-  CreateTemplateCommandOutput,
-  DeleteTemplateCommandOutput,
-  GetTemplateCommandOutput,
-  SendTemplatedEmailCommandOutput,
+    CreateTemplateCommandOutput,
+    DeleteTemplateCommandOutput,
+    GetTemplateCommandOutput,
+    SendTemplatedEmailCommandOutput,
 } from '@aws-sdk/client-ses';
 
-import { AwsSESGetTemplate, AwsSESSend, AwsSESTemplate } from '../../helper/dtos/aws.ses.dto';
+import {
+    IAwsSESGetTemplate,
+    IAwsSESSend,
+    IAwsSESTemplate,
+} from './aws.ses.interface';
 
 export interface IAwsSESService {
-  getTemplate(params: AwsSESGetTemplate): Promise<GetTemplateCommandOutput>;
-  createTemplate(template: AwsSESTemplate): Promise<CreateTemplateCommandOutput>;
-  deleteTemplate(params: AwsSESGetTemplate): Promise<DeleteTemplateCommandOutput>;
-  send<T>(params: AwsSESSend<T>): Promise<SendTemplatedEmailCommandOutput>;
+    getTemplate(params: IAwsSESGetTemplate): Promise<GetTemplateCommandOutput>;
+    createTemplate(
+        template: IAwsSESTemplate
+    ): Promise<CreateTemplateCommandOutput>;
+    deleteTemplate(
+        params: IAwsSESGetTemplate
+    ): Promise<DeleteTemplateCommandOutput>;
+    send<T>(params: IAwsSESSend<T>): Promise<SendTemplatedEmailCommandOutput>;
 }

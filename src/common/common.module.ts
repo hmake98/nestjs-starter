@@ -1,29 +1,49 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-
-import configs from '../config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as redisStore from 'cache-manager-ioredis';
 
 import { AuthModule } from './auth/auth.module';
-import { AwsModule } from './aws/aws.module';
+import configs from './config';
 import { DatabaseModule } from './database/database.module';
-import { FilesModule } from './files/files.module';
-import { HelperModule } from './helper/helper.module';
+import { FileModule } from './file/file.module';
+import { LoggerModule } from './logger/logger.module';
+import { RequestModule } from './request/request.module';
+import { ResponseModule } from './response/response.module';
 
 @Module({
-  imports: [
-    AuthModule,
-    AwsModule,
-    FilesModule,
-    HelperModule,
-    DatabaseModule,
+    imports: [
+        DatabaseModule,
+        AuthModule,
+        FileModule,
 
-    ConfigModule.forRoot({
-      load: configs,
-      isGlobal: true,
-      cache: true,
-      envFilePath: ['.env'],
-      expandVariables: true,
-    }),
-  ],
+        LoggerModule,
+        RequestModule,
+        ResponseModule,
+
+        ConfigModule.forRoot({
+            load: configs,
+            isGlobal: true,
+            cache: true,
+            envFilePath: ['.env'],
+            expandVariables: true,
+        }),
+
+        CacheModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => {
+                return {
+                    isGlobal: true,
+                    store: redisStore,
+                    host: configService.get('redis.host'),
+                    port: configService.get('redis.port'),
+                    password: configService.get('redis.password'),
+                    tls: configService.get('redis.tls'),
+                    ttl: 5000,
+                };
+            },
+            inject: [ConfigService],
+        }),
+    ],
 })
 export class CommonModule {}

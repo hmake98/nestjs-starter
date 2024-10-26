@@ -1,16 +1,16 @@
-import { ENUM_EMAIL_TEMPLATES } from 'src/app/app.constant';
+import { AWS_SES_EMAIL_TEMPLATES } from 'src/common/aws/enums/aws.ses.enum';
 
 export interface ISendEmailParams {
-  emailType: ENUM_EMAIL_TEMPLATES;
-  emails: string[];
-  payload: Record<string, any>;
+    emailType: AWS_SES_EMAIL_TEMPLATES;
+    emails: string[];
+    payload: Record<string, any>;
 }
 
 export interface ISendEmailBasePayload<T> {
-  data: T;
-  toEmails: string[];
+    data: T;
+    toEmails: string[];
 }
 
 export interface IWelcomeEmailDataPaylaod {
-  userName: string;
+    userName: string;
 }
