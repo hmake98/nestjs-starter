@@ -264,8 +264,26 @@ yarn rollback:email
 ```bash
 # Local deployment with Minikube
 minikube start
-kubectl apply -f k8s/
-minikube service nestjs-starter-service
+
+# Update the Docker image in k8s/deployment.yaml
+# image: your-registry/nestjs-starter:latest
+
+# Deploy to Kubernetes
+cd k8s
+chmod +x deploy.sh
+./deploy.sh
+
+# Access the application
+kubectl port-forward service/nestjs-starter-service 3001:80 -n nestjs-starter
+
+# Check deployment status
+kubectl get pods -n nestjs-starter
+
+# View application logs
+kubectl logs -f deployment/nestjs-app -n nestjs-starter
+
+# Clean up (when needed)
+kubectl delete namespace nestjs-starter
 ```
 
 ### Docker Production
@@ -277,16 +295,36 @@ docker build -f ci/Dockerfile.prod -t your-registry/nestjs-starter:v1.0.0 .
 # Push to registry
 docker push your-registry/nestjs-starter:v1.0.0
 
-# Deploy with Docker Compose
-docker-compose -f docker-compose.prod.yml up -d
+# Run with Docker
+docker run -p 3001:3001 --env-file .env your-registry/nestjs-starter:v1.0.0
+
+# Or deploy with Docker Compose
+docker-compose up -d --build
 ```
 
-### Environment-Specific Configuration
+### Cloud Deployment
 
-Create environment-specific files:
-- `.env.development`
-- `.env.staging`
-- `.env.production`
+#### AWS ECS/EKS
+```bash
+# Push to ECR
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
+docker tag nestjs-starter:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/nestjs-starter:latest
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/nestjs-starter:latest
+```
+
+#### Google Cloud Run
+```bash
+# Build and deploy
+gcloud builds submit --tag gcr.io/PROJECT-ID/nestjs-starter
+gcloud run deploy --image gcr.io/PROJECT-ID/nestjs-starter --platform managed
+```
+
+#### Azure Container Instances
+```bash
+# Push to ACR
+az acr build --registry myregistry --image nestjs-starter .
+az container create --resource-group myResourceGroup --name nestjs-starter --image myregistry.azurecr.io/nestjs-starter
+```
 
 ## 🔐 Security Best Practices
 

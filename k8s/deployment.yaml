@@ -1,0 +1,158 @@
+# k8s/deployment.yaml
+# Simple Kubernetes deployment for NestJS Starter
+
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: nestjs-starter
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: app-config
+    namespace: nestjs-starter
+data:
+    NODE_ENV: 'production'
+    HTTP_PORT: '3001'
+    DATABASE_URL: 'postgresql://postgres:password@postgres:5432/nestjs_starter'
+    REDIS_HOST: 'redis'
+    REDIS_PORT: '6379'
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: app-secrets
+    namespace: nestjs-starter
+data:
+    AUTH_ACCESS_TOKEN_SECRET: eW91ci1hY2Nlc3MtdG9rZW4tc2VjcmV0 # your-access-token-secret
+    AUTH_REFRESH_TOKEN_SECRET: eW91ci1yZWZyZXNoLXRva2VuLXNlY3JldA== # your-refresh-token-secret
+
+---
+# PostgreSQL
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: postgres
+    namespace: nestjs-starter
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: postgres
+    template:
+        metadata:
+            labels:
+                app: postgres
+        spec:
+            containers:
+                - name: postgres
+                  image: postgres:16-alpine
+                  env:
+                      - name: POSTGRES_DB
+                        value: nestjs_starter
+                      - name: POSTGRES_USER
+                        value: postgres
+                      - name: POSTGRES_PASSWORD
+                        value: password
+                  ports:
+                      - containerPort: 5432
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: postgres
+    namespace: nestjs-starter
+spec:
+    selector:
+        app: postgres
+    ports:
+        - port: 5432
+
+---
+# Redis
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: redis
+    namespace: nestjs-starter
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: redis
+    template:
+        metadata:
+            labels:
+                app: redis
+        spec:
+            containers:
+                - name: redis
+                  image: redis:7-alpine
+                  ports:
+                      - containerPort: 6379
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: redis
+    namespace: nestjs-starter
+spec:
+    selector:
+        app: redis
+    ports:
+        - port: 6379
+
+---
+# NestJS App
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: nestjs-app
+    namespace: nestjs-starter
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app: nestjs-app
+    template:
+        metadata:
+            labels:
+                app: nestjs-app
+        spec:
+            containers:
+                - name: app
+                  image: ghcr.io/hmake98/nestjs-starter:latest
+                  ports:
+                      - containerPort: 3001
+                  envFrom:
+                      - configMapRef:
+                            name: app-config
+                  env:
+                      - name: AUTH_ACCESS_TOKEN_SECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: AUTH_ACCESS_TOKEN_SECRET
+                      - name: AUTH_REFRESH_TOKEN_SECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: app-secrets
+                                key: AUTH_REFRESH_TOKEN_SECRET
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: nestjs-starter-service
+    namespace: nestjs-starter
+spec:
+    selector:
+        app: nestjs-app
+    ports:
+        - port: 80
+          targetPort: 3001
+    type: LoadBalancer
