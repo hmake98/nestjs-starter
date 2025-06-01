@@ -1,3 +1,13 @@
 node_modules
-npm-debug.log
 dist
+coverage
+ci
+.vscode
+.husky
+.github
+test
+.env
+Dockerfile.prod
+lcov-report
+prisma/migrations
+prisma/migration_lock.toml

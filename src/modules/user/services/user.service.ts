@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
 
-import { PrismaService } from 'src/common/database/services/prisma.service';
+import { DatabaseService } from 'src/common/database/services/database.service';
 import { ApiGenericResponseDto } from 'src/common/response/dtos/response.generic.dto';
 
 import { UserUpdateDto } from '../dtos/request/user.update.request';
@@ -12,14 +12,14 @@ import { IUserService } from '../interfaces/user.service.interface';
 
 @Injectable()
 export class UserService implements IUserService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(private readonly databaseService: DatabaseService) {}
 
     async updateUser(
         userId: string,
         data: UserUpdateDto
     ): Promise<UserUpdateProfileResponseDto> {
         try {
-            const user = await this.prismaService.user.findUnique({
+            const user = await this.databaseService.user.findUnique({
                 where: { id: userId },
             });
             if (!user) {
@@ -28,7 +28,7 @@ export class UserService implements IUserService {
                     HttpStatus.NOT_FOUND
                 );
             }
-            const updatedUser = await this.prismaService.user.update({
+            const updatedUser = await this.databaseService.user.update({
                 where: { id: userId },
                 data,
             });
@@ -40,7 +40,7 @@ export class UserService implements IUserService {
 
     async deleteUser(userId: string): Promise<ApiGenericResponseDto> {
         try {
-            const user = await this.prismaService.user.findUnique({
+            const user = await this.databaseService.user.findUnique({
                 where: { id: userId },
             });
             if (!user) {
@@ -49,7 +49,7 @@ export class UserService implements IUserService {
                     HttpStatus.NOT_FOUND
                 );
             }
-            await this.prismaService.user.update({
+            await this.databaseService.user.update({
                 where: { id: userId },
                 data: { deletedAt: new Date() },
             });
@@ -64,7 +64,7 @@ export class UserService implements IUserService {
     }
 
     async getProfile(id: string): Promise<UserGetProfileResponseDto> {
-        const user = await this.prismaService.user.findUnique({
+        const user = await this.databaseService.user.findUnique({
             where: { id },
         });
         if (!user) {

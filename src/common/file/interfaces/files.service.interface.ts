@@ -1,5 +1,5 @@
-import { FilePresignDto } from '../dtos/file.presign.dto';
-import { FilePutPresignResponseDto } from '../dtos/file.response.dto';
+import { FilePresignDto } from '../dtos/request/file.presign.dto';
+import { FilePutPresignResponseDto } from '../dtos/response/file.response.dto';
 
 export interface IFilesServiceInterface {
     getPresignUrlPutObject(

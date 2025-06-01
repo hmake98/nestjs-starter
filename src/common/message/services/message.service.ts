@@ -47,7 +47,7 @@ export class MessageService {
                 const [key, paramsString] = msg.split('|');
                 const params = paramsString ? JSON.parse(paramsString) : {};
                 return this.translate(key, { lang, args: params });
-            } catch (error) {
+            } catch {
                 return msg;
             }
         });

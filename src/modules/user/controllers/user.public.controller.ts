@@ -1,13 +1,10 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpStatus, Put } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { DocResponse } from 'src/common/doc/decorators/doc.response.decorator';
 import { AuthUser } from 'src/common/request/decorators/request.user.decorator';
 import { IAuthUser } from 'src/common/request/interfaces/request.interface';
 
-import {
-    UserPublicGetProfileDoc,
-    UserPublicUpdateProfileDoc,
-} from '../docs/user.public.doc';
 import { UserUpdateDto } from '../dtos/request/user.update.request';
 import {
     UserGetProfileResponseDto,
@@ -23,16 +20,26 @@ import { UserService } from '../services/user.service';
 export class UserPublicController {
     constructor(private readonly userService: UserService) {}
 
-    @UserPublicGetProfileDoc()
     @Get('profile')
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: 'Get user profile' })
+    @DocResponse({
+        serialization: UserGetProfileResponseDto,
+        httpStatus: HttpStatus.OK,
+    })
     public async getProfile(
         @AuthUser() user: IAuthUser
     ): Promise<UserGetProfileResponseDto> {
         return this.userService.getProfile(user.userId);
     }
 
-    @UserPublicUpdateProfileDoc()
     @Put()
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: 'Update user' })
+    @DocResponse({
+        serialization: UserUpdateProfileResponseDto,
+        httpStatus: HttpStatus.OK,
+    })
     public async update(
         @AuthUser() user: IAuthUser,
         @Body() payload: UserUpdateDto

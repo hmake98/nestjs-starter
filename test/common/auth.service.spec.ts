@@ -5,7 +5,7 @@ import { Role } from '@prisma/client';
 
 import { APP_BULL_QUEUES } from 'src/app/enums/app.enum';
 import { AuthService } from 'src/common/auth/services/auth.service';
-import { PrismaService } from 'src/common/database/services/prisma.service';
+import { DatabaseService } from 'src/common/database/services/database.service';
 import { HelperEncryptionService } from 'src/common/helper/services/helper.encryption.service';
 
 describe('AuthService', () => {
@@ -32,7 +32,7 @@ describe('AuthService', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 AuthService,
-                { provide: PrismaService, useValue: mockPrismaService },
+                { provide: DatabaseService, useValue: mockPrismaService },
                 {
                     provide: HelperEncryptionService,
                     useValue: mockHelperEncryptionService,

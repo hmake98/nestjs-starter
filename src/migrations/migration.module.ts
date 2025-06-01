@@ -3,11 +3,11 @@ import { CommandModule } from 'nestjs-command';
 
 import { CommonModule } from 'src/common/common.module';
 
-import { EmailSeed } from './seed/email.seed';
+import { EmailMigrationSeed } from './seed/email.seed';
 
 @Module({
     imports: [CommonModule, CommandModule],
-    providers: [EmailSeed],
-    exports: [EmailSeed],
+    providers: [EmailMigrationSeed],
+    exports: [EmailMigrationSeed],
 })
 export class MigrationModule {}

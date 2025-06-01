@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bull';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -7,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import configs from './config';
 import { DatabaseModule } from './database/database.module';
 import { FileModule } from './file/file.module';
-import { LoggerModule } from './logger/logger.module';
+import { CustomLoggerModule } from './logger/logger.module';
 import { RequestModule } from './request/request.module';
 import { ResponseModule } from './response/response.module';
 
@@ -17,7 +18,7 @@ import { ResponseModule } from './response/response.module';
         AuthModule,
         FileModule,
 
-        LoggerModule,
+        CustomLoggerModule,
         RequestModule,
         ResponseModule,
 
@@ -42,6 +43,17 @@ import { ResponseModule } from './response/response.module';
                     ttl: 5000,
                 };
             },
+            inject: [ConfigService],
+        }),
+
+        BullModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                redis: {
+                    host: configService.get('redis.host'),
+                    port: Number(configService.get('redis.port')),
+                },
+            }),
             inject: [ConfigService],
         }),
     ],

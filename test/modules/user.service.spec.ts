@@ -1,7 +1,7 @@
 import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { PrismaService } from 'src/common/database/services/prisma.service';
+import { DatabaseService } from 'src/common/database/services/database.service';
 import { UserUpdateDto } from 'src/modules/user/dtos/request/user.update.request';
 import { UserService } from 'src/modules/user/services/user.service';
 
@@ -19,7 +19,7 @@ describe('UserService', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 UserService,
-                { provide: PrismaService, useValue: mockPrismaService },
+                { provide: DatabaseService, useValue: mockPrismaService },
             ],
         }).compile();
 

@@ -3,24 +3,27 @@ import {
     Controller,
     Delete,
     Get,
+    HttpStatus,
     Param,
     Post,
     Put,
     Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiParam,
+    ApiTags,
+} from '@nestjs/swagger';
 
+import { DocGenericResponse } from 'src/common/doc/decorators/doc.generic.decorator';
+import { DocPaginatedResponse } from 'src/common/doc/decorators/doc.paginated.decorator';
+import { DocResponse } from 'src/common/doc/decorators/doc.response.decorator';
 import { AuthUser } from 'src/common/request/decorators/request.user.decorator';
 import { IAuthUser } from 'src/common/request/interfaces/request.interface';
 import { ApiGenericResponseDto } from 'src/common/response/dtos/response.generic.dto';
 import { ApiPaginatedDataDto } from 'src/common/response/dtos/response.paginated.dto';
 
-import {
-    PostPublicCreateDoc,
-    PostPublicDeleteDoc,
-    PostPublicGetAllDoc,
-    PostPublicUpdateDoc,
-} from '../docs/post.public.doc';
 import { PostCreateDto } from '../dtos/request/post.create.request';
 import { PostGetDto } from '../dtos/request/post.get.request';
 import { PostUpdateDto } from '../dtos/request/post.update.request';
@@ -39,8 +42,13 @@ import { PostService } from '../services/post.service';
 export class PostPublicController {
     constructor(private readonly postService: PostService) {}
 
-    @PostPublicCreateDoc()
     @Post()
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: 'Create a new post' })
+    @DocResponse({
+        serialization: PostCreateResponseDto,
+        httpStatus: HttpStatus.CREATED,
+    })
     public async createPost(
         @AuthUser() { userId }: IAuthUser,
         @Body() payload: PostCreateDto
@@ -48,8 +56,11 @@ export class PostPublicController {
         return this.postService.create(userId, payload);
     }
 
-    @PostPublicDeleteDoc()
     @Delete(':id')
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: 'Delete a post' })
+    @ApiParam({ name: 'id', description: 'Post ID' })
+    @DocGenericResponse()
     public async deletePost(
         @AuthUser() { userId }: IAuthUser,
         @Param('id') postId: string
@@ -57,16 +68,27 @@ export class PostPublicController {
         return this.postService.delete(userId, postId);
     }
 
-    @PostPublicGetAllDoc()
     @Get()
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: 'Get all posts' })
+    @DocPaginatedResponse({
+        serialization: PostResponseDto,
+        httpStatus: HttpStatus.OK,
+    })
     public async getPosts(
         @Query() params: PostGetDto
     ): Promise<ApiPaginatedDataDto<PostResponseDto>> {
         return this.postService.getAll(params);
     }
 
-    @PostPublicUpdateDoc()
     @Put(':id')
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: 'Update a post' })
+    @ApiParam({ name: 'id', description: 'Post ID' })
+    @DocResponse({
+        serialization: PostUpdateResponseDto,
+        httpStatus: HttpStatus.OK,
+    })
     public async updatePost(
         @AuthUser() { userId }: IAuthUser,
         @Param('id') postId: string,

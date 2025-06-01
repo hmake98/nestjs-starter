@@ -45,7 +45,6 @@ export default registerAs('app', (): Record<string, any> => {
             environment: process.env.NODE_ENV ?? APP_ENVIRONMENT.LOCAL,
         },
 
-        globalPrefix: '/api',
         debug: process.env.APP_DEBUG === 'true',
         logLevel: process.env.APP_LOG_LEVEL ?? 'info',
     };

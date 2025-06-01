@@ -6,7 +6,7 @@ import { Queue } from 'bull';
 
 import { APP_BULL_QUEUES } from 'src/app/enums/app.enum';
 import { AWS_SES_EMAIL_TEMPLATES } from 'src/common/aws/enums/aws.ses.enum';
-import { PrismaService } from 'src/common/database/services/prisma.service';
+import { DatabaseService } from 'src/common/database/services/database.service';
 import {
     ISendEmailBasePayload,
     IWelcomeEmailDataPaylaod,
@@ -14,18 +14,18 @@ import {
 
 import { HelperEncryptionService } from '../../helper/services/helper.encryption.service';
 import { IAuthUser } from '../../request/interfaces/request.interface';
-import { UserLoginDto } from '../dtos/auth.login.dto';
+import { UserLoginDto } from '../dtos/request/auth.login.dto';
+import { UserCreateDto } from '../dtos/request/auth.signup.dto';
 import {
     AuthRefreshResponseDto,
     AuthResponseDto,
-} from '../dtos/auth.response.dto';
-import { UserCreateDto } from '../dtos/auth.signup.dto';
+} from '../dtos/response/auth.response.dto';
 import { IAuthService } from '../interfaces/auth.service.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
     constructor(
-        private readonly prismaService: PrismaService,
+        private readonly databaseService: DatabaseService,
         private readonly helperEncryptionService: HelperEncryptionService,
         @InjectQueue(APP_BULL_QUEUES.EMAIL)
         private emailQueue: Queue
@@ -35,7 +35,7 @@ export class AuthService implements IAuthService {
         try {
             const { email, password } = data;
 
-            const user = await this.prismaService.user.findUnique({
+            const user = await this.databaseService.user.findUnique({
                 where: { email },
             });
 
@@ -76,7 +76,7 @@ export class AuthService implements IAuthService {
         try {
             const { email, firstName, lastName, password } = data;
 
-            const existingUser = await this.prismaService.user.findUnique({
+            const existingUser = await this.databaseService.user.findUnique({
                 where: { email },
             });
 
@@ -90,7 +90,7 @@ export class AuthService implements IAuthService {
             const hashed =
                 await this.helperEncryptionService.createHash(password);
 
-            const createdUser = await this.prismaService.user.create({
+            const createdUser = await this.databaseService.user.create({
                 data: {
                     email,
                     password: hashed,

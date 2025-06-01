@@ -8,8 +8,8 @@ import { AWS_SES_EMAIL_TEMPLATE_SUBJECTS } from 'src/common/aws/enums/aws.ses.en
 import { AwsSESService } from 'src/common/aws/services/aws.ses.service';
 
 @Injectable()
-export class EmailSeed {
-    private readonly logger = new Logger(EmailSeed.name);
+export class EmailMigrationSeed {
+    private readonly logger = new Logger(EmailMigrationSeed.name);
 
     constructor(private readonly awsSESService: AwsSESService) {}
 
@@ -39,7 +39,7 @@ export class EmailSeed {
                     this.logger.log(
                         `Template ${templateName} already exists. Skipping creation.`
                     );
-                } catch (error) {
+                } catch {
                     await this.awsSESService.createTemplate({
                         name: templateName,
                         subject,

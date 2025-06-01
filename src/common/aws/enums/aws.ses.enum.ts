@@ -3,5 +3,5 @@ export enum AWS_SES_EMAIL_TEMPLATES {
 }
 
 export enum AWS_SES_EMAIL_TEMPLATE_SUBJECTS {
-    WELCOME_EMAIL = 'Welcome to api',
+    WELCOME_EMAIL = 'Welcome to Nesjts Starter Project',
 }

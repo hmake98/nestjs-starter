@@ -1,60 +1,148 @@
-// logger.service.ts
-import { Injectable, LoggerService as LogService } from '@nestjs/common';
+import { Injectable, LoggerService as NestLoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import pino, { Logger as PinoLogger } from 'pino';
 
-@Injectable()
-export class LoggerService implements LogService {
-    private logger: PinoLogger;
+import { APP_ENVIRONMENT } from 'src/app/enums/app.enum';
 
-    constructor(private configService: ConfigService) {
+@Injectable()
+export class CustomLoggerService implements NestLoggerService {
+    private readonly logger: PinoLogger;
+    private context = 'Application';
+
+    constructor(private readonly configService: ConfigService) {
+        const isLocal =
+            this.configService.get('app.env') === APP_ENVIRONMENT.LOCAL;
+
         this.logger = pino({
-            level: this.configService.get<string>('app.logLevel'),
+            level: this.configService.get('LOG_LEVEL', 'info'),
+            transport: isLocal
+                ? {
+                      target: 'pino-pretty',
+                      options: {
+                          colorize: true,
+                          levelFirst: true,
+                          translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+                          ignore: 'pid,hostname',
+                      },
+                  }
+                : undefined,
             formatters: {
-                level: label => ({ level: label }),
+                level: (label: string) => ({ level: label.toUpperCase() }),
             },
-            timestamp: () =>
-                `,"timestamp":"${new Date(Date.now()).toISOString()}"`,
-            messageKey: 'message',
+            timestamp: () => `,"timestamp":"${new Date().toISOString()}"`,
             base: {
-                environment: this.configService.get<string>('app.env'),
-                service: this.configService.get<string>('app.name'),
+                pid: false,
+                hostname: false,
+                environment: this.configService.get('app.env'),
+                service: this.configService.get('app.name'),
             },
-            redact: ['req.headers.authorization'],
         });
     }
 
+    setContext(context: string): void {
+        this.context = context;
+    }
+
     log(message: any, context?: string): void {
-        this.logger.info({ context }, message);
+        this.logger.info({ context: context || this.context }, message);
     }
 
     error(message: any, trace?: string, context?: string): void {
-        this.logger.error({ context, trace }, message);
+        this.logger.error(
+            {
+                context: context || this.context,
+                trace,
+            },
+            message
+        );
     }
 
     warn(message: any, context?: string): void {
-        this.logger.warn({ context }, message);
+        this.logger.warn({ context: context || this.context }, message);
     }
 
     debug(message: any, context?: string): void {
-        this.logger.debug({ context }, message);
+        this.logger.debug({ context: context || this.context }, message);
     }
 
     verbose(message: any, context?: string): void {
-        this.logger.trace({ context }, message);
+        this.logger.trace({ context: context || this.context }, message);
     }
 
-    logError(error: Error, context?: string): void {
-        this.logger.error(
+    // Additional methods for structured logging
+    info(message: string, meta?: any, context?: string): void {
+        this.logger.info(
             {
-                context,
-                error: {
-                    message: error.message,
-                    name: error.name,
-                    stack: error.stack,
-                },
+                context: context || this.context,
+                ...meta,
             },
-            'Error occurred'
+            message
+        );
+    }
+
+    fatal(message: string, meta?: any, context?: string): void {
+        this.logger.fatal(
+            {
+                context: context || this.context,
+                ...meta,
+            },
+            message
+        );
+    }
+
+    // Method for logging with correlation ID
+    logWithCorrelation(
+        level: 'info' | 'error' | 'warn' | 'debug',
+        message: string,
+        correlationId: string,
+        meta?: any,
+        context?: string
+    ): void {
+        this.logger[level](
+            {
+                context: context || this.context,
+                correlationId,
+                ...meta,
+            },
+            message
+        );
+    }
+
+    // Method for performance logging
+    logPerformance(
+        operation: string,
+        duration: number,
+        meta?: any,
+        context?: string
+    ): void {
+        this.logger.info(
+            {
+                context: context || this.context,
+                operation,
+                duration,
+                type: 'performance',
+                ...meta,
+            },
+            `Operation ${operation} completed in ${duration}ms`
+        );
+    }
+
+    // Method for business event logging
+    logBusinessEvent(
+        event: string,
+        userId?: string,
+        meta?: any,
+        context?: string
+    ): void {
+        this.logger.info(
+            {
+                context: context || this.context,
+                event,
+                userId,
+                type: 'business-event',
+                ...meta,
+            },
+            `Business event: ${event}`
         );
     }
 }

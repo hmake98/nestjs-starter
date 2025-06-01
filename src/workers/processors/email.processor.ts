@@ -28,6 +28,6 @@ export class EmailProcessorWorker {
             payload: data,
         });
 
-        this.logger.log('Email sent!');
+        this.logger.log('Email sent successfully');
     }
 }

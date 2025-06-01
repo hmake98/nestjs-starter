@@ -1,12 +1,21 @@
 {
     "testTimeout": 10000,
     "rootDir": "../",
-    "modulePaths": ["."],
+    "modulePaths": [
+        "."
+    ],
     "testEnvironment": "node",
-    "testMatch": ["<rootDir>/test/**/*.spec.ts"],
+    "testMatch": [
+        "<rootDir>/test/**/*.spec.ts"
+    ],
     "collectCoverage": true,
     "coverageDirectory": "coverage",
-    "coverageReporters": ["lcov", "json-summary", "text", "html"],
+    "coverageReporters": [
+        "lcov",
+        "json-summary",
+        "text",
+        "html"
+    ],
     "collectCoverageFrom": [
         "<rootDir>/src/**/*.service.ts",
         "!<rootDir>/src/common/database/services/prisma.service.ts",
@@ -21,9 +30,21 @@
             "statements": 100
         }
     },
-    "moduleFileExtensions": ["js", "ts", "json"],
+    "moduleFileExtensions": [
+        "js",
+        "ts",
+        "json"
+    ],
+    "coverageProvider": "v8",
     "transform": {
-        "^.+\\.(t|j)s$": "ts-jest"
+        "^.+\\.(t|j)sx?$": [
+            "@swc/jest",
+            {
+                "sourceMaps": true
+            }
+        ]
     },
-    "modulePathIgnorePatterns": ["<rootDir>/dist"]
+    "modulePathIgnorePatterns": [
+        "<rootDir>/dist"
+    ]
 }

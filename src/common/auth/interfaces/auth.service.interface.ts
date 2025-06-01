@@ -4,7 +4,7 @@ import { UserLoginDto } from '../dtos/auth.login.dto';
 import {
     AuthRefreshResponseDto,
     AuthResponseDto,
-} from '../dtos/auth.response.dto';
+} from '../dtos/response/auth.response.dto';
 import { UserCreateDto } from '../dtos/auth.signup.dto';
 
 export interface IAuthService {

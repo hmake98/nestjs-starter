@@ -1,12 +1,12 @@
-import { Controller, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, HttpStatus, Post, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { DocResponse } from 'src/common/doc/decorators/doc.response.decorator';
 import { AuthUser } from 'src/common/request/decorators/request.user.decorator';
 import { IAuthUser } from 'src/common/request/interfaces/request.interface';
 
-import { FilePublicPresignUrlDoc } from '../docs/file.public.doc';
-import { FilePresignDto } from '../dtos/file.presign.dto';
-import { FilePutPresignResponseDto } from '../dtos/file.response.dto';
+import { FilePresignDto } from '../dtos/request/file.presign.dto';
+import { FilePutPresignResponseDto } from '../dtos/response/file.response.dto';
 import { FileService } from '../services/files.service';
 
 @ApiTags('public.file')
@@ -17,8 +17,13 @@ import { FileService } from '../services/files.service';
 export class FilePublicController {
     constructor(private readonly fileService: FileService) {}
 
-    @FilePublicPresignUrlDoc()
     @Post('get-presign')
+    @ApiBearerAuth('accessToken')
+    @ApiOperation({ summary: 'Get pre-signed URL for file upload' })
+    @DocResponse({
+        serialization: FilePutPresignResponseDto,
+        httpStatus: HttpStatus.CREATED,
+    })
     putPresignUrl(
         @AuthUser() { userId }: IAuthUser,
         @Query() params: FilePresignDto

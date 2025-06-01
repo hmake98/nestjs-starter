@@ -3,7 +3,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { FilePresignDto } from 'src/common/file/dtos/file.presign.dto';
+import { FilePresignDto } from 'src/common/file/dtos/request/file.presign.dto';
 import { ENUM_FILE_STORE } from 'src/common/file/enums/files.enum';
 import { FileService } from 'src/common/file/services/files.service';
 

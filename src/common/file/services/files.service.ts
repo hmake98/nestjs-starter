@@ -3,8 +3,8 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { FilePresignDto } from '../dtos/file.presign.dto';
-import { FilePutPresignResponseDto } from '../dtos/file.response.dto';
+import { FilePresignDto } from '../dtos/request/file.presign.dto';
+import { FilePutPresignResponseDto } from '../dtos/response/file.response.dto';
 import { IFilesServiceInterface } from '../interfaces/files.service.interface';
 
 @Injectable()

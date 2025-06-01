@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { PrismaService } from 'src/common/database/services/prisma.service';
+import { DatabaseService } from 'src/common/database/services/database.service';
 import { HelperPaginationService } from 'src/common/helper/services/helper.pagination.service';
 import { PostCreateDto } from 'src/modules/post/dtos/request/post.create.request';
 import { PostGetDto } from 'src/modules/post/dtos/request/post.get.request';
@@ -32,7 +32,7 @@ describe('PostService', () => {
             providers: [
                 PostService,
                 {
-                    provide: PrismaService,
+                    provide: DatabaseService,
                     useValue: mockPrismaService,
                 },
                 {

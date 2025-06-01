@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 
-import { PrismaService } from 'src/common/database/services/prisma.service';
+import { DatabaseService } from 'src/common/database/services/database.service';
 import { HelperPaginationService } from 'src/common/helper/services/helper.pagination.service';
 import { ApiGenericResponseDto } from 'src/common/response/dtos/response.generic.dto';
 import { ApiPaginatedDataDto } from 'src/common/response/dtos/response.paginated.dto';
@@ -18,7 +18,7 @@ import { IPostService } from '../interfaces/post.service.interface';
 @Injectable()
 export class PostService implements IPostService {
     constructor(
-        private readonly prismaService: PrismaService,
+        private readonly databaseService: DatabaseService,
         private readonly helperPaginationService: HelperPaginationService
     ) {}
 
@@ -29,7 +29,7 @@ export class PostService implements IPostService {
         const { content, title, images } = data;
 
         try {
-            const user = await this.prismaService.user.findUnique({
+            const user = await this.databaseService.user.findUnique({
                 where: { id: userId },
             });
 
@@ -40,7 +40,7 @@ export class PostService implements IPostService {
                 );
             }
 
-            return await this.prismaService.post.create({
+            return await this.databaseService.post.create({
                 data: {
                     content,
                     title,
@@ -63,7 +63,7 @@ export class PostService implements IPostService {
 
     async delete(userId: string, id: string): Promise<ApiGenericResponseDto> {
         try {
-            const post = await this.prismaService.post.findUnique({
+            const post = await this.databaseService.post.findUnique({
                 where: { id },
                 select: { authorId: true },
             });
@@ -82,7 +82,7 @@ export class PostService implements IPostService {
                 );
             }
 
-            await this.prismaService.post.update({
+            await this.databaseService.post.update({
                 where: { id },
                 data: { deletedAt: new Date() },
             });
@@ -121,7 +121,7 @@ export class PostService implements IPostService {
             : {};
 
         return this.helperPaginationService.paginate(
-            this.prismaService.post,
+            this.databaseService.post,
             paginationParams,
             {
                 where: whereClause,
@@ -142,7 +142,7 @@ export class PostService implements IPostService {
         const { content, title, images } = data;
 
         try {
-            const post = await this.prismaService.post.findUnique({
+            const post = await this.databaseService.post.findUnique({
                 where: { id },
                 include: { images: true },
             });
@@ -169,7 +169,7 @@ export class PostService implements IPostService {
                 image => !currentImages.includes(image)
             );
 
-            return await this.prismaService.post.update({
+            return await this.databaseService.post.update({
                 where: { id },
                 data: {
                     title,

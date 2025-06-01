@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
-import { ENUM_FILE_STORE } from '../enums/files.enum';
+import { ENUM_FILE_STORE } from '../../enums/files.enum';
 
 export class FilePresignDto {
     @ApiProperty({
