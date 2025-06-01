@@ -1,8 +1,10 @@
 {
     "success": {
-        "postFetched": "Posts retrieved successfully",
-        "postUpdated": "Post updated successfully",
-        "postDeleted": "Post deleted successfully"
+        "fetched": "Posts retrieved successfully",
+        "getOne": "Post retrieved successfully",
+        "updated": "Post updated successfully",
+        "deleted": "Post deleted successfully",
+        "created": "Post created successfully"
     },
     "error": {
         "postNotFound": "Post not found in database"

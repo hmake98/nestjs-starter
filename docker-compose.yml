@@ -1,6 +1,8 @@
 services:
     postgres:
-        image: postgres:latest
+        image: postgres:16-alpine
+        container_name: nestjs-postgres
+        restart: unless-stopped
         ports:
             - '5432:5432'
         environment:
@@ -8,43 +10,50 @@ services:
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master123}
             POSTGRES_DB: ${POSTGRES_DB:-postgres}
         volumes:
-            - pg_data:/var/lib/postgresql/data
+            - postgres_data:/var/lib/postgresql/data
         networks:
-            - backend
+            - app-network
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres}']
             interval: 10s
             timeout: 5s
             retries: 5
+            start_period: 30s
 
     redis:
-        image: redis:latest
+        image: redis:7-alpine
+        container_name: nestjs-redis
+        restart: unless-stopped
         ports:
             - '6379:6379'
         volumes:
             - redis_data:/data
         networks:
-            - backend
+            - app-network
         healthcheck:
             test: ['CMD', 'redis-cli', 'ping']
             interval: 10s
             timeout: 5s
             retries: 5
+            start_period: 10s
+        command: redis-server --appendonly yes
 
     server:
         build:
             context: .
             dockerfile: Dockerfile
+        container_name: nestjs-app
         restart: unless-stopped
         ports:
             - '3001:3001'
         env_file:
             - .env.docker
         networks:
-            - backend
+            - app-network
         volumes:
             - .:/app
             - /app/node_modules
+            - /app/dist
         depends_on:
             postgres:
                 condition: service_healthy
@@ -52,11 +61,14 @@ services:
                 condition: service_healthy
 
 networks:
-    backend:
+    app-network:
         driver: bridge
+        name: nestjs-network
 
 volumes:
-    pg_data:
+    postgres_data:
         driver: local
+        name: nestjs-postgres-data
     redis_data:
         driver: local
+        name: nestjs-redis-data

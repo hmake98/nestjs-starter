@@ -17,7 +17,6 @@ export class MessageService {
         const finalOptions = {
             ...defaultOptions,
             ...options,
-            // Ensure args is an object even if undefined
             args: options?.args || {},
         };
 
@@ -34,7 +33,7 @@ export class MessageService {
     translateError(statusCode: number, lang: string = 'en'): string {
         return this.translate(`http.error.${statusCode}`, {
             lang,
-            defaultValue: 'An error occurred.',
+            defaultValue: 'Internal server error.',
         });
     }
 

@@ -48,6 +48,7 @@ export class PostPublicController {
     @DocResponse({
         serialization: PostCreateResponseDto,
         httpStatus: HttpStatus.CREATED,
+        messageKey: 'post.success.created',
     })
     public async createPost(
         @AuthUser() { userId }: IAuthUser,
@@ -60,7 +61,10 @@ export class PostPublicController {
     @ApiBearerAuth('accessToken')
     @ApiOperation({ summary: 'Delete a post' })
     @ApiParam({ name: 'id', description: 'Post ID' })
-    @DocGenericResponse()
+    @DocGenericResponse({
+        httpStatus: HttpStatus.OK,
+        messageKey: 'post.success.deleted',
+    })
     public async deletePost(
         @AuthUser() { userId }: IAuthUser,
         @Param('id') postId: string
@@ -73,6 +77,7 @@ export class PostPublicController {
     @ApiOperation({ summary: 'Get all posts' })
     @DocPaginatedResponse({
         serialization: PostResponseDto,
+        messageKey: 'post.success.fetched',
         httpStatus: HttpStatus.OK,
     })
     public async getPosts(
@@ -87,6 +92,7 @@ export class PostPublicController {
     @ApiParam({ name: 'id', description: 'Post ID' })
     @DocResponse({
         serialization: PostUpdateResponseDto,
+        messageKey: 'post.success.updated',
         httpStatus: HttpStatus.OK,
     })
     public async updatePost(

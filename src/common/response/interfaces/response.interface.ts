@@ -36,6 +36,12 @@ export interface IGenericResponse {
 }
 
 export interface IResponseDocOptions<T> {
-    serialization?: ClassConstructor<T>;
     httpStatus: number;
+    messageKey: string;
+    serialization?: ClassConstructor<T>;
+}
+
+export interface IGenericResponseOptions {
+    httpStatus: number;
+    messageKey: string;
 }

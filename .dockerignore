@@ -1,13 +1,75 @@
+# Dependencies
 node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
 dist
+build
 coverage
-ci
-.vscode
-.husky
-.github
-test
+*.tsbuildinfo
+
+# Environment files
 .env
-Dockerfile.prod
-lcov-report
+.env.local
+.env.*.local
+!.env.docker
+
+# Development files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Version control
+.git
+.gitignore
+.github
+
+# CI/CD
+ci/Dockerfile.prod
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# Testing
+test
+coverage
+*.test.js
+*.spec.js
+jest.config.js
+
+# Linting
+.eslintrc.js
+.eslintignore
+.prettierrc
+.prettierignore
+
+# Husky
+.husky
+
+# Database
 prisma/migrations
 prisma/migration_lock.toml
+
+# Logs
+logs
+*.log
+lcov-report
+
+# Temporary files
+tmp
+temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

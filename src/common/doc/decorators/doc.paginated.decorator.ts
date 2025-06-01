@@ -9,14 +9,14 @@ import { ApiSuccessResponseDto } from 'src/common/response/dtos/response.success
 import { IResponseDocOptions } from 'src/common/response/interfaces/response.interface';
 
 import {
+    DOC_RESPONSE_MESSAGE_META_KEY,
     DOC_RESPONSE_SERIALIZATION_META_KEY,
-    HTTP_STATUS_MESSAGES_SWAGGER,
 } from '../constants/doc.constant';
 
 export function DocPaginatedResponse<T>(
     options: IResponseDocOptions<T>
 ): MethodDecorator {
-    const { httpStatus, serialization } = options;
+    const { serialization, messageKey, httpStatus } = options;
 
     const schema: Record<string, any> = {
         allOf: [
@@ -26,7 +26,7 @@ export function DocPaginatedResponse<T>(
                     statusCode: { type: 'number', example: httpStatus },
                     message: {
                         type: 'string',
-                        example: HTTP_STATUS_MESSAGES_SWAGGER[httpStatus],
+                        example: messageKey,
                     },
                     timestamp: {
                         type: 'string',
@@ -59,10 +59,11 @@ export function DocPaginatedResponse<T>(
         ),
         ApiResponse({
             status: httpStatus,
-            description: HTTP_STATUS_MESSAGES_SWAGGER[httpStatus],
+            description: messageKey,
             schema,
         }),
         SetMetadata(DOC_RESPONSE_SERIALIZATION_META_KEY, serialization),
+        SetMetadata(DOC_RESPONSE_MESSAGE_META_KEY, messageKey),
     ];
 
     if (serialization) {

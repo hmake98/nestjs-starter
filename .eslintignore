@@ -1,6 +1,0 @@
-dist/*
-coverage/*
-node_modules/*
-.husky/*
-.github/*
-commitlint.config.js

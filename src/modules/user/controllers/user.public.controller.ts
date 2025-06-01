@@ -26,6 +26,7 @@ export class UserPublicController {
     @DocResponse({
         serialization: UserGetProfileResponseDto,
         httpStatus: HttpStatus.OK,
+        messageKey: 'user.success.profile',
     })
     public async getProfile(
         @AuthUser() user: IAuthUser
@@ -39,6 +40,7 @@ export class UserPublicController {
     @DocResponse({
         serialization: UserUpdateProfileResponseDto,
         httpStatus: HttpStatus.OK,
+        messageKey: 'user.success.updated',
     })
     public async update(
         @AuthUser() user: IAuthUser,

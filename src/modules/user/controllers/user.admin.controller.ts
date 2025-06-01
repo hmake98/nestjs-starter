@@ -1,4 +1,4 @@
-import { Controller, Delete, Param } from '@nestjs/common';
+import { Controller, Delete, HttpStatus, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
@@ -20,7 +20,10 @@ export class UserAdminController {
     @AllowedRoles([Role.ADMIN])
     @ApiBearerAuth('accessToken')
     @ApiOperation({ summary: 'Delete user' })
-    @DocGenericResponse()
+    @DocGenericResponse({
+        httpStatus: HttpStatus.OK,
+        messageKey: 'user.success.deleted',
+    })
     public async deleteUser(
         @Param('id') userId: string
     ): Promise<ApiGenericResponseDto> {

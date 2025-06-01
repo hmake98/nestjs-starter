@@ -3,56 +3,61 @@ FROM node:20-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache --virtual .build-deps \
-  alpine-sdk \
-  python3 \
-  make \
-  g++
+    alpine-sdk \
+    python3 \
+    make \
+    g++
 
 WORKDIR /app
 
-# Install dependencies based on the package files
+# Copy package files
 COPY package.json yarn.lock ./
 
 # Install dependencies (including devDependencies for building)
 RUN yarn install --frozen-lockfile
 
-# Copy the rest of the application source code
+# Copy source code
 COPY . .
 
 # Generate Prisma client and build the application
 RUN yarn prisma generate && yarn build
 
-# Remove build dependencies and devDependencies
+# Remove devDependencies and build deps
 RUN yarn install --production --frozen-lockfile && \
     apk del .build-deps
 
 # Production stage
-FROM node:20-alpine
+FROM node:20-alpine AS production
 
-# Install runtime dependencies
+# Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
-# Set the working directory
+# Create app directory
 WORKDIR /app
 
-# Copy necessary files and directories from the builder stage
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/yarn.lock ./
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
 
-# Ensure node_modules and other critical directories have correct permissions
-RUN chown -R node:node /app
+# Copy built application from builder stage
+COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nestjs:nodejs /app/package.json ./
+COPY --from=builder --chown=nestjs:nodejs /app/yarn.lock ./
+COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
 
-# Switch to a non-root user for better security
-USER node
+# Switch to non-root user
+USER nestjs
 
-# Expose the port your application will run on
+# Expose port
 EXPOSE 3001
 
-# Use dumb-init as the entrypoint to handle signals properly
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node healthcheck.js
 
-# Start the application using Yarn
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
 CMD ["yarn", "start"]

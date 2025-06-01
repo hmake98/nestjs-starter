@@ -14,14 +14,7 @@ import { ResponseModule } from './response/response.module';
 
 @Module({
     imports: [
-        DatabaseModule,
-        AuthModule,
-        FileModule,
-
-        CustomLoggerModule,
-        RequestModule,
-        ResponseModule,
-
+        // Configuration - Global
         ConfigModule.forRoot({
             load: configs,
             isGlobal: true,
@@ -30,32 +23,44 @@ import { ResponseModule } from './response/response.module';
             expandVariables: true,
         }),
 
+        // Core Infrastructure
+        DatabaseModule,
+        AuthModule,
+        FileModule,
+
+        // Cross-cutting Concerns
+        CustomLoggerModule,
+        RequestModule,
+        ResponseModule,
+
+        // Caching - Redis
         CacheModule.registerAsync({
             imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => {
-                return {
-                    isGlobal: true,
-                    store: redisStore,
-                    host: configService.get('redis.host'),
-                    port: configService.get('redis.port'),
-                    password: configService.get('redis.password'),
-                    tls: configService.get('redis.tls'),
-                    ttl: 5000,
-                };
-            },
+            useFactory: (configService: ConfigService) => ({
+                isGlobal: true,
+                store: redisStore,
+                host: configService.get('redis.host'),
+                port: configService.get('redis.port'),
+                password: configService.get('redis.password'),
+                tls: configService.get('redis.tls'),
+                ttl: 5000,
+            }),
             inject: [ConfigService],
         }),
 
+        // Queue Management - Bull/Redis
         BullModule.forRootAsync({
             imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
+            useFactory: (configService: ConfigService) => ({
                 redis: {
                     host: configService.get('redis.host'),
                     port: Number(configService.get('redis.port')),
+                    password: configService.get('redis.password'),
                 },
             }),
             inject: [ConfigService],
         }),
     ],
+    exports: [DatabaseModule],
 })
 export class CommonModule {}

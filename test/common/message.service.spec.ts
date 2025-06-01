@@ -6,25 +6,27 @@ import { MessageService } from 'src/common/message/services/message.service';
 
 describe('MessageService', () => {
     let service: MessageService;
-    let i18nService: I18nService;
-
-    const mockI18nService = {
-        translate: jest.fn(),
-    };
+    let mockI18nService: jest.Mocked<I18nService>;
 
     beforeEach(async () => {
+        const mockI18nServiceValue = {
+            translate: jest.fn(),
+        };
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 MessageService,
                 {
                     provide: I18nService,
-                    useValue: mockI18nService,
+                    useValue: mockI18nServiceValue,
                 },
             ],
         }).compile();
 
         service = module.get<MessageService>(MessageService);
-        i18nService = module.get<I18nService>(I18nService);
+        mockI18nService = module.get<I18nService>(
+            I18nService
+        ) as jest.Mocked<I18nService>;
     });
 
     afterEach(() => {
@@ -50,7 +52,10 @@ describe('MessageService', () => {
             const result = service.translate(key, options);
 
             expect(result).toBe(expectedTranslation);
-            expect(i18nService.translate).toHaveBeenCalledWith(key, options);
+            expect(mockI18nService.translate).toHaveBeenCalledWith(
+                key,
+                options
+            );
         });
 
         it('should use default language when not provided', () => {
@@ -62,7 +67,7 @@ describe('MessageService', () => {
 
             service.translate(key, options);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(key, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 ...options,
                 lang: 'en',
             });
@@ -77,7 +82,7 @@ describe('MessageService', () => {
 
             service.translate(key, options);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(key, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 ...options,
                 args: {},
             });
@@ -92,7 +97,7 @@ describe('MessageService', () => {
 
             service.translate(key, options);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(key, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 ...options,
                 defaultValue: key,
             });
@@ -104,7 +109,7 @@ describe('MessageService', () => {
 
             service.translate(key, minimalOptions);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(key, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: 'en',
                 args: {},
                 defaultValue: key,
@@ -117,7 +122,7 @@ describe('MessageService', () => {
 
             service.translate(key, options as any);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(key, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: 'en',
                 args: {},
                 defaultValue: key,
@@ -134,7 +139,7 @@ describe('MessageService', () => {
 
             service.translate(key, options);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(key, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: '',
                 args: {},
                 defaultValue: '',
@@ -150,7 +155,7 @@ describe('MessageService', () => {
 
             service.translate(key, options);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(key, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: 'fr',
                 args: {},
                 defaultValue: key,
@@ -163,7 +168,7 @@ describe('MessageService', () => {
 
             service.translate(key, options);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(key, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: 'en',
                 args: {},
                 defaultValue: key,
@@ -181,7 +186,7 @@ describe('MessageService', () => {
             const result = service.translateSuccess(statusCode);
 
             expect(result).toBe(expectedMessage);
-            expect(i18nService.translate).toHaveBeenCalledWith(
+            expect(mockI18nService.translate).toHaveBeenCalledWith(
                 `http.success.${statusCode}`,
                 {
                     lang: 'en',
@@ -197,7 +202,7 @@ describe('MessageService', () => {
 
             service.translateSuccess(statusCode, lang);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(
+            expect(mockI18nService.translate).toHaveBeenCalledWith(
                 `http.success.${statusCode}`,
                 {
                     lang,
@@ -218,12 +223,12 @@ describe('MessageService', () => {
             const result = service.translateError(statusCode);
 
             expect(result).toBe(expectedMessage);
-            expect(i18nService.translate).toHaveBeenCalledWith(
+            expect(mockI18nService.translate).toHaveBeenCalledWith(
                 `http.error.${statusCode}`,
                 {
                     lang: 'en',
                     args: {},
-                    defaultValue: 'An error occurred.',
+                    defaultValue: 'Internal server error.',
                 }
             );
         });
@@ -234,12 +239,12 @@ describe('MessageService', () => {
 
             service.translateError(statusCode, lang);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(
+            expect(mockI18nService.translate).toHaveBeenCalledWith(
                 `http.error.${statusCode}`,
                 {
                     lang,
                     args: {},
-                    defaultValue: 'An error occurred.',
+                    defaultValue: 'Internal server error.',
                 }
             );
         });
@@ -341,6 +346,7 @@ describe('MessageService', () => {
             );
         });
     });
+
     describe('translateResponseMessage', () => {
         it('should translate response message', () => {
             const message = 'response.success';
@@ -351,7 +357,7 @@ describe('MessageService', () => {
             const result = service.translateResponseMessage(message);
 
             expect(result).toBe(expectedTranslation);
-            expect(i18nService.translate).toHaveBeenCalledWith(message, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(message, {
                 lang: 'en',
                 args: {},
                 defaultValue: 'Operation completed.',
@@ -364,7 +370,7 @@ describe('MessageService', () => {
 
             service.translateResponseMessage(message, lang);
 
-            expect(i18nService.translate).toHaveBeenCalledWith(message, {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(message, {
                 lang,
                 args: {},
                 defaultValue: 'Operation completed.',
