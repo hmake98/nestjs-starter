@@ -1,83 +1,357 @@
-# NestJS Starter Boilerplate 
-[![CodeQL](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql) 
+# NestJS Starter Boilerplate 🚀
+
+[![CodeQL](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql)
 [![Run Tests](https://github.com/hmake98/nestjs-starter/actions/workflows/tests.yml/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/main.yml)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Features: <br>
-✅ Basic Authentication <br>
-📚 Swagger API Documentation <br>
-🐳 Containerized with Docker <br>
-☸️ Kubernetes Configuration <br>
-🧪 Testing Setup <br>
+A production-ready NestJS boilerplate with comprehensive features and best practices for building scalable APIs.
 
-## Installation
+## ✨ Features
+
+- 🔐 **Authentication & Authorization** - JWT-based auth with access/refresh tokens
+- 📚 **API Documentation** - Auto-generated Swagger/OpenAPI documentation
+- 🗄️ **Database Integration** - PostgreSQL with Prisma ORM
+- 📧 **Email Service** - AWS SES integration with templating
+- 📁 **File Upload** - AWS S3 integration with pre-signed URLs
+- 🔄 **Background Jobs** - Bull queue with Redis for async processing
+- 📊 **Logging** - Structured logging with Pino
+- 🧪 **Testing** - Comprehensive unit tests with Jest
+- 🐳 **Containerization** - Docker and Docker Compose ready
+- ☸️ **Kubernetes** - Production deployment configurations
+- 🚀 **CI/CD** - GitHub Actions workflows
+- 🔍 **Code Quality** - ESLint, Prettier, Husky pre-commit hooks
+- 📈 **Monitoring** - Sentry integration for error tracking
+- 🚦 **Rate Limiting** - Built-in request throttling
+- 🌐 **CORS** - Configurable cross-origin resource sharing
+- 🔒 **Security** - Helmet, input validation, and sanitization
+- 📝 **Internationalization** - Multi-language support
+- 🎯 **Health Checks** - Application and database health endpoints
+
+## 🛠️ Tech Stack
+
+- **Framework**: NestJS 10.x
+- **Language**: TypeScript 5.x
+- **Database**: PostgreSQL with Prisma ORM
+- **Cache/Queue**: Redis with Bull
+- **Authentication**: JWT with Passport
+- **File Storage**: AWS S3
+- **Email**: AWS SES
+- **Documentation**: Swagger/OpenAPI
+- **Testing**: Jest with SWC
+- **Containerization**: Docker & Docker Compose
+- **Orchestration**: Kubernetes
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js >= 20.0.0
+- Yarn >= 1.22.0
+- Docker & Docker Compose (for containerized setup)
+- PostgreSQL (if running locally)
+- Redis (if running locally)
+
+### 1. Clone and Install
 
 ```bash
-$ yarn
+# Clone the repository
+git clone https://github.com/hmake98/nestjs-starter.git
+cd nestjs-starter
+
+# Install dependencies
+yarn install
 ```
 
-## Running Server
+### 2. Environment Setup
 
 ```bash
-# development
-$ yarn dev
+# Copy environment template
+cp .env.docker .env
 
-# production
-$ yarn start
+# Edit the environment file with your configuration
+nano .env  # or use your preferred editor
 ```
 
-## Running all services on Docker
+### 3. Database Setup
 
 ```bash
+# Generate Prisma client
+yarn generate
+
+# Run database migrations
+yarn migrate
+
+# (Optional) Seed email templates
+yarn seed:email
+```
+
+### 4. Start Development Server
+
+```bash
+# Development mode with hot reload
+yarn dev
+
+# Or using Docker Compose (recommended for full stack)
 docker-compose up --build
 ```
 
-## Run only database and redis services on Docker
+The API will be available at:
+- **API**: http://localhost:3001
+- **Documentation**: http://localhost:3001/docs
+
+## 📋 Environment Configuration
+
+Create a `.env` file based on `.env.docker` template:
+
+### Required Variables
+
+| Variable                    | Description                  | Example                                 |
+| --------------------------- | ---------------------------- | --------------------------------------- |
+| `NODE_ENV`                  | Environment mode             | `local`, `development`, `production`    |
+| `DATABASE_URL`              | PostgreSQL connection string | `postgresql://user:pass@host:5432/db`   |
+| `AUTH_ACCESS_TOKEN_SECRET`  | JWT access token secret      | Generate with `openssl rand -base64 32` |
+| `AUTH_REFRESH_TOKEN_SECRET` | JWT refresh token secret     | Generate with `openssl rand -base64 32` |
+
+### Optional Variables
+
+| Variable         | Description               | Default     |
+| ---------------- | ------------------------- | ----------- |
+| `HTTP_PORT`      | Server port               | `3001`      |
+| `REDIS_HOST`     | Redis host                | `localhost` |
+| `AWS_ACCESS_KEY` | AWS access key            | -           |
+| `AWS_SECRET_KEY` | AWS secret key            | -           |
+| `SENTRY_DSN`     | Sentry error tracking DSN | -           |
+
+## 🐳 Docker Setup
+
+### Development with Docker Compose
 
 ```bash
+# Start all services (app, database, redis)
+docker-compose up --build
+
+# Start only database and Redis (run app locally)
 docker-compose up postgres redis
+
+# Run in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
 ```
 
-## Build
+### Production Docker Build
 
 ```bash
+# Build production image
+docker build -f ci/Dockerfile.prod -t nestjs-starter:latest .
+
+# Run production container
+docker run -p 3001:3001 --env-file .env nestjs-starter:latest
+```
+
+## 📚 API Documentation
+
+### Swagger UI
+
+Visit `/docs` endpoint when the server is running for interactive API documentation.
+
+### Authentication
+
+The API uses JWT Bearer token authentication:
+
+```bash
+# Login to get tokens
+curl -X POST http://localhost:3001/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password"}'
+
+# Use access token in requests
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  http://localhost:3001/v1/user/profile
+```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+yarn test
+
+# Run tests with coverage
+yarn test --coverage
+
+# Run tests in watch mode
+yarn test --watch
+
+# Debug tests
+yarn test:debug
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                    # Application module and health checks
+├── common/                 # Shared modules and utilities
+│   ├── auth/              # Authentication logic
+│   ├── aws/               # AWS services (S3, SES)
+│   ├── config/            # Configuration files
+│   ├── database/          # Database service and connection
+│   ├── file/              # File upload handling
+│   ├── helper/            # Utility services
+│   ├── logger/            # Logging configuration
+│   ├── message/           # Internationalization
+│   ├── request/           # Request decorators and guards
+│   └── response/          # Response interceptors and filters
+├── languages/             # Translation files
+├── migrations/            # Database seeders and migrations
+├── modules/               # Feature modules
+│   ├── post/              # Post management
+│   └── user/              # User management
+└── workers/               # Background job processors
+```
+
+## 🔧 Development Workflow
+
+### Code Quality
+
+```bash
+# Lint code
+yarn lint
+
+# Format code
+yarn format
+
+# Type checking
 yarn build
 ```
 
-## Tests
+### Database Operations
 
 ```bash
-# unit tests
-$ yarn test
+# Generate Prisma client after schema changes
+yarn generate
+
+# Create new migration
+yarn migrate
+
+# Deploy migrations to production
+yarn migrate:prod
+
+# Open Prisma Studio
+yarn studio
 ```
 
-## Swagger Documentation
-
-- Swagger documentation endpoint will be running at <b> `/docs` </b>.
-
-## K8s Deployment Local
+### Background Jobs
 
 ```bash
-# first start minikube
+# Seed email templates
+yarn seed:email
+
+# Remove email templates
+yarn rollback:email
+```
+
+## 🚀 Deployment
+
+### Kubernetes (Recommended)
+
+```bash
+# Local deployment with Minikube
 minikube start
-
-# deployment
 kubectl apply -f k8s/
-
-# get endpoint of k8s cluster
 minikube service nestjs-starter-service
 ```
 
-## Support
+### Docker Production
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Build and tag production image
+docker build -f ci/Dockerfile.prod -t your-registry/nestjs-starter:v1.0.0 .
 
-## License
+# Push to registry
+docker push your-registry/nestjs-starter:v1.0.0
 
-Nest is [MIT licensed](LICENSE).
+# Deploy with Docker Compose
+docker-compose -f docker-compose.prod.yml up -d
+```
 
-## Author
+### Environment-Specific Configuration
 
-🇮🇳 Harsh Makwana <br>
-[Github](https://github.com/hmake98/nestjs-starter)
-[Linkedin](https://www.linkedin.com/in/hmake98)
-[Instagram](https://www.instagram.com/hmake98)
+Create environment-specific files:
+- `.env.development`
+- `.env.staging`
+- `.env.production`
+
+## 🔐 Security Best Practices
+
+1. **Environment Variables**: Never commit sensitive data
+2. **JWT Secrets**: Use strong, randomly generated secrets
+3. **Database**: Use connection pooling and read replicas
+4. **Rate Limiting**: Configure appropriate limits for your use case
+5. **CORS**: Restrict origins to your frontend domains
+6. **HTTPS**: Always use TLS in production
+7. **Validation**: Input validation on all endpoints
+8. **Monitoring**: Set up error tracking and logging
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow TypeScript and ESLint rules
+- Write tests for new features
+- Update documentation when needed
+- Use conventional commit messages
+- Ensure all tests pass before submitting PR
+
+## 📄 Scripts Reference
+
+| Script          | Description                              |
+| --------------- | ---------------------------------------- |
+| `yarn dev`      | Start development server with hot reload |
+| `yarn build`    | Build for production                     |
+| `yarn start`    | Start production server                  |
+| `yarn test`     | Run unit tests                           |
+| `yarn lint`     | Lint and fix code                        |
+| `yarn format`   | Format code with Prettier                |
+| `yarn generate` | Generate Prisma client                   |
+| `yarn migrate`  | Run database migrations                  |
+| `yarn studio`   | Open Prisma Studio                       |
+
+## 🔗 Useful Links
+
+- [NestJS Documentation](https://docs.nestjs.com)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Docker Documentation](https://docs.docker.com)
+- [Kubernetes Documentation](https://kubernetes.io/docs)
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Harsh Makwana**
+
+- 🌐 [GitHub](https://github.com/hmake98)
+- 💼 [LinkedIn](https://www.linkedin.com/in/hmake98)
+- 📷 [Instagram](https://www.instagram.com/hmake98)
+
+## 🙏 Support
+
+If this project helped you, please consider giving it a ⭐️!
+
+---
+
+**Happy Coding! 🎉**
