@@ -28,9 +28,7 @@ export class ResponseInterceptor implements NestInterceptor {
             map(responseBody => {
                 const ctx = context.switchToHttp();
                 const response = ctx.getResponse();
-                const request = ctx.getRequest();
                 const statusCode: number = response.statusCode;
-                const lang = request.headers['accept-language'] || 'en';
 
                 const classSerialization: ClassConstructor<any> =
                     this.reflector.get(
@@ -49,9 +47,19 @@ export class ResponseInterceptor implements NestInterceptor {
                       })
                     : responseBody;
 
-                const message =
-                    this.messageService.translate(messageKey, lang) ||
-                    this.messageService.translateSuccess(statusCode, lang);
+                // Translate response message
+                let message: string;
+                if (messageKey) {
+                    message = this.messageService.translate(messageKey);
+                } else {
+                    // Use HTTP success message based on status code
+                    message = this.messageService.translateKey(
+                        ['http', 'success', statusCode],
+                        {
+                            defaultValue: 'Success',
+                        }
+                    );
+                }
 
                 // Handle ApiGenericResponseDto message translation
                 if (
@@ -60,9 +68,11 @@ export class ResponseInterceptor implements NestInterceptor {
                     'message' in data &&
                     classSerialization?.name === ApiGenericResponseDto.name
                 ) {
-                    data.message = this.messageService.translateResponseMessage(
+                    data.message = this.messageService.translate(
                         data.message,
-                        lang
+                        {
+                            defaultValue: data.message,
+                        }
                     );
                 }
 

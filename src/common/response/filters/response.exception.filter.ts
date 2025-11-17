@@ -32,40 +32,52 @@ export class ResponseExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest<Request>();
-        const lang = request.headers['accept-language'] || 'en';
 
         const statusCode =
             exception instanceof HttpException
                 ? exception.getStatus()
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
-        let message = 'Internal server error.';
+        let message: string;
         let validationMessages: string[] | undefined;
 
         if (exception instanceof BadRequestException) {
             const exceptionResponse = exception.getResponse() as any;
-            const exceptionMessage = exceptionResponse.message || message;
+            const exceptionMessage = exceptionResponse.message;
 
             if (Array.isArray(exceptionMessage)) {
-                validationMessages =
-                    this.messageService.translateValidationMessages(
-                        exceptionMessage,
-                        lang
-                    );
-                message = this.messageService.translateError(statusCode, lang);
+                // Handle validation errors
+                validationMessages = this.translateValidationMessages(
+                    exceptionMessage
+                );
+                message = this.messageService.translateKey(
+                    ['http', 'error', statusCode],
+                    {
+                        defaultValue: 'Bad Request',
+                    }
+                );
             } else {
-                message = this.messageService.translate(exceptionMessage, {
-                    lang,
-                    defaultValue: exceptionMessage,
-                });
+                // Handle single error message
+                message = this.messageService.translate(
+                    exceptionMessage || 'http.error.400',
+                    {
+                        defaultValue: exceptionMessage || 'Bad Request',
+                    }
+                );
             }
         } else if (exception instanceof HttpException) {
+            // Handle HTTP exceptions
             message = this.messageService.translate(exception.message, {
-                lang,
                 defaultValue: exception.message,
             });
         } else {
-            message = this.messageService.translateError(statusCode, lang);
+            // Handle unknown errors
+            message = this.messageService.translateKey(
+                ['http', 'error', statusCode],
+                {
+                    defaultValue: 'Internal Server Error',
+                }
+            );
         }
 
         const errorResponse: IApiErrorResponse = {
@@ -96,6 +108,30 @@ export class ResponseExceptionFilter implements ExceptionFilter {
         }
 
         response.status(statusCode).json(errorResponse);
+    }
+
+    /**
+     * Translate validation error messages
+     * Supports format: "key|{json_params}"
+     *
+     * @param messages - Array of validation messages
+     * @returns Array of translated messages
+     */
+    private translateValidationMessages(messages: string[]): string[] {
+        return messages.map(msg => {
+            try {
+                // Support format: "validation.key|{\"param\":\"value\"}"
+                const [key, paramsString] = msg.split('|');
+                const args = paramsString ? JSON.parse(paramsString) : {};
+
+                return this.messageService.translate(key, { args });
+            } catch {
+                // If parsing fails, try translating as-is
+                return this.messageService.translate(msg, {
+                    defaultValue: msg,
+                });
+            }
+        });
     }
 
     private initializeSentry(): void {

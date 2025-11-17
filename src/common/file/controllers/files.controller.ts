@@ -23,6 +23,7 @@ export class FilePublicController {
     @DocResponse({
         serialization: FilePutPresignResponseDto,
         httpStatus: HttpStatus.CREATED,
+        messageKey: 'file.success.presignUrl',
     })
     putPresignUrl(
         @AuthUser() { userId }: IAuthUser,

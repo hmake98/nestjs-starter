@@ -1,8 +1,10 @@
-import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { I18nService } from 'nestjs-i18n';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 
 import { MessageService } from 'src/common/message/services/message.service';
+
+// Mock I18nContext.current method
+const mockI18nContextCurrent = jest.fn();
 
 describe('MessageService', () => {
     let service: MessageService;
@@ -27,6 +29,14 @@ describe('MessageService', () => {
         mockI18nService = module.get<I18nService>(
             I18nService
         ) as jest.Mocked<I18nService>;
+
+        // Spy on I18nContext.current
+        jest.spyOn(I18nContext, 'current').mockImplementation(
+            mockI18nContextCurrent
+        );
+
+        // Reset mocks
+        jest.clearAllMocks();
     });
 
     afterEach(() => {
@@ -52,24 +62,43 @@ describe('MessageService', () => {
             const result = service.translate(key, options);
 
             expect(result).toBe(expectedTranslation);
-            expect(mockI18nService.translate).toHaveBeenCalledWith(
-                key,
-                options
-            );
-        });
-
-        it('should use default language when not provided', () => {
-            const key = 'test.key';
-            const options = {
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
+                lang: 'fr',
                 args: { name: 'John' },
                 defaultValue: 'Default message',
-            };
+            });
+        });
 
-            service.translate(key, options);
+        it('should use context language when not provided', () => {
+            const key = 'test.key';
+            const contextLang = 'es';
+
+            mockI18nContextCurrent.mockReturnValue({
+                lang: contextLang,
+            });
+
+            mockI18nService.translate.mockReturnValue('Mensaje');
+
+            service.translate(key);
 
             expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
-                ...options,
+                lang: contextLang,
+                args: {},
+                defaultValue: key,
+            });
+        });
+
+        it('should use fallback language when context is not available', () => {
+            const key = 'test.key';
+
+            mockI18nContextCurrent.mockReturnValue(null);
+
+            service.translate(key);
+
+            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: 'en',
+                args: {},
+                defaultValue: key,
             });
         });
 
@@ -83,8 +112,9 @@ describe('MessageService', () => {
             service.translate(key, options);
 
             expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
-                ...options,
+                lang: 'en',
                 args: {},
+                defaultValue: 'Default message',
             });
         });
 
@@ -98,29 +128,20 @@ describe('MessageService', () => {
             service.translate(key, options);
 
             expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
-                ...options,
-                defaultValue: key,
-            });
-        });
-
-        it('should handle minimal options', () => {
-            const key = 'test.key';
-            const minimalOptions = {};
-
-            service.translate(key, minimalOptions);
-
-            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: 'en',
-                args: {},
+                args: { name: 'John' },
                 defaultValue: key,
             });
         });
 
         it('should handle undefined options', () => {
             const key = 'test.key';
-            const options = undefined;
 
-            service.translate(key, options as any);
+            mockI18nContextCurrent.mockReturnValue({
+                lang: 'en',
+            });
+
+            service.translate(key);
 
             expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: 'en',
@@ -129,31 +150,14 @@ describe('MessageService', () => {
             });
         });
 
-        it('should use provided values even if empty strings', () => {
+        it('should prioritize provided lang over context lang', () => {
             const key = 'test.key';
-            const options = {
-                lang: '',
-                args: {},
-                defaultValue: '',
-            };
 
-            service.translate(key, options);
-
-            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
-                lang: '',
-                args: {},
-                defaultValue: '',
+            mockI18nContextCurrent.mockReturnValue({
+                lang: 'es',
             });
-        });
 
-        it('should handle partial options', () => {
-            const key = 'test.key';
-            const options = {
-                lang: 'fr',
-                // missing args and defaultValue
-            };
-
-            service.translate(key, options);
+            service.translate(key, { lang: 'fr' });
 
             expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
                 lang: 'fr',
@@ -161,220 +165,200 @@ describe('MessageService', () => {
                 defaultValue: key,
             });
         });
+    });
 
-        it('should handle empty object options', () => {
-            const key = 'test.key';
-            const options = {};
+    describe('translateBulk', () => {
+        it('should translate multiple messages', () => {
+            const items = [
+                { key: 'user.created' },
+                { key: 'user.updated', args: { name: 'John' } },
+                { key: 'user.deleted', defaultValue: 'User removed' },
+            ];
 
-            service.translate(key, options);
-
-            expect(mockI18nService.translate).toHaveBeenCalledWith(key, {
+            mockI18nContextCurrent.mockReturnValue({
                 lang: 'en',
-                args: {},
-                defaultValue: key,
             });
-        });
-    });
-
-    describe('translateSuccess', () => {
-        it('should translate success message with status code', () => {
-            const statusCode = HttpStatus.CREATED;
-            const expectedMessage = 'Created successfully';
-
-            mockI18nService.translate.mockReturnValue(expectedMessage);
-
-            const result = service.translateSuccess(statusCode);
-
-            expect(result).toBe(expectedMessage);
-            expect(mockI18nService.translate).toHaveBeenCalledWith(
-                `http.success.${statusCode}`,
-                {
-                    lang: 'en',
-                    args: {},
-                    defaultValue: 'Operation completed successfully.',
-                }
-            );
-        });
-
-        it('should use provided language', () => {
-            const statusCode = HttpStatus.OK;
-            const lang = 'es';
-
-            service.translateSuccess(statusCode, lang);
-
-            expect(mockI18nService.translate).toHaveBeenCalledWith(
-                `http.success.${statusCode}`,
-                {
-                    lang,
-                    args: {},
-                    defaultValue: 'Operation completed successfully.',
-                }
-            );
-        });
-    });
-
-    describe('translateError', () => {
-        it('should translate error message with status code', () => {
-            const statusCode = HttpStatus.NOT_FOUND;
-            const expectedMessage = 'Not Found';
-
-            mockI18nService.translate.mockReturnValue(expectedMessage);
-
-            const result = service.translateError(statusCode);
-
-            expect(result).toBe(expectedMessage);
-            expect(mockI18nService.translate).toHaveBeenCalledWith(
-                `http.error.${statusCode}`,
-                {
-                    lang: 'en',
-                    args: {},
-                    defaultValue: 'Internal server error.',
-                }
-            );
-        });
-
-        it('should use provided language', () => {
-            const statusCode = HttpStatus.BAD_REQUEST;
-            const lang = 'fr';
-
-            service.translateError(statusCode, lang);
-
-            expect(mockI18nService.translate).toHaveBeenCalledWith(
-                `http.error.${statusCode}`,
-                {
-                    lang,
-                    args: {},
-                    defaultValue: 'Internal server error.',
-                }
-            );
-        });
-    });
-
-    describe('translateValidationMessages', () => {
-        it('should translate array of validation messages', () => {
-            const messages = [
-                'validation.isString|{"field":"username"}',
-                'validation.minLength|{"field":"password","min":6}',
-            ];
-            const translatedMessages = [
-                'Username must be a string',
-                'Password must be at least 6 characters',
-            ];
 
             mockI18nService.translate
-                .mockReturnValueOnce(translatedMessages[0])
-                .mockReturnValueOnce(translatedMessages[1]);
+                .mockReturnValueOnce('User created')
+                .mockReturnValueOnce('User John updated')
+                .mockReturnValueOnce('User deleted');
 
-            const result = service.translateValidationMessages(messages);
+            const result = service.translateBulk(items);
 
-            expect(result).toEqual(translatedMessages);
-            expect(mockI18nService.translate).toHaveBeenCalledTimes(2);
+            expect(result).toEqual([
+                'User created',
+                'User John updated',
+                'User deleted',
+            ]);
+            expect(mockI18nService.translate).toHaveBeenCalledTimes(3);
             expect(mockI18nService.translate).toHaveBeenNthCalledWith(
                 1,
-                'validation.isString',
+                'user.created',
                 {
                     lang: 'en',
-                    args: { field: 'username' },
-                    defaultValue: 'validation.isString',
+                    args: {},
+                    defaultValue: 'user.created',
                 }
             );
             expect(mockI18nService.translate).toHaveBeenNthCalledWith(
                 2,
-                'validation.minLength',
+                'user.updated',
                 {
                     lang: 'en',
-                    args: { field: 'password', min: 6 },
-                    defaultValue: 'validation.minLength',
+                    args: { name: 'John' },
+                    defaultValue: 'user.updated',
                 }
             );
-        });
-
-        it('should handle messages without parameters', () => {
-            const messages = ['validation.required'];
-            const translatedMessage = 'Field is required';
-
-            mockI18nService.translate.mockReturnValue(translatedMessage);
-
-            const result = service.translateValidationMessages(messages);
-
-            expect(result).toEqual([translatedMessage]);
-            expect(mockI18nService.translate).toHaveBeenCalledWith(
-                'validation.required',
+            expect(mockI18nService.translate).toHaveBeenNthCalledWith(
+                3,
+                'user.deleted',
                 {
                     lang: 'en',
                     args: {},
-                    defaultValue: 'validation.required',
+                    defaultValue: 'User removed',
                 }
             );
         });
 
-        it('should return original message if parsing fails', () => {
-            const invalidMessage = 'invalid|{message}';
+        it('should use provided language for all items', () => {
+            const items = [
+                { key: 'user.created' },
+                { key: 'user.updated' },
+            ];
 
-            const result = service.translateValidationMessages([
-                invalidMessage,
-            ]);
+            mockI18nService.translate
+                .mockReturnValueOnce('Usuario creado')
+                .mockReturnValueOnce('Usuario actualizado');
 
-            expect(result).toEqual([invalidMessage]);
-            // Should not call translate service for invalid messages
-            expect(mockI18nService.translate).not.toHaveBeenCalled();
+            service.translateBulk(items, 'es');
+
+            expect(mockI18nService.translate).toHaveBeenNthCalledWith(
+                1,
+                'user.created',
+                {
+                    lang: 'es',
+                    args: {},
+                    defaultValue: 'user.created',
+                }
+            );
+            expect(mockI18nService.translate).toHaveBeenNthCalledWith(
+                2,
+                'user.updated',
+                {
+                    lang: 'es',
+                    args: {},
+                    defaultValue: 'user.updated',
+                }
+            );
         });
 
-        it('should handle empty messages array', () => {
-            const result = service.translateValidationMessages([]);
+        it('should handle empty array', () => {
+            const result = service.translateBulk([]);
 
             expect(result).toEqual([]);
             expect(mockI18nService.translate).not.toHaveBeenCalled();
         });
+    });
 
-        it('should handle messages with empty parameters', () => {
-            const messages = ['validation.required|{}'];
-            const translatedMessage = 'Field is required';
+    describe('translateKey', () => {
+        it('should build and translate key from parts', () => {
+            const parts = ['http', 'error', '404'];
 
-            mockI18nService.translate.mockReturnValue(translatedMessage);
+            mockI18nContextCurrent.mockReturnValue({
+                lang: 'en',
+            });
 
-            const result = service.translateValidationMessages(messages);
+            mockI18nService.translate.mockReturnValue('Not Found');
 
-            expect(result).toEqual([translatedMessage]);
+            const result = service.translateKey(parts);
+
+            expect(result).toBe('Not Found');
             expect(mockI18nService.translate).toHaveBeenCalledWith(
-                'validation.required',
+                'http.error.404',
                 {
                     lang: 'en',
                     args: {},
-                    defaultValue: 'validation.required',
+                    defaultValue: 'http.error.404',
+                }
+            );
+        });
+
+        it('should handle numeric parts', () => {
+            const parts = ['http', 'success', 201];
+
+            mockI18nContextCurrent.mockReturnValue({
+                lang: 'en',
+            });
+
+            mockI18nService.translate.mockReturnValue('Created');
+
+            service.translateKey(parts);
+
+            expect(mockI18nService.translate).toHaveBeenCalledWith(
+                'http.success.201',
+                expect.any(Object)
+            );
+        });
+
+        it('should pass options correctly', () => {
+            const parts = ['auth', 'error', 'invalidPassword'];
+            const options = {
+                lang: 'fr',
+                args: { attempts: 3 },
+                defaultValue: 'Invalid password',
+            };
+
+            mockI18nService.translate.mockReturnValue('Mot de passe invalide');
+
+            service.translateKey(parts, options);
+
+            expect(mockI18nService.translate).toHaveBeenCalledWith(
+                'auth.error.invalidPassword',
+                {
+                    lang: 'fr',
+                    args: { attempts: 3 },
+                    defaultValue: 'Invalid password',
                 }
             );
         });
     });
 
-    describe('translateResponseMessage', () => {
-        it('should translate response message', () => {
-            const message = 'response.success';
-            const expectedTranslation = 'Success message';
-
-            mockI18nService.translate.mockReturnValue(expectedTranslation);
-
-            const result = service.translateResponseMessage(message);
-
-            expect(result).toBe(expectedTranslation);
-            expect(mockI18nService.translate).toHaveBeenCalledWith(message, {
-                lang: 'en',
-                args: {},
-                defaultValue: 'Operation completed.',
+    describe('getCurrentLanguage', () => {
+        it('should return language from context', () => {
+            mockI18nContextCurrent.mockReturnValue({
+                lang: 'fr',
             });
+
+            const result = service.getCurrentLanguage();
+
+            expect(result).toBe('fr');
         });
 
-        it('should use provided language', () => {
-            const message = 'response.success';
-            const lang = 'de';
+        it('should return fallback language when context is null', () => {
+            mockI18nContextCurrent.mockReturnValue(null);
 
-            service.translateResponseMessage(message, lang);
+            const result = service.getCurrentLanguage();
 
-            expect(mockI18nService.translate).toHaveBeenCalledWith(message, {
-                lang,
-                args: {},
-                defaultValue: 'Operation completed.',
+            expect(result).toBe('en');
+        });
+
+        it('should return fallback language when context throws error', () => {
+            mockI18nContextCurrent.mockImplementation(() => {
+                throw new Error('No context');
             });
+
+            const result = service.getCurrentLanguage();
+
+            expect(result).toBe('en');
+        });
+
+        it('should return fallback language when context.lang is undefined', () => {
+            mockI18nContextCurrent.mockReturnValue({});
+
+            const result = service.getCurrentLanguage();
+
+            expect(result).toBe('en');
         });
     });
 });

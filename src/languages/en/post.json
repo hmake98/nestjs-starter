@@ -4,7 +4,8 @@
         "getOne": "Post retrieved successfully",
         "updated": "Post updated successfully",
         "deleted": "Post deleted successfully",
-        "created": "Post created successfully"
+        "created": "Post created successfully",
+        "postDeleted": "Post deleted successfully"
     },
     "error": {
         "postNotFound": "Post not found in database"

@@ -1,7 +1,7 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { PinoLogger } from 'nestjs-pino';
+
+import { AwsS3Service } from 'src/common/aws/services/aws.s3.service';
 
 import { FilePresignDto } from '../dtos/request/file.presign.dto';
 import { FilePutPresignResponseDto } from '../dtos/response/file.response.dto';
@@ -9,20 +9,11 @@ import { IFilesServiceInterface } from '../interfaces/files.service.interface';
 
 @Injectable()
 export class FileService implements IFilesServiceInterface {
-    private readonly s3Client: S3Client;
-    private readonly expiresIn: number;
-    private readonly bucket: string;
-
-    constructor(private readonly configService: ConfigService) {
-        this.s3Client = new S3Client({
-            credentials: {
-                accessKeyId: this.configService.get('aws.accessKey'),
-                secretAccessKey: this.configService.get('aws.secretKey'),
-            },
-            region: this.configService.get('aws.region'),
-        });
-        this.expiresIn = this.configService.get('aws.s3.linkExpire');
-        this.bucket = this.configService.get('aws.s3.bucket');
+    constructor(
+        private readonly awsS3Service: AwsS3Service,
+        private readonly logger: PinoLogger
+    ) {
+        this.logger.setContext(FileService.name);
     }
 
     async getPresignUrlPutObject(
@@ -30,17 +21,24 @@ export class FileService implements IFilesServiceInterface {
         { fileName, storeType, contentType }: FilePresignDto
     ): Promise<FilePutPresignResponseDto> {
         try {
-            const Key = `${userId}/${storeType}/${Date.now()}_${fileName}`;
-            const command = new PutObjectCommand({
-                Bucket: this.bucket,
-                Key,
-                ContentType: contentType,
-            });
-            const url = await getSignedUrl(this.s3Client, command, {
-                expiresIn: this.expiresIn,
-            });
-            return { url, expiresIn: this.expiresIn };
+            const key = `${userId}/${storeType}/${Date.now()}_${fileName}`;
+
+            const { url, expiresIn } =
+                await this.awsS3Service.getPresignedUploadUrl(
+                    key,
+                    contentType
+                );
+
+            this.logger.info(
+                { userId, fileName, storeType },
+                'Generated presigned URL for file upload'
+            );
+
+            return { url, expiresIn };
         } catch (error) {
+            this.logger.error(
+                `Failed to generate presigned URL: ${error.message}`
+            );
             throw error;
         }
     }

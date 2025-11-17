@@ -1,0 +1,10 @@
+{
+    "success": {
+        "presignUrl": "Presigned URL generated successfully"
+    },
+    "error": {
+        "uploadFailed": "File upload failed",
+        "invalidFileType": "Invalid file type",
+        "fileTooLarge": "File size exceeds the allowed limit"
+    }
+}

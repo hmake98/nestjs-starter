@@ -1,63 +1,59 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PinoLogger } from 'nestjs-pino';
 
+import { AwsS3Service } from 'src/common/aws/services/aws.s3.service';
 import { FilePresignDto } from 'src/common/file/dtos/request/file.presign.dto';
 import { ENUM_FILE_STORE } from 'src/common/file/enums/files.enum';
 import { FileService } from 'src/common/file/services/files.service';
 
-jest.mock('@aws-sdk/client-s3');
-jest.mock('@aws-sdk/s3-request-presigner');
-
 describe('FileService', () => {
     let service: FileService;
-    let configService: ConfigService;
-    let s3Client: jest.Mocked<S3Client>;
-
-    const mockConfig = {
-        'aws.accessKey': 'testAccessKey',
-        'aws.secretKey': 'testSecretKey',
-        'aws.region': 'us-west-2',
-        'aws.s3.linkExpire': 3600,
-        'aws.s3.bucket': 'testBucket',
-    };
+    let awsS3Service: jest.Mocked<AwsS3Service>;
+    let loggerMock: jest.Mocked<PinoLogger>;
 
     beforeEach(async () => {
         jest.useFakeTimers();
+
+        const mockAwsS3Service = {
+            getPresignedUploadUrl: jest.fn().mockResolvedValue({
+                url: 'https://test-bucket.s3.amazonaws.com/test-key',
+                expiresIn: 3600,
+            }),
+        };
+
+        loggerMock = {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+            trace: jest.fn(),
+            fatal: jest.fn(),
+            setContext: jest.fn(),
+        } as unknown as jest.Mocked<PinoLogger>;
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 FileService,
                 {
-                    provide: ConfigService,
-                    useValue: {
-                        get: jest.fn((key: string) => mockConfig[key]),
-                    },
+                    provide: AwsS3Service,
+                    useValue: mockAwsS3Service,
+                },
+                {
+                    provide: PinoLogger,
+                    useValue: loggerMock,
                 },
             ],
         }).compile();
 
         service = module.get<FileService>(FileService);
-        configService = module.get<ConfigService>(ConfigService);
-        s3Client = service['s3Client'] as jest.Mocked<S3Client>;
+        awsS3Service = module.get<AwsS3Service>(
+            AwsS3Service
+        ) as jest.Mocked<AwsS3Service>;
     });
 
     afterEach(() => {
         jest.useRealTimers();
         jest.clearAllMocks();
-    });
-
-    describe('constructor', () => {
-        it('should initialize S3 client with correct config', () => {
-            expect(S3Client).toHaveBeenCalledWith({
-                credentials: {
-                    accessKeyId: mockConfig['aws.accessKey'],
-                    secretAccessKey: mockConfig['aws.secretKey'],
-                },
-                region: mockConfig['aws.region'],
-            });
-        });
     });
 
     describe('getPresignUrlPutObject', () => {
@@ -69,11 +65,12 @@ describe('FileService', () => {
         const mockUserId = 'user123';
         const mockUrl = 'https://testbucket.s3.amazonaws.com/presigned-url';
 
-        beforeEach(() => {
-            (getSignedUrl as jest.Mock).mockReset().mockResolvedValue(mockUrl);
-        });
-
         it('should generate a pre-signed URL successfully', async () => {
+            awsS3Service.getPresignedUploadUrl.mockResolvedValue({
+                url: mockUrl,
+                expiresIn: 3600,
+            });
+
             const result = await service.getPresignUrlPutObject(
                 mockUserId,
                 mockPresignDto
@@ -81,64 +78,39 @@ describe('FileService', () => {
 
             expect(result).toEqual({
                 url: mockUrl,
-                expiresIn: mockConfig['aws.s3.linkExpire'],
+                expiresIn: 3600,
             });
 
-            expect(PutObjectCommand).toHaveBeenCalledWith({
-                Bucket: mockConfig['aws.s3.bucket'],
-                Key: expect.stringMatching(
+            expect(awsS3Service.getPresignedUploadUrl).toHaveBeenCalledWith(
+                expect.stringMatching(
                     new RegExp(
                         `^${mockUserId}/${mockPresignDto.storeType}/\\d+_${mockPresignDto.fileName}$`
                     )
                 ),
-                ContentType: mockPresignDto.contentType,
-            });
-
-            expect(getSignedUrl).toHaveBeenCalledWith(
-                expect.any(S3Client),
-                expect.any(PutObjectCommand),
-                { expiresIn: mockConfig['aws.s3.linkExpire'] }
+                mockPresignDto.contentType
             );
         });
 
         it('should throw an error if generating pre-signed URL fails', async () => {
             const mockError = new Error('Failed to generate URL');
-            (getSignedUrl as jest.Mock).mockRejectedValue(mockError);
+            awsS3Service.getPresignedUploadUrl.mockRejectedValue(mockError);
 
             await expect(
                 service.getPresignUrlPutObject(mockUserId, mockPresignDto)
             ).rejects.toThrow(mockError);
         });
 
-        it('should generate unique keys for different requests', async () => {
-            const firstCall = service.getPresignUrlPutObject(
-                mockUserId,
-                mockPresignDto
-            );
+        it('should use correct content type', async () => {
+            awsS3Service.getPresignedUploadUrl.mockResolvedValue({
+                url: mockUrl,
+                expiresIn: 3600,
+            });
 
-            jest.advanceTimersByTime(1000);
+            await service.getPresignUrlPutObject(mockUserId, mockPresignDto);
 
-            const secondCall = service.getPresignUrlPutObject(
-                mockUserId,
-                mockPresignDto
-            );
-
-            await Promise.all([firstCall, secondCall]);
-
-            const [[firstCallArgs], [secondCallArgs]] = (
-                PutObjectCommand as unknown as jest.Mock
-            ).mock.calls;
-
-            expect(firstCallArgs.Key).not.toEqual(secondCallArgs.Key);
-            expect(firstCallArgs.Key).toMatch(
-                new RegExp(
-                    `^${mockUserId}/${mockPresignDto.storeType}/\\d+_${mockPresignDto.fileName}$`
-                )
-            );
-            expect(secondCallArgs.Key).toMatch(
-                new RegExp(
-                    `^${mockUserId}/${mockPresignDto.storeType}/\\d+_${mockPresignDto.fileName}$`
-                )
+            expect(awsS3Service.getPresignedUploadUrl).toHaveBeenCalledWith(
+                expect.any(String),
+                'image/jpeg'
             );
         });
     });

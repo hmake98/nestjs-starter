@@ -1,6 +1,7 @@
 import { SESClient } from '@aws-sdk/client-ses';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PinoLogger } from 'nestjs-pino';
 
 import { AwsSESService } from 'src/common/aws/services/aws.ses.service';
 
@@ -9,6 +10,7 @@ jest.mock('@aws-sdk/client-ses');
 describe('AwsSESService', () => {
     let service: AwsSESService;
     let mockSesClient: jest.Mocked<SESClient>;
+    let loggerMock: jest.Mocked<PinoLogger>;
 
     const mockConfigService = {
         get: jest.fn().mockImplementation((key: string) => {
@@ -22,12 +24,26 @@ describe('AwsSESService', () => {
     };
 
     beforeEach(async () => {
+        loggerMock = {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+            trace: jest.fn(),
+            fatal: jest.fn(),
+            setContext: jest.fn(),
+        } as unknown as jest.Mocked<PinoLogger>;
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 AwsSESService,
                 {
                     provide: ConfigService,
                     useValue: mockConfigService,
+                },
+                {
+                    provide: PinoLogger,
+                    useValue: loggerMock,
                 },
             ],
         }).compile();

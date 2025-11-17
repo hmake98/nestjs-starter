@@ -2,10 +2,13 @@
     "success": {
         "profile": "User details retrieved successfully",
         "deleted": "User deleted successfully",
-        "updated": "User updated successfully"
+        "updated": "User updated successfully",
+        "userDeleted": "User deleted successfully"
     },
     "error": {
         "notFound": "User not found in database",
-        "exists": "User with provided email/username already exists"
+        "userNotFound": "User not found in database",
+        "exists": "User with provided email/username already exists",
+        "userExists": "User with provided email/username already exists"
     }
 }

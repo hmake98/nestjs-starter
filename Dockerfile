@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:lts-alpine
 
 # Install build dependencies
 RUN apk add --no-cache --virtual .build-deps \

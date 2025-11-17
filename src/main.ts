@@ -70,9 +70,9 @@ async function bootstrap(): Promise<void> {
         await app.listen(port, host);
 
         const appUrl = await app.getUrl();
-        logger.log(`🚀 Server running on: ${appUrl}`);
+        logger.log(`Server running on: ${appUrl}`);
     } catch (error) {
-        console.error('❌ Server failed to start:', error);
+        console.error('Server failed to start:', error);
         if (app) await app.close();
         process.exit(1);
     }

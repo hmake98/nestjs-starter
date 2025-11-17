@@ -17,7 +17,7 @@ export default registerAs('app', (): Record<string, any> => {
     };
 
     return {
-        env: process.env.NODE_ENV ?? APP_ENVIRONMENT.LOCAL,
+        env: process.env.APP_ENV ?? APP_ENVIRONMENT.LOCAL,
         name: process.env.APP_NAME ?? 'nestjs-starter',
 
         versioning: {
@@ -42,7 +42,7 @@ export default registerAs('app', (): Record<string, any> => {
 
         sentry: {
             dsn: process.env.SENTRY_DSN,
-            environment: process.env.NODE_ENV ?? APP_ENVIRONMENT.LOCAL,
+            environment: process.env.APP_ENV ?? APP_ENVIRONMENT.LOCAL,
         },
 
         debug: process.env.APP_DEBUG === 'true',

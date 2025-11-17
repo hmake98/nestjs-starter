@@ -3,12 +3,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { HelperModule } from 'src/common/helper/helper.module';
 
-import { CronProcessorWorker } from './processors/cron.processor';
 import { EmailProcessorWorker } from './processors/email.processor';
+import { MidNightScheduleWorker } from './schedulers/midnight.scheduler';
 
 @Module({
     imports: [HelperModule, ScheduleModule.forRoot()],
-    providers: [CronProcessorWorker, EmailProcessorWorker],
-    exports: [CronProcessorWorker, EmailProcessorWorker],
+    providers: [MidNightScheduleWorker, EmailProcessorWorker],
+    exports: [MidNightScheduleWorker, EmailProcessorWorker],
 })
 export class WorkerModule {}

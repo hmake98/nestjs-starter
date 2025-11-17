@@ -1,20 +1,33 @@
-import { Injectable, LoggerService as NestLoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import pino, { Logger as PinoLogger } from 'pino';
+import { Params } from 'nestjs-pino';
+import { IncomingMessage } from 'http';
 
 import { APP_ENVIRONMENT } from 'src/app/enums/app.enum';
 
-@Injectable()
-export class CustomLoggerService implements NestLoggerService {
-    private readonly logger: PinoLogger;
-    private context = 'Application';
+/**
+ * Creates Pino logger configuration for NestJS application
+ *
+ * This configuration provides:
+ * - Pretty logging for local development (colorized, human-readable)
+ * - Structured JSON logging for other environments (Grafana/ELK compatible)
+ * - Automatic request/response logging with correlation tracking
+ * - Security-sensitive data redaction
+ * - Performance monitoring support
+ *
+ * @param configService - NestJS ConfigService instance
+ * @returns Pino logger configuration params
+ */
+export const createLoggerConfig = (configService: ConfigService): Params => {
+    const env = configService.get<string>('app.env', APP_ENVIRONMENT.LOCAL);
+    const isLocal = env === APP_ENVIRONMENT.LOCAL;
+    const logLevel = configService.get<string>('app.logLevel', 'info');
 
-    constructor(private readonly configService: ConfigService) {
-        const isLocal =
-            this.configService.get('app.env') === APP_ENVIRONMENT.LOCAL;
+    return {
+        pinoHttp: {
+            // Log level configuration
+            level: logLevel,
 
-        this.logger = pino({
-            level: this.configService.get('LOG_LEVEL', 'info'),
+            // Pretty printing for local development only
             transport: isLocal
                 ? {
                       target: 'pino-pretty',
@@ -23,126 +36,206 @@ export class CustomLoggerService implements NestLoggerService {
                           levelFirst: true,
                           translateTime: 'yyyy-mm-dd HH:MM:ss.l',
                           ignore: 'pid,hostname',
+                          singleLine: false,
+                          messageFormat: '{context} {msg}',
                       },
                   }
                 : undefined,
+
+            // Standard formatters for distributed logging
             formatters: {
+                // Uppercase level for better visibility in log aggregators
                 level: (label: string) => ({ level: label.toUpperCase() }),
+
+                // Flatten bindings to avoid nested objects
+                bindings: () => ({}),
             },
+
+            // ISO 8601 timestamp for consistency across timezones
             timestamp: () => `,"timestamp":"${new Date().toISOString()}"`,
+
+            // Use standard 'message' key for compatibility
+            messageKey: 'message',
+
+            // Base context fields - included in every log
             base: {
-                pid: false,
-                hostname: false,
-                environment: this.configService.get('app.env'),
-                service: this.configService.get('app.name'),
+                environment: env,
+                service: configService.get<string>('app.name', 'nestjs-app'),
+                version: configService.get<string>('app.versioning.version', '1'),
             },
-        });
-    }
 
-    setContext(context: string): void {
-        this.context = context;
-    }
-
-    log(message: any, context?: string): void {
-        this.logger.info({ context: context || this.context }, message);
-    }
-
-    error(message: any, trace?: string, context?: string): void {
-        this.logger.error(
-            {
-                context: context || this.context,
-                trace,
+            // Redact sensitive data from logs
+            redact: {
+                paths: [
+                    'req.headers.authorization',
+                    'req.headers.cookie',
+                    'req.body.password',
+                    'req.body.confirmPassword',
+                    'req.body.currentPassword',
+                    'req.body.newPassword',
+                    'req.body.token',
+                    'res.headers["set-cookie"]',
+                ],
+                remove: true,
             },
-            message
-        );
-    }
 
-    warn(message: any, context?: string): void {
-        this.logger.warn({ context: context || this.context }, message);
-    }
+            // Add correlation ID and context to every log
+            customProps: (req: IncomingMessage & { id?: string }) => ({
+                correlationId: req.id,
+            }),
 
-    debug(message: any, context?: string): void {
-        this.logger.debug({ context: context || this.context }, message);
-    }
-
-    verbose(message: any, context?: string): void {
-        this.logger.trace({ context: context || this.context }, message);
-    }
-
-    // Additional methods for structured logging
-    info(message: string, meta?: any, context?: string): void {
-        this.logger.info(
-            {
-                context: context || this.context,
-                ...meta,
+            // Custom serializers - keep only essential fields
+            serializers: {
+                req: (req: any) => ({
+                    method: req.method,
+                    url: req.url,
+                    userAgent: req.headers?.['user-agent'],
+                }),
+                res: (res: any) => ({
+                    statusCode: res.statusCode,
+                }),
+                err: (err: any) => ({
+                    type: err.type || err.name,
+                    message: err.message,
+                    stack: isLocal ? err.stack : undefined, // Stack traces only in local
+                }),
             },
-            message
-        );
-    }
 
-    fatal(message: string, meta?: any, context?: string): void {
-        this.logger.fatal(
-            {
-                context: context || this.context,
-                ...meta,
+            // Auto-assign log level based on HTTP status
+            customLogLevel: (_req: any, res: any, err: any) => {
+                if (res.statusCode >= 500 || err) return 'error';
+                if (res.statusCode >= 400) return 'warn';
+                return 'info';
             },
-            message
-        );
-    }
 
-    // Method for logging with correlation ID
-    logWithCorrelation(
-        level: 'info' | 'error' | 'warn' | 'debug',
-        message: string,
-        correlationId: string,
-        meta?: any,
-        context?: string
-    ): void {
-        this.logger[level](
-            {
-                context: context || this.context,
-                correlationId,
-                ...meta,
+            // Clean, informative log messages
+            customSuccessMessage: (req: any, res: any) => {
+                return `${req.method} ${req.url} ${res.statusCode}`;
             },
-            message
-        );
-    }
 
-    // Method for performance logging
-    logPerformance(
-        operation: string,
-        duration: number,
-        meta?: any,
-        context?: string
-    ): void {
-        this.logger.info(
-            {
-                context: context || this.context,
-                operation,
-                duration,
-                type: 'performance',
-                ...meta,
+            customErrorMessage: (_req: any, _res: any, err: any) => {
+                return err.message;
             },
-            `Operation ${operation} completed in ${duration}ms`
-        );
-    }
 
-    // Method for business event logging
-    logBusinessEvent(
+            // Attach request ID for distributed tracing
+            genReqId: (req: IncomingMessage & { id?: string }) => {
+                return req.id || req.headers['x-request-id']?.toString() || crypto.randomUUID();
+            },
+        },
+
+        // Exclude health check and static endpoints from logging
+        exclude: ['/health', '/health/live', '/health/ready', '/metrics', '/favicon.ico'],
+    };
+};
+
+/**
+ * Logger utility class for structured application logging
+ *
+ * Usage:
+ * ```typescript
+ * import { PinoLogger } from 'nestjs-pino';
+ *
+ * class MyService {
+ *   constructor(private readonly logger: PinoLogger) {
+ *     this.logger.setContext(MyService.name);
+ *   }
+ *
+ *   doSomething() {
+ *     this.logger.info('Operation started');
+ *     this.logger.error('Operation failed: %s', error.message);
+ *
+ *     // Structured logging
+ *     this.logger.info({ userId: 123, action: 'login' }, 'User logged in');
+ *   }
+ * }
+ * ```
+ */
+export class LoggerHelpers {
+    /**
+     * Log a business event with structured data
+     *
+     * @example
+     * LoggerHelpers.logBusinessEvent(logger, 'user_signup', { userId: 123, plan: 'pro' });
+     */
+    static logBusinessEvent(
+        logger: any,
         event: string,
-        userId?: string,
-        meta?: any,
-        context?: string
+        metadata?: Record<string, any>
     ): void {
-        this.logger.info(
+        logger.info(
             {
-                context: context || this.context,
+                eventType: 'business',
                 event,
-                userId,
-                type: 'business-event',
-                ...meta,
+                ...metadata,
             },
             `Business event: ${event}`
+        );
+    }
+
+    /**
+     * Log performance metrics
+     *
+     * @example
+     * const start = Date.now();
+     * // ... operation ...
+     * LoggerHelpers.logPerformance(logger, 'database_query', Date.now() - start);
+     */
+    static logPerformance(
+        logger: any,
+        operation: string,
+        durationMs: number,
+        metadata?: Record<string, any>
+    ): void {
+        logger.info(
+            {
+                eventType: 'performance',
+                operation,
+                durationMs,
+                ...metadata,
+            },
+            `${operation} completed in ${durationMs}ms`
+        );
+    }
+
+    /**
+     * Log with correlation ID for distributed tracing
+     *
+     * @example
+     * LoggerHelpers.logWithCorrelation(logger, correlationId, 'Processing request', { step: 1 });
+     */
+    static logWithCorrelation(
+        logger: any,
+        correlationId: string,
+        message: string,
+        metadata?: Record<string, any>
+    ): void {
+        logger.info(
+            {
+                correlationId,
+                ...metadata,
+            },
+            message
+        );
+    }
+
+    /**
+     * Log security events (auth failures, suspicious activity, etc.)
+     *
+     * @example
+     * LoggerHelpers.logSecurityEvent(logger, 'failed_login', { ip: req.ip, attempts: 3 });
+     */
+    static logSecurityEvent(
+        logger: any,
+        event: string,
+        metadata?: Record<string, any>
+    ): void {
+        logger.warn(
+            {
+                eventType: 'security',
+                event,
+                ...metadata,
+            },
+            `Security event: ${event}`
         );
     }
 }

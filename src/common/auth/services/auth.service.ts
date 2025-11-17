@@ -97,7 +97,7 @@ export class AuthService implements IAuthService {
                     firstName: firstName?.trim(),
                     lastName: lastName?.trim(),
                     role: Role.USER,
-                    userName: faker.internet.userName(),
+                    userName: faker.internet.username(),
                 },
             });
 

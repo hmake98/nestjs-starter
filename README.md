@@ -109,7 +109,7 @@ Create a `.env` file based on `.env.docker` template:
 
 | Variable                    | Description                  | Example                                 |
 | --------------------------- | ---------------------------- | --------------------------------------- |
-| `NODE_ENV`                  | Environment mode             | `local`, `development`, `production`    |
+| `APP_ENV`                  | Environment mode             | `local`, `development`, `production`    |
 | `DATABASE_URL`              | PostgreSQL connection string | `postgresql://user:pass@host:5432/db`   |
 | `AUTH_ACCESS_TOKEN_SECRET`  | JWT access token secret      | Generate with `openssl rand -base64 32` |
 | `AUTH_REFRESH_TOKEN_SECRET` | JWT refresh token secret     | Generate with `openssl rand -base64 32` |

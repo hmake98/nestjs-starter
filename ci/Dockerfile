@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:lts-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache --virtual .build-deps \
@@ -27,7 +27,7 @@ RUN yarn install --production --frozen-lockfile && \
     apk del .build-deps
 
 # Production stage
-FROM node:20-alpine AS production
+FROM node:lts-alpine AS production
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init

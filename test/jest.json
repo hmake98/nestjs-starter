@@ -1,25 +1,13 @@
 {
     "testTimeout": 15000,
     "rootDir": "../",
-    "modulePaths": [
-        "."
-    ],
+    "modulePaths": ["."],
     "testEnvironment": "node",
-    "testMatch": [
-        "<rootDir>/test/**/*.spec.ts"
-    ],
-    "testPathIgnorePatterns": [
-        "<rootDir>/node_modules/",
-        "<rootDir>/dist/"
-    ],
+    "testMatch": ["<rootDir>/test/**/*.spec.ts"],
+    "testPathIgnorePatterns": ["<rootDir>/node_modules/", "<rootDir>/dist/"],
     "collectCoverage": true,
     "coverageDirectory": "coverage",
-    "coverageReporters": [
-        "lcov",
-        "json-summary",
-        "text",
-        "html"
-    ],
+    "coverageReporters": ["lcov", "json-summary", "text", "html"],
     "collectCoverageFrom": [
         "<rootDir>/src/**/*.service.ts",
         "!<rootDir>/src/**/*.spec.ts",
@@ -36,11 +24,7 @@
             "statements": 98
         }
     },
-    "moduleFileExtensions": [
-        "js",
-        "ts",
-        "json"
-    ],
+    "moduleFileExtensions": ["js", "ts", "json"],
     "coverageProvider": "v8",
     "transform": {
         "^.+\\.(t|j)sx?$": [
@@ -60,9 +44,10 @@
             }
         ]
     },
-    "modulePathIgnorePatterns": [
-        "<rootDir>/dist"
-    ],
+    "modulePathIgnorePatterns": ["<rootDir>/dist"],
+    "moduleNameMapper": {
+        "^@faker-js/faker$": "<rootDir>/test/mocks/faker.mock.ts"
+    },
     "clearMocks": true,
     "restoreMocks": true,
     "forceExit": true,

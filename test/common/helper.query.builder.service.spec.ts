@@ -592,5 +592,80 @@ describe('HelperPrismaQueryBuilderService', () => {
                 take: 10,
             });
         });
+
+        it('should skip search when all search fields are filtered by allowedSearchFields', async () => {
+            mockDelegate.findMany.mockResolvedValue([]);
+            mockDelegate.count.mockResolvedValue(0);
+
+            const options: IQueryOptions = {
+                searchQuery: 'test',
+                searchFields: ['password', 'secret'], // none of these are allowed
+                searchMode: 'insensitive',
+            };
+
+            const builderOptions = {
+                allowedSearchFields: ['name', 'email'], // only these are allowed
+            };
+
+            await service.buildQuery(mockDelegate, options, builderOptions);
+
+            // Should not include search conditions since all fields were filtered out
+            expect(mockDelegate.findMany).toHaveBeenCalledWith({
+                orderBy: { createdAt: 'desc' },
+                skip: 0,
+                take: 10,
+            });
+        });
+
+        it('should handle string filter values with commas', async () => {
+            mockDelegate.findMany.mockResolvedValue([]);
+            mockDelegate.count.mockResolvedValue(0);
+
+            const options: IQueryOptions = {
+                filters: {
+                    tags: 'javascript,typescript,nodejs', // comma-separated string
+                    category: 'tech', // normal string
+                },
+            };
+
+            const builderOptions = {
+                allowedFilterFields: ['tags', 'category'],
+            };
+
+            await service.buildQuery(mockDelegate, options, builderOptions);
+
+            expect(mockDelegate.findMany).toHaveBeenCalledWith({
+                where: {
+                    AND: [
+                        {
+                            tags: {
+                                in: ['javascript', 'typescript', 'nodejs'],
+                            },
+                            category: 'tech',
+                        },
+                    ],
+                },
+                orderBy: { createdAt: 'desc' },
+                skip: 0,
+                take: 10,
+            });
+        });
+
+        it('should use custom orderBy when provided', async () => {
+            mockDelegate.findMany.mockResolvedValue([]);
+            mockDelegate.count.mockResolvedValue(0);
+
+            const options: IQueryOptions = {
+                orderBy: { name: 'asc', createdAt: 'desc' },
+            };
+
+            await service.buildQuery(mockDelegate, options);
+
+            expect(mockDelegate.findMany).toHaveBeenCalledWith({
+                orderBy: { name: 'asc', createdAt: 'desc' },
+                skip: 0,
+                take: 10,
+            });
+        });
     });
 });

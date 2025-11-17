@@ -15,6 +15,7 @@ import {
 } from '@aws-sdk/client-ses';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PinoLogger } from 'nestjs-pino';
 
 import {
     IAwsSESGetTemplate,
@@ -27,18 +28,26 @@ import { IAwsSESService } from '../interfaces/aws.ses.service.interface';
 export class AwsSESService implements IAwsSESService {
     private readonly sesClient: SESClient;
 
-    constructor(private readonly configService: ConfigService) {
+    constructor(
+        private readonly configService: ConfigService,
+        private readonly logger: PinoLogger
+    ) {
+        this.logger.setContext(AwsSESService.name);
+
+        const region = this.configService.get<string>('aws.ses.region');
+        const accessKeyId = this.configService.get<string>('aws.accessKey');
+        const secretAccessKey =
+            this.configService.get<string>('aws.secretKey');
+
         this.sesClient = new SESClient({
             credentials: {
-                accessKeyId: this.configService.get<string>(
-                    'aws.ses.credential.key'
-                ),
-                secretAccessKey: this.configService.get<string>(
-                    'aws.ses.credential.secret'
-                ),
+                accessKeyId,
+                secretAccessKey,
             },
-            region: this.configService.get<string>('aws.ses.region'),
+            region,
         });
+
+        this.logger.info({ region }, 'SES service initialized');
     }
 
     async getTemplate({
@@ -54,8 +63,12 @@ export class AwsSESService implements IAwsSESService {
                 GetTemplateCommandOutput
             >(command);
 
+            this.logger.debug({ templateName: name }, 'Retrieved SES template');
             return output;
         } catch (error) {
+            this.logger.error(
+                `Failed to get SES template ${name}: ${error.message}`
+            );
             throw error;
         }
     }
@@ -85,8 +98,12 @@ export class AwsSESService implements IAwsSESService {
                 CreateTemplateCommandOutput
             >(command);
 
+            this.logger.info({ templateName: name }, 'Created SES template');
             return output;
         } catch (error) {
+            this.logger.error(
+                `Failed to create SES template ${name}: ${error.message}`
+            );
             throw error;
         }
     }
@@ -104,8 +121,12 @@ export class AwsSESService implements IAwsSESService {
                 DeleteTemplateCommandOutput
             >(command);
 
+            this.logger.info({ templateName: name }, 'Deleted SES template');
             return output;
         } catch (error) {
+            this.logger.error(
+                `Failed to delete SES template ${name}: ${error.message}`
+            );
             throw error;
         }
     }
@@ -138,8 +159,19 @@ export class AwsSESService implements IAwsSESService {
                 SendTemplatedEmailCommandOutput
             >(command);
 
+            this.logger.info(
+                {
+                    templateName,
+                    recipients: recipients.length,
+                    messageId: output.MessageId,
+                },
+                'Email sent via SES'
+            );
             return output;
         } catch (error) {
+            this.logger.error(
+                `Failed to send email via SES: ${error.message}`
+            );
             throw error;
         }
     }

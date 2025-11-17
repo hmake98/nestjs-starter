@@ -1,6 +1,6 @@
 import { Process, Processor } from '@nestjs/bull';
-import { Logger } from '@nestjs/common';
-import { Job } from 'bullmq';
+import { Job } from 'bull';
+import { PinoLogger } from 'nestjs-pino';
 
 import { APP_BULL_QUEUES } from 'src/app/enums/app.enum';
 import { AWS_SES_EMAIL_TEMPLATES } from 'src/common/aws/enums/aws.ses.enum';
@@ -12,22 +12,41 @@ import { HelperEmailService } from 'src/common/helper/services/helper.email.serv
 
 @Processor(APP_BULL_QUEUES.EMAIL)
 export class EmailProcessorWorker {
-    private logger = new Logger(EmailProcessorWorker.name);
-
-    constructor(private readonly helperEmailService: HelperEmailService) {}
+    constructor(
+        private readonly helperEmailService: HelperEmailService,
+        private readonly logger: PinoLogger
+    ) {
+        this.logger.setContext(EmailProcessorWorker.name);
+    }
 
     @Process(AWS_SES_EMAIL_TEMPLATES.WELCOME_EMAIL)
     async processWelcomeEmails(
-        job: Job<ISendEmailBasePayload<IWelcomeEmailDataPaylaod>, any, string>
+        job: Job<ISendEmailBasePayload<IWelcomeEmailDataPaylaod>>
     ) {
         const { toEmails, data } = job.data;
 
-        await this.helperEmailService.sendEmail({
-            emails: toEmails,
-            emailType: AWS_SES_EMAIL_TEMPLATES.WELCOME_EMAIL,
-            payload: data,
-        });
+        this.logger.info(
+            { jobId: job.id, recipients: toEmails.length },
+            'Processing welcome email job'
+        );
 
-        this.logger.log('Email sent successfully');
+        try {
+            await this.helperEmailService.sendEmail({
+                emails: toEmails,
+                emailType: AWS_SES_EMAIL_TEMPLATES.WELCOME_EMAIL,
+                payload: data,
+            });
+
+            this.logger.info(
+                { jobId: job.id, recipients: toEmails.length },
+                'Welcome emails sent successfully'
+            );
+        } catch (error) {
+            this.logger.error(
+                { jobId: job.id, error: error.message },
+                `Failed to send welcome emails: ${error.message}`
+            );
+            throw error;
+        }
     }
 }

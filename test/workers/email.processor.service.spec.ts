@@ -1,6 +1,6 @@
-import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Job } from 'bullmq';
+import { Job } from 'bull';
+import { PinoLogger } from 'nestjs-pino';
 
 import { AWS_SES_EMAIL_TEMPLATES } from 'src/common/aws/enums/aws.ses.enum';
 import {
@@ -13,7 +13,7 @@ import { EmailProcessorWorker } from 'src/workers/processors/email.processor';
 describe('EmailProcessorWorkerService', () => {
     let service: EmailProcessorWorker;
     let helperEmailServiceMock: jest.Mocked<HelperEmailService>;
-    let loggerMock: jest.Mocked<Logger>;
+    let loggerMock: jest.Mocked<PinoLogger>;
 
     beforeEach(async () => {
         helperEmailServiceMock = {
@@ -21,12 +21,14 @@ describe('EmailProcessorWorkerService', () => {
         } as unknown as jest.Mocked<HelperEmailService>;
 
         loggerMock = {
-            log: jest.fn(),
+            info: jest.fn(),
             error: jest.fn(),
             warn: jest.fn(),
             debug: jest.fn(),
-            verbose: jest.fn(),
-        } as unknown as jest.Mocked<Logger>;
+            trace: jest.fn(),
+            fatal: jest.fn(),
+            setContext: jest.fn(),
+        } as unknown as jest.Mocked<PinoLogger>;
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -35,7 +37,7 @@ describe('EmailProcessorWorkerService', () => {
                     provide: HelperEmailService,
                     useValue: helperEmailServiceMock,
                 },
-                { provide: Logger, useValue: loggerMock },
+                { provide: PinoLogger, useValue: loggerMock },
             ],
         }).compile();
 

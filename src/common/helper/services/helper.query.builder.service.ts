@@ -4,6 +4,7 @@ import {
     IPrismaQueryResult,
     IQueryOptions,
 } from '../interfaces/query.builder.interface';
+import { IHelperPrismaQueryBuilderService } from '../interfaces/query.builder.service.interface';
 
 type PrismaDelegate = {
     count: (args?: any) => Promise<number>;
@@ -11,7 +12,9 @@ type PrismaDelegate = {
 };
 
 @Injectable()
-export class HelperPrismaQueryBuilderService {
+export class HelperPrismaQueryBuilderService
+    implements IHelperPrismaQueryBuilderService
+{
     private readonly defaultOptions: IPrismaQueryBuilderOptions = {
         defaultLimit: 10,
         maxLimit: 100,
