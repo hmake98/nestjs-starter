@@ -33,17 +33,19 @@ A production-ready NestJS boilerplate with comprehensive features and best pract
 
 ## 🛠️ Tech Stack
 
-- **Framework**: NestJS 10.x
-- **Language**: TypeScript 5.x
-- **Database**: PostgreSQL with Prisma ORM
-- **Cache/Queue**: Redis with Bull
+- **Framework**: NestJS 11.x
+- **Language**: TypeScript 5.9
+- **Database**: PostgreSQL with Prisma ORM 6.x
+- **Cache/Queue**: Redis with Bull 4.x
 - **Authentication**: JWT with Passport
 - **File Storage**: AWS S3
 - **Email**: AWS SES
 - **Documentation**: Swagger/OpenAPI
-- **Testing**: Jest with SWC
+- **Testing**: Jest 30.x with SWC
+- **Logging**: Pino (structured JSON logging)
+- **Validation**: class-validator & class-transformer
+- **MCP Integration**: @hmake98/nestjs-mcp for AI capabilities
 - **Containerization**: Docker & Docker Compose
-- **Orchestration**: Kubernetes
 
 ## 🚀 Quick Start
 
@@ -151,8 +153,8 @@ docker-compose down
 ### Production Docker Build
 
 ```bash
-# Build production image
-docker build -f ci/Dockerfile.prod -t nestjs-starter:latest .
+# Build production image (uses ci/Dockerfile for production)
+docker build -f ci/Dockerfile -t nestjs-starter:latest .
 
 # Run production container
 docker run -p 3001:3001 --env-file .env nestjs-starter:latest
@@ -199,35 +201,41 @@ Access the interactive MCP playground at `http://localhost:3001/mcp/playground` 
 
 ### Built-in Examples
 
+The boilerplate includes example MCP implementations in `src/common/mcp/services/`:
+
 #### Tools (Calculator & Utilities)
 ```typescript
-// Example: Add numbers
-POST /mcp/tools/add
-{ "a": 5, "b": 3 }  // Returns: 8
+// Mathematical operations
+- add(a, b)          // Add two numbers
+- subtract(a, b)     // Subtract two numbers
+- multiply(a, b)     // Multiply two numbers
+- divide(a, b)       // Divide two numbers
 
-// Example: Generate UUID
-POST /mcp/tools/generateUUID
-// Returns: "550e8400-e29b-41d4-a716-446655440000"
+// Text utilities
+- toUpperCase(text)  // Convert text to uppercase
+- toLowerCase(text)  // Convert text to lowercase
+- reverse(text)      // Reverse text string
 ```
 
-#### Resources (Documentation & Status)
+#### Resources (Documentation & Data)
 ```typescript
-// Example: Get API overview
-GET /mcp/resources/docs://api/overview
+// System information
+- system://info      // Application metadata and version
+- system://config    // Configuration overview
+- docs://api         // API documentation
 
-// Example: Get specific documentation
-GET /mcp/resources/docs://api/auth
+// Data resources
+- data://users       // User statistics
+- data://posts       // Post statistics
 ```
 
 #### Prompts (AI Templates)
 ```typescript
-// Example: Code review prompt
-POST /mcp/prompts/code-review
-{
-  "language": "TypeScript",
-  "code": "function add(a, b) { return a + b; }",
-  "focus": "type safety"
-}
+// Code assistance prompts
+- code-review        // Review code for best practices
+- bug-analysis       // Analyze and suggest bug fixes
+- documentation      // Generate documentation
+- test-generation    // Generate unit tests
 ```
 
 ### Creating Custom MCP Services
@@ -235,12 +243,13 @@ POST /mcp/prompts/code-review
 #### 1. Create a Tool Service
 
 ```typescript
-// src/modules/your-module/mcp.tools.service.ts
+// src/modules/your-module/services/mcp.tools.service.ts
 import { Injectable } from '@nestjs/common';
-import { MCPTool } from '@hmake98/nestjs-mcp';
+import { MCPTool, MCPToolWithParams } from '@hmake98/nestjs-mcp';
 
 @Injectable()
 export class YourMCPToolsService {
+    // Simple tool (auto-infers parameters from TypeScript types)
     @MCPTool({
         name: 'customTool',
         description: 'Your custom tool description',
@@ -249,13 +258,37 @@ export class YourMCPToolsService {
         // Your business logic here
         return `Processed: ${params.input}`;
     }
+
+    // Tool with explicit parameter definitions
+    @MCPToolWithParams({
+        name: 'complexTool',
+        description: 'A more complex tool with explicit params',
+        parameters: [
+            {
+                name: 'userId',
+                type: 'string',
+                description: 'The user ID to process',
+                required: true,
+            },
+            {
+                name: 'options',
+                type: 'object',
+                description: 'Additional options',
+                required: false,
+            },
+        ],
+    })
+    async complexTool(params: { userId: string; options?: any }): Promise<any> {
+        // Your complex business logic
+        return { success: true, userId: params.userId };
+    }
 }
 ```
 
 #### 2. Create a Resource Service
 
 ```typescript
-// src/modules/your-module/mcp.resources.service.ts
+// src/modules/your-module/services/mcp.resources.service.ts
 import { Injectable } from '@nestjs/common';
 import { MCPResource } from '@hmake98/nestjs-mcp';
 
@@ -264,31 +297,83 @@ export class YourMCPResourcesService {
     @MCPResource({
         uri: 'data://your-resource',
         name: 'Your Resource',
-        description: 'Resource description',
+        description: 'Provides access to your data',
         mimeType: 'application/json',
     })
     async getResource() {
         return {
             uri: 'data://your-resource',
             mimeType: 'application/json',
-            text: JSON.stringify({ data: 'your data' }),
+            text: JSON.stringify({
+                data: 'your data',
+                timestamp: new Date().toISOString()
+            }),
         };
     }
 }
 ```
 
-#### 3. Register in Module
+#### 3. Create a Prompt Service
 
 ```typescript
+// src/modules/your-module/services/mcp.prompts.service.ts
+import { Injectable } from '@nestjs/common';
+import { MCPPrompt } from '@hmake98/nestjs-mcp';
+
+@Injectable()
+export class YourMCPPromptsService {
+    @MCPPrompt({
+        name: 'customPrompt',
+        description: 'Custom AI prompt template',
+        arguments: [
+            {
+                name: 'context',
+                description: 'Context for the prompt',
+                required: true,
+            },
+        ],
+    })
+    async customPrompt(args: { context: string }) {
+        return {
+            messages: [
+                {
+                    role: 'user',
+                    content: {
+                        type: 'text',
+                        text: `Given the context: ${args.context}, please provide analysis.`,
+                    },
+                },
+            ],
+        };
+    }
+}
+```
+
+#### 4. Register in Module
+
+```typescript
+// src/modules/your-module/your-module.module.ts
 import { Module } from '@nestjs/common';
-import { YourMCPToolsService } from './mcp.tools.service';
+import { YourMCPToolsService } from './services/mcp.tools.service';
+import { YourMCPResourcesService } from './services/mcp.resources.service';
+import { YourMCPPromptsService } from './services/mcp.prompts.service';
 
 @Module({
-    providers: [YourMCPToolsService],
-    exports: [YourMCPToolsService],
+    providers: [
+        YourMCPToolsService,
+        YourMCPResourcesService,
+        YourMCPPromptsService,
+    ],
+    exports: [
+        YourMCPToolsService,
+        YourMCPResourcesService,
+        YourMCPPromptsService,
+    ],
 })
 export class YourModule {}
 ```
+
+MCP services are **auto-discovered** - no additional registration needed! Just create the services with decorators and they'll automatically appear in the MCP playground.
 
 ### Configuration
 
@@ -307,18 +392,45 @@ MCP_LOG_LEVEL="info"  # debug, info, warn, error
 
 ## 🧪 Testing
 
+The project uses Jest with SWC for fast test execution. Tests are located in the `test/` directory, mirroring the `src/` structure.
+
 ```bash
 # Run all tests
 yarn test
 
-# Run tests with coverage
-yarn test --coverage
-
-# Run tests in watch mode
-yarn test --watch
+# Run tests in watch mode (requires manual setup)
+jest --config test/jest.json --watch
 
 # Debug tests
 yarn test:debug
+```
+
+**Test Structure**:
+- `test/common/` - Tests for shared services (auth, database, helpers, AWS)
+- `test/modules/` - Tests for feature modules (user, post)
+- `test/workers/` - Tests for background processors
+- `test/mocks/` - Mock data generators using @faker-js/faker
+
+**Example Test**:
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+import { UserService } from 'src/modules/user/services/user.service';
+
+describe('UserService', () => {
+    let service: UserService;
+
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [UserService, /* mock dependencies */],
+        }).compile();
+
+        service = module.get<UserService>(UserService);
+    });
+
+    it('should be defined', () => {
+        expect(service).toBeDefined();
+    });
+});
 ```
 
 ## 📁 Project Structure
@@ -390,83 +502,105 @@ yarn rollback:email
 
 ## 🚀 Deployment
 
-### Kubernetes (Recommended)
-
-```bash
-# Local deployment with Minikube
-minikube start
-
-# Update the Docker image in k8s/deployment.yaml
-# image: your-registry/nestjs-starter:latest
-
-# Deploy to Kubernetes
-cd k8s
-chmod +x deploy.sh
-./deploy.sh
-
-# Access the application
-kubectl port-forward service/nestjs-starter-service 3001:80 -n nestjs-starter
-
-# Check deployment status
-kubectl get pods -n nestjs-starter
-
-# View application logs
-kubectl logs -f deployment/nestjs-app -n nestjs-starter
-
-# Clean up (when needed)
-kubectl delete namespace nestjs-starter
-```
-
-### Docker Production
+### Docker Production (Recommended)
 
 ```bash
 # Build and tag production image
-docker build -f ci/Dockerfile.prod -t your-registry/nestjs-starter:v1.0.0 .
+docker build -f ci/Dockerfile -t your-registry/nestjs-starter:v1.0.0 .
 
 # Push to registry
 docker push your-registry/nestjs-starter:v1.0.0
 
 # Run with Docker
-docker run -p 3001:3001 --env-file .env your-registry/nestjs-starter:v1.0.0
+docker run -d -p 3001:3001 --env-file .env --name nestjs-app your-registry/nestjs-starter:v1.0.0
 
-# Or deploy with Docker Compose
+# Or deploy with Docker Compose (full stack)
 docker-compose up -d --build
 ```
 
-### Cloud Deployment
+### Cloud Deployment Examples
 
-#### AWS ECS/EKS
+#### AWS ECS
 ```bash
-# Push to ECR
+# 1. Create ECR repository
+aws ecr create-repository --repository-name nestjs-starter --region us-east-1
+
+# 2. Authenticate Docker to ECR
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
+
+# 3. Build and push
+docker build -f ci/Dockerfile -t nestjs-starter:latest .
 docker tag nestjs-starter:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/nestjs-starter:latest
 docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/nestjs-starter:latest
+
+# 4. Create ECS task definition and service through AWS Console or CLI
 ```
 
 #### Google Cloud Run
 ```bash
-# Build and deploy
+# 1. Build and submit to Google Container Registry
 gcloud builds submit --tag gcr.io/PROJECT-ID/nestjs-starter
-gcloud run deploy --image gcr.io/PROJECT-ID/nestjs-starter --platform managed
+
+# 2. Deploy to Cloud Run
+gcloud run deploy nestjs-starter \
+  --image gcr.io/PROJECT-ID/nestjs-starter \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars "APP_ENV=production" \
+  --port 3001
 ```
 
-#### Azure Container Instances
+#### DigitalOcean App Platform
 ```bash
-# Push to ACR
-az acr build --registry myregistry --image nestjs-starter .
-az container create --resource-group myResourceGroup --name nestjs-starter --image myregistry.azurecr.io/nestjs-starter
+# 1. Push to Docker Hub or DigitalOcean Container Registry
+docker build -f ci/Dockerfile -t your-dockerhub/nestjs-starter:latest .
+docker push your-dockerhub/nestjs-starter:latest
+
+# 2. Create app via DigitalOcean Console
+#    - Select Docker Hub as source
+#    - Configure environment variables
+#    - Add PostgreSQL and Redis managed databases
+```
+
+#### Heroku
+```bash
+# 1. Login to Heroku
+heroku login
+heroku container:login
+
+# 2. Create app
+heroku create your-app-name
+
+# 3. Add PostgreSQL and Redis addons
+heroku addons:create heroku-postgresql:mini
+heroku addons:create heroku-redis:mini
+
+# 4. Build and push
+docker build -f ci/Dockerfile -t registry.heroku.com/your-app-name/web .
+docker push registry.heroku.com/your-app-name/web
+
+# 5. Release
+heroku container:release web -a your-app-name
 ```
 
 ## 🔐 Security Best Practices
 
-1. **Environment Variables**: Never commit sensitive data
-2. **JWT Secrets**: Use strong, randomly generated secrets
-3. **Database**: Use connection pooling and read replicas
-4. **Rate Limiting**: Configure appropriate limits for your use case
-5. **CORS**: Restrict origins to your frontend domains
-6. **HTTPS**: Always use TLS in production
-7. **Validation**: Input validation on all endpoints
-8. **Monitoring**: Set up error tracking and logging
+1. **Environment Variables**: Never commit sensitive data - use `.env.docker` as template only
+2. **JWT Secrets**: Use strong, randomly generated secrets (minimum 32 characters)
+   ```bash
+   openssl rand -base64 32
+   ```
+3. **Global Guards**: All routes are protected by default (JWT, Roles, Throttler)
+4. **Password Hashing**: Uses Argon2 for secure password storage
+5. **Rate Limiting**: Throttler guard prevents brute force attacks
+6. **CORS**: Configure `APP_CORS_ORIGINS` to restrict allowed domains
+7. **Helmet**: Security headers configured automatically
+8. **Input Validation**: class-validator validates all DTOs automatically
+9. **Database**: Use connection pooling, read replicas, and prepared statements (Prisma handles this)
+10. **HTTPS**: Always use TLS in production
+11. **Monitoring**: Sentry integration for error tracking and monitoring
+12. **Soft Deletes**: Models support soft deletion to prevent data loss
 
 ## 🤝 Contributing
 
@@ -502,8 +636,13 @@ az container create --resource-group myResourceGroup --name nestjs-starter --ima
 
 - [NestJS Documentation](https://docs.nestjs.com)
 - [Prisma Documentation](https://www.prisma.io/docs)
+- [Passport JWT Strategy](http://www.passportjs.org/packages/passport-jwt/)
+- [Bull Queue](https://github.com/OptimalBits/bull)
+- [Pino Logger](https://getpino.io/)
+- [class-validator](https://github.com/typestack/class-validator)
 - [Docker Documentation](https://docs.docker.com)
-- [Kubernetes Documentation](https://kubernetes.io/docs)
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io)
+- [@hmake98/nestjs-mcp Package](https://www.npmjs.com/package/@hmake98/nestjs-mcp)
 
 ## 📝 License
 
