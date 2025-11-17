@@ -17,6 +17,7 @@ A production-ready NestJS boilerplate with comprehensive features and best pract
 - 📧 **Email Service** - AWS SES integration with templating
 - 📁 **File Upload** - AWS S3 integration with pre-signed URLs
 - 🔄 **Background Jobs** - Bull queue with Redis for async processing
+- 🤖 **MCP Integration** - Model Context Protocol support for AI tools, resources, and prompts
 - 📊 **Logging** - Structured logging with Pino
 - 🧪 **Testing** - Comprehensive unit tests with Jest
 - 🐳 **Containerization** - Docker and Docker Compose ready
@@ -101,6 +102,7 @@ docker-compose up --build
 The API will be available at:
 - **API**: http://localhost:3001
 - **Documentation**: http://localhost:3001/docs
+- **MCP Playground**: http://localhost:3001/mcp/playground (for testing AI tools)
 
 ## 📋 Environment Configuration
 
@@ -177,6 +179,132 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   http://localhost:3001/v1/user/profile
 ```
 
+## 🤖 Model Context Protocol (MCP) Integration
+
+This boilerplate includes built-in support for the Model Context Protocol (MCP), enabling AI-powered features through tools, resources, and prompts.
+
+### What is MCP?
+
+MCP is a standardized protocol for integrating AI capabilities into applications. It allows you to:
+- **Tools**: Execute functions through AI (e.g., calculations, data transformations)
+- **Resources**: Provide data to AI (e.g., documentation, configuration)
+- **Prompts**: Template AI interactions (e.g., code reviews, documentation generation)
+
+### MCP Playground
+
+Access the interactive MCP playground at `http://localhost:3001/mcp/playground` to:
+- Test all available tools, resources, and prompts
+- View auto-generated schemas
+- Execute operations with real-time feedback
+
+### Built-in Examples
+
+#### Tools (Calculator & Utilities)
+```typescript
+// Example: Add numbers
+POST /mcp/tools/add
+{ "a": 5, "b": 3 }  // Returns: 8
+
+// Example: Generate UUID
+POST /mcp/tools/generateUUID
+// Returns: "550e8400-e29b-41d4-a716-446655440000"
+```
+
+#### Resources (Documentation & Status)
+```typescript
+// Example: Get API overview
+GET /mcp/resources/docs://api/overview
+
+// Example: Get specific documentation
+GET /mcp/resources/docs://api/auth
+```
+
+#### Prompts (AI Templates)
+```typescript
+// Example: Code review prompt
+POST /mcp/prompts/code-review
+{
+  "language": "TypeScript",
+  "code": "function add(a, b) { return a + b; }",
+  "focus": "type safety"
+}
+```
+
+### Creating Custom MCP Services
+
+#### 1. Create a Tool Service
+
+```typescript
+// src/modules/your-module/mcp.tools.service.ts
+import { Injectable } from '@nestjs/common';
+import { MCPTool } from '@hmake98/nestjs-mcp';
+
+@Injectable()
+export class YourMCPToolsService {
+    @MCPTool({
+        name: 'customTool',
+        description: 'Your custom tool description',
+    })
+    async customTool(params: { input: string }): Promise<string> {
+        // Your business logic here
+        return `Processed: ${params.input}`;
+    }
+}
+```
+
+#### 2. Create a Resource Service
+
+```typescript
+// src/modules/your-module/mcp.resources.service.ts
+import { Injectable } from '@nestjs/common';
+import { MCPResource } from '@hmake98/nestjs-mcp';
+
+@Injectable()
+export class YourMCPResourcesService {
+    @MCPResource({
+        uri: 'data://your-resource',
+        name: 'Your Resource',
+        description: 'Resource description',
+        mimeType: 'application/json',
+    })
+    async getResource() {
+        return {
+            uri: 'data://your-resource',
+            mimeType: 'application/json',
+            text: JSON.stringify({ data: 'your data' }),
+        };
+    }
+}
+```
+
+#### 3. Register in Module
+
+```typescript
+import { Module } from '@nestjs/common';
+import { YourMCPToolsService } from './mcp.tools.service';
+
+@Module({
+    providers: [YourMCPToolsService],
+    exports: [YourMCPToolsService],
+})
+export class YourModule {}
+```
+
+### Configuration
+
+MCP settings can be configured via environment variables:
+
+```bash
+MCP_SERVER_NAME="your-mcp-server"
+MCP_SERVER_VERSION="1.0.0"
+MCP_LOG_LEVEL="info"  # debug, info, warn, error
+```
+
+### Learn More
+
+- [MCP Package Documentation](https://github.com/hmake98/nestjs-mcp)
+- [MCP Protocol Specification](https://modelcontextprotocol.io)
+
 ## 🧪 Testing
 
 ```bash
@@ -206,6 +334,8 @@ src/
 │   ├── file/              # File upload handling
 │   ├── helper/            # Utility services
 │   ├── logger/            # Logging configuration
+│   ├── mcp/               # Model Context Protocol integration
+│   │   └── services/      # MCP tools, resources, and prompts
 │   ├── message/           # Internationalization
 │   ├── request/           # Request decorators and guards
 │   └── response/          # Response interceptors and filters

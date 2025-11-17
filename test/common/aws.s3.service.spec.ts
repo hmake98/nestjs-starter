@@ -11,7 +11,7 @@ jest.mock('@aws-sdk/s3-request-presigner');
 
 describe('AwsS3Service', () => {
     let service: AwsS3Service;
-    let configService: ConfigService;
+    let _configService: ConfigService;
     let loggerMock: jest.Mocked<PinoLogger>;
     let mockS3Client: jest.Mocked<S3Client>;
 
@@ -53,7 +53,7 @@ describe('AwsS3Service', () => {
         }).compile();
 
         service = module.get<AwsS3Service>(AwsS3Service);
-        configService = module.get<ConfigService>(ConfigService);
+        _configService = module.get<ConfigService>(ConfigService);
         mockS3Client = service['s3Client'] as jest.Mocked<S3Client>;
     });
 

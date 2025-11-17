@@ -34,6 +34,7 @@
     "@aws-sdk/client-ses": "^3.932.0",
     "@aws-sdk/s3-request-presigner": "^3.932.0",
     "@faker-js/faker": "^10.1.0",
+    "@hmake98/nestjs-mcp": "^1.0.1",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.1.9",
@@ -119,7 +120,8 @@
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.46.4"
   },
   "lint-staged": {
     "{src,test}/**/*.{ts,js,json}": [

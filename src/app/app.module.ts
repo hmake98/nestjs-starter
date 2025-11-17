@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 
 import { CommonModule } from 'src/common/common.module';
+import { MCPCommonModule } from 'src/common/mcp';
 import { PostModule } from 'src/modules/post/post.module';
 import { UserModule } from 'src/modules/user/user.module';
 import { WorkerModule } from 'src/workers/worker.module';
@@ -12,6 +13,9 @@ import { HealthController } from './controllers/health.controller';
     imports: [
         // Shared Common Services
         CommonModule,
+
+        // MCP Integration
+        MCPCommonModule,
 
         // Background Processing
         WorkerModule,

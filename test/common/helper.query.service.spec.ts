@@ -96,7 +96,7 @@ describe('HelperQueryService', () => {
                 mockDelegate.count.mockResolvedValue(1);
                 mockDelegate.findMany.mockResolvedValue(mockItems);
 
-                const result = await service
+                const _result = await service
                     .query(mockDelegate)
                     .search('john', ['name', 'email'])
                     .execute();

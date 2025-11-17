@@ -176,7 +176,7 @@ describe('DatabaseService', () => {
             const connectSpy = jest
                 .spyOn(service, '$connect')
                 .mockResolvedValue(undefined);
-            const queryRawSpy = jest
+            const _queryRawSpy = jest
                 .spyOn(service, '$queryRaw')
                 .mockResolvedValue([{ '1': 1 }]);
 
@@ -198,7 +198,7 @@ describe('DatabaseService', () => {
             const connectSpy = jest
                 .spyOn(service, '$connect')
                 .mockResolvedValue(undefined);
-            const queryRawSpy = jest
+            const _queryRawSpy = jest
                 .spyOn(service, '$queryRaw')
                 .mockRejectedValue(new Error('Query failed'));
 
@@ -217,10 +217,10 @@ describe('DatabaseService', () => {
 
         it('should handle connection failure during init but successful health check', async () => {
             // Arrange
-            const connectSpy = jest
+            const _connectSpy = jest
                 .spyOn(service, '$connect')
                 .mockRejectedValue(new Error('Initial connection failed'));
-            const queryRawSpy = jest
+            const _queryRawSpy = jest
                 .spyOn(service, '$queryRaw')
                 .mockResolvedValue([{ '1': 1 }]);
 

@@ -2,6 +2,10 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 import tsEsLintPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import tsEslint from 'typescript-eslint';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const rules = tsEslint.configs.recommended
     .map(config => config.rules)
@@ -30,7 +34,7 @@ export default [
             parser: tsParser,
             parserOptions: {
                 project: 'tsconfig.json',
-                tsconfigRootDir: '.',
+                tsconfigRootDir: __dirname,
             },
         },
         linterOptions: {
@@ -67,7 +71,7 @@ export default [
             parser: tsParser,
             parserOptions: {
                 project: 'tsconfig.json',
-                tsconfigRootDir: '.',
+                tsconfigRootDir: __dirname,
             },
         },
         linterOptions: {

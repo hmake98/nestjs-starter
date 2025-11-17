@@ -309,7 +309,7 @@ describe('HelperEncryptionService', () => {
                 Buffer.from('mockRandomBytes')
             );
             (crypto.scrypt as jest.Mock).mockImplementation(
-                (secret, salt, keylen, callback) => {
+                (_secret, _salt, _keylen, callback) => {
                     callback(null, Buffer.from('mockDerivedKey'));
                 }
             );
@@ -362,7 +362,7 @@ describe('HelperEncryptionService', () => {
             const text = 'sensitive data';
             const error = new Error('Key derivation failed');
             (crypto.scrypt as jest.Mock).mockImplementation(
-                (secret, salt, keylen, callback) => {
+                (_secret, _salt, _keylen, callback) => {
                     callback(error, null);
                 }
             );
@@ -394,7 +394,7 @@ describe('HelperEncryptionService', () => {
 
         beforeEach(() => {
             (crypto.scrypt as jest.Mock).mockImplementation(
-                (secret, salt, keylen, callback) => {
+                (_secret, _salt, _keylen, callback) => {
                     callback(null, Buffer.from('mockDerivedKey'));
                 }
             );
@@ -424,7 +424,7 @@ describe('HelperEncryptionService', () => {
         it('should handle key derivation errors during decryption', async () => {
             const error = new Error('Key derivation failed');
             (crypto.scrypt as jest.Mock).mockImplementation(
-                (secret, salt, keylen, callback) => {
+                (_secret, _salt, _keylen, callback) => {
                     callback(error, null);
                 }
             );
@@ -520,7 +520,7 @@ describe('HelperEncryptionService', () => {
                 .mockReturnValueOnce(Buffer.from('saltBytes'))
                 .mockReturnValueOnce(Buffer.from('ivBytes'));
             (crypto.scrypt as jest.Mock).mockImplementation(
-                (secret, salt, keylen, callback) => {
+                (_secret, _salt, _keylen, callback) => {
                     callback(null, Buffer.from('derivedKey'));
                 }
             );
