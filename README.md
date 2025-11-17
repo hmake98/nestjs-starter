@@ -5,6 +5,7 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Statements](https://img.shields.io/badge/statements-7.94%25-red.svg?style=flat) ![Branches](https://img.shields.io/badge/branches-62.06%25-red.svg?style=flat) ![Functions](https://img.shields.io/badge/functions-38.88%25-red.svg?style=flat) ![Lines](https://img.shields.io/badge/lines-7.94%25-red.svg?style=flat)
 
 A production-ready NestJS boilerplate with comprehensive features and best practices for building scalable APIs.
 

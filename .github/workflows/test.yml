@@ -1,0 +1,71 @@
+name: Test
+
+on:
+    push:
+        branches: [master, staging, develop]
+    pull_request:
+        branches: [master, staging, develop]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: write
+
+        strategy:
+            matrix:
+                node-version: [24.x] # LTS version
+            fail-fast: false
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.head_ref }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'yarn'
+
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache yarn dependencies
+              uses: actions/cache@v4
+              id: yarn-cache
+              with:
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
+
+            - name: Run linting fix
+              run: yarn lint
+
+            - name: Run format fix
+              run: yarn format
+
+            - name: Run unit tests
+              run: yarn test
+
+            - name: Generate badges
+              run: yarn make-badges
+              continue-on-error: true
+
+            - name: Commit changes
+              uses: stefanzweifel/git-auto-commit-action@v5
+              with:
+                  commit_message: 'chore: update badges and apply formatting/linting fixes'
+                  file_pattern: '*.md *.ts *.js *.json'
+                  commit_user_name: 'github-actions[bot]'
+                  commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+                  commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+                  skip_dirty_check: false
