@@ -222,10 +222,7 @@ describe('MessageService', () => {
         });
 
         it('should use provided language for all items', () => {
-            const items = [
-                { key: 'user.created' },
-                { key: 'user.updated' },
-            ];
+            const items = [{ key: 'user.created' }, { key: 'user.updated' }];
 
             mockI18nService.translate
                 .mockReturnValueOnce('Usuario creado')

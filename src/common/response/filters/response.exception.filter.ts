@@ -47,9 +47,8 @@ export class ResponseExceptionFilter implements ExceptionFilter {
 
             if (Array.isArray(exceptionMessage)) {
                 // Handle validation errors
-                validationMessages = this.translateValidationMessages(
-                    exceptionMessage
-                );
+                validationMessages =
+                    this.translateValidationMessages(exceptionMessage);
                 message = this.messageService.translateKey(
                     ['http', 'error', statusCode],
                     {

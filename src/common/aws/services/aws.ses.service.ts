@@ -36,8 +36,7 @@ export class AwsSESService implements IAwsSESService {
 
         const region = this.configService.get<string>('aws.ses.region');
         const accessKeyId = this.configService.get<string>('aws.accessKey');
-        const secretAccessKey =
-            this.configService.get<string>('aws.secretKey');
+        const secretAccessKey = this.configService.get<string>('aws.secretKey');
 
         this.sesClient = new SESClient({
             credentials: {
@@ -169,9 +168,7 @@ export class AwsSESService implements IAwsSESService {
             );
             return output;
         } catch (error) {
-            this.logger.error(
-                `Failed to send email via SES: ${error.message}`
-            );
+            this.logger.error(`Failed to send email via SES: ${error.message}`);
             throw error;
         }
     }
