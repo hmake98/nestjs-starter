@@ -68,12 +68,9 @@ export class ResponseInterceptor implements NestInterceptor {
                     'message' in data &&
                     classSerialization?.name === ApiGenericResponseDto.name
                 ) {
-                    data.message = this.messageService.translate(
-                        data.message,
-                        {
-                            defaultValue: data.message,
-                        }
-                    );
+                    data.message = this.messageService.translate(data.message, {
+                        defaultValue: data.message,
+                    });
                 }
 
                 return {

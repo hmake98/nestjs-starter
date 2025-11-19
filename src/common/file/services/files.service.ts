@@ -24,10 +24,7 @@ export class FileService implements IFilesServiceInterface {
             const key = `${userId}/${storeType}/${Date.now()}_${fileName}`;
 
             const { url, expiresIn } =
-                await this.awsS3Service.getPresignedUploadUrl(
-                    key,
-                    contentType
-                );
+                await this.awsS3Service.getPresignedUploadUrl(key, contentType);
 
             this.logger.info(
                 { userId, fileName, storeType },

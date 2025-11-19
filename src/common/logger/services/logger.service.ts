@@ -61,7 +61,10 @@ export const createLoggerConfig = (configService: ConfigService): Params => {
             base: {
                 environment: env,
                 service: configService.get<string>('app.name', 'nestjs-app'),
-                version: configService.get<string>('app.versioning.version', '1'),
+                version: configService.get<string>(
+                    'app.versioning.version',
+                    '1'
+                ),
             },
 
             // Redact sensitive data from logs
@@ -119,12 +122,22 @@ export const createLoggerConfig = (configService: ConfigService): Params => {
 
             // Attach request ID for distributed tracing
             genReqId: (req: IncomingMessage & { id?: string }) => {
-                return req.id || req.headers['x-request-id']?.toString() || crypto.randomUUID();
+                return (
+                    req.id ||
+                    req.headers['x-request-id']?.toString() ||
+                    crypto.randomUUID()
+                );
             },
         },
 
         // Exclude health check and static endpoints from logging
-        exclude: ['/health', '/health/live', '/health/ready', '/metrics', '/favicon.ico'],
+        exclude: [
+            '/health',
+            '/health/live',
+            '/health/ready',
+            '/metrics',
+            '/favicon.ico',
+        ],
     };
 };
 

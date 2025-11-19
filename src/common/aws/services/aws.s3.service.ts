@@ -20,8 +20,7 @@ export class AwsS3Service implements IAwsS3Service {
 
         const region = this.configService.get<string>('aws.s3.region');
         const accessKeyId = this.configService.get<string>('aws.accessKey');
-        const secretAccessKey =
-            this.configService.get<string>('aws.secretKey');
+        const secretAccessKey = this.configService.get<string>('aws.secretKey');
 
         this.s3Client = new S3Client({
             credentials: {
