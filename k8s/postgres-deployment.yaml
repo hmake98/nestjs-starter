@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: postgres
+    namespace: nestjs-starter
+    labels:
+        app: postgres
+        tier: database
+spec:
+    replicas: 1
+    strategy:
+        type: Recreate
+    selector:
+        matchLabels:
+            app: postgres
+    template:
+        metadata:
+            labels:
+                app: postgres
+                tier: database
+        spec:
+            containers:
+                - name: postgres
+                  image: postgres:16-alpine
+                  ports:
+                      - containerPort: 5432
+                        name: postgres
+                  env:
+                      - name: POSTGRES_USER
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: POSTGRES_USER
+                      - name: POSTGRES_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: POSTGRES_PASSWORD
+                      - name: POSTGRES_DB
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: POSTGRES_DB
+                      - name: PGDATA
+                        value: /var/lib/postgresql/data/pgdata
+                  volumeMounts:
+                      - name: postgres-storage
+                        mountPath: /var/lib/postgresql/data
+                  resources:
+                      requests:
+                          memory: '256Mi'
+                          cpu: '250m'
+                      limits:
+                          memory: '512Mi'
+                          cpu: '500m'
+                  livenessProbe:
+                      exec:
+                          command:
+                              - /bin/sh
+                              - -c
+                              - pg_isready -U $POSTGRES_USER
+                      initialDelaySeconds: 30
+                      periodSeconds: 10
+                      timeoutSeconds: 5
+                      failureThreshold: 3
+                  readinessProbe:
+                      exec:
+                          command:
+                              - /bin/sh
+                              - -c
+                              - pg_isready -U $POSTGRES_USER
+                      initialDelaySeconds: 10
+                      periodSeconds: 5
+                      timeoutSeconds: 3
+                      failureThreshold: 3
+            volumes:
+                - name: postgres-storage
+                  persistentVolumeClaim:
+                      claimName: postgres-pvc

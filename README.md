@@ -1,13 +1,89 @@
 # NestJS Starter Boilerplate 🚀
 
+<div align="center">
+
 [![CodeQL](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql)
+[![Test](https://github.com/hmake98/nestjs-starter/actions/workflows/test.yml/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/test.yml)
+![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)
 ![Statements](https://img.shields.io/badge/statements-75.98%25-red.svg?style=flat)
 ![Branches](https://img.shields.io/badge/branches-95.65%25-brightgreen.svg?style=flat)
 ![Functions](https://img.shields.io/badge/functions-96.55%25-brightgreen.svg?style=flat)
 ![Lines](https://img.shields.io/badge/lines-75.98%25-red.svg?style=flat)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+</div>
 
-A production-ready NestJS boilerplate with comprehensive features and best practices for building scalable APIs.
+<p align="center">
+  A production-ready NestJS boilerplate with comprehensive features and best practices for building scalable, enterprise-grade APIs.
+</p>
+
+<p align="center">
+  <strong>⚡️ Quick Start</strong> • <strong>🐳 Docker Ready</strong> • <strong>☸️ Kubernetes Ready</strong> • <strong>🤖 AI/MCP Integrated</strong>
+</p>
+
+---
+
+### 🎯 What's Included
+
+<table>
+<tr>
+<td width="50%">
+
+**Core Features**
+- ✅ JWT Authentication (Access/Refresh)
+- ✅ Role-Based Access Control (RBAC)
+- ✅ PostgreSQL + Prisma ORM
+- ✅ Redis Cache & Bull Queues
+- ✅ AWS S3 File Uploads
+- ✅ AWS SES Email Service
+- ✅ Swagger API Documentation
+- ✅ Health Checks & Monitoring
+
+</td>
+<td width="50%">
+
+**Developer Experience**
+- ✅ Docker & Docker Compose
+- ✅ Kubernetes Manifests (HPA, Ingress)
+- ✅ GitHub Actions CI/CD
+- ✅ Jest Testing (75%+ Coverage)
+- ✅ ESLint + Prettier + Husky
+- ✅ Structured Logging (Pino)
+- ✅ Model Context Protocol (MCP)
+- ✅ i18n Multi-language Support
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📑 Table of Contents
+
+- [Features](#-features)
+- [Tech Stack](#️-tech-stack)
+- [Quick Start](#-quick-start)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#1-clone-and-install)
+  - [Environment Setup](#2-environment-setup)
+  - [Database Setup](#3-database-setup)
+  - [Start Development Server](#4-start-development-server)
+- [Environment Configuration](#-environment-configuration)
+- [Docker Setup](#-docker-setup)
+- [Kubernetes Deployment](#️-kubernetes-deployment)
+- [API Documentation](#-api-documentation)
+- [Model Context Protocol (MCP)](#-model-context-protocol-mcp-integration)
+- [Testing](#-testing)
+- [Project Structure](#-project-structure)
+- [Development Workflow](#-development-workflow)
+- [Deployment](#-deployment)
+- [Security Best Practices](#-security-best-practices)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [Scripts Reference](#-scripts-reference)
+- [License](#-license)
+
+---
 
 ## ✨ Features
 
@@ -108,26 +184,90 @@ The API will be available at:
 
 ## 📋 Environment Configuration
 
-Create a `.env` file based on `.env.docker` template:
+Create a `.env` file based on `.env.docker` template. All environment variables are documented with comments in the template file.
 
-### Required Variables
+### Application Settings
 
-| Variable                    | Description                  | Example                                 |
-| --------------------------- | ---------------------------- | --------------------------------------- |
-| `APP_ENV`                  | Environment mode             | `local`, `development`, `production`    |
-| `DATABASE_URL`              | PostgreSQL connection string | `postgresql://user:pass@host:5432/db`   |
-| `AUTH_ACCESS_TOKEN_SECRET`  | JWT access token secret      | Generate with `openssl rand -base64 32` |
-| `AUTH_REFRESH_TOKEN_SECRET` | JWT refresh token secret     | Generate with `openssl rand -base64 32` |
+| Variable            | Description                              | Default       | Required |
+| ------------------- | ---------------------------------------- | ------------- | -------- |
+| `APP_ENV`           | Environment mode                         | `local`       | Yes      |
+| `APP_NAME`          | Application name                         | `nestjs-starter` | No    |
+| `APP_DEBUG`         | Enable debug mode                        | `true`        | No       |
+| `APP_LOG_LEVEL`     | Logging level                            | `debug`       | No       |
+| `APP_CORS_ORIGINS`  | Comma-separated allowed CORS origins     | `*`           | No       |
 
-### Optional Variables
+### HTTP Server Configuration
 
-| Variable         | Description               | Default     |
-| ---------------- | ------------------------- | ----------- |
-| `HTTP_PORT`      | Server port               | `3001`      |
-| `REDIS_HOST`     | Redis host                | `localhost` |
-| `AWS_ACCESS_KEY` | AWS access key            | -           |
-| `AWS_SECRET_KEY` | AWS secret key            | -           |
-| `SENTRY_DSN`     | Sentry error tracking DSN | -           |
+| Variable                   | Description                   | Default   | Required |
+| -------------------------- | ----------------------------- | --------- | -------- |
+| `HTTP_HOST`                | Server bind address           | `0.0.0.0` | No       |
+| `HTTP_PORT`                | Server port                   | `3001`    | No       |
+| `HTTP_VERSIONING_ENABLE`   | Enable API versioning         | `true`    | No       |
+| `HTTP_VERSION`             | Default API version           | `1`       | No       |
+
+### Authentication & JWT
+
+| Variable                    | Description                  | Example                                 | Required |
+| --------------------------- | ---------------------------- | --------------------------------------- | -------- |
+| `AUTH_ACCESS_TOKEN_SECRET`  | JWT access token secret      | Generate with `openssl rand -base64 32` | Yes      |
+| `AUTH_REFRESH_TOKEN_SECRET` | JWT refresh token secret     | Generate with `openssl rand -base64 32` | Yes      |
+| `AUTH_ACCESS_TOKEN_EXP`     | Access token expiration      | `1d` (1 day)                            | No       |
+| `AUTH_REFRESH_TOKEN_EXP`    | Refresh token expiration     | `7d` (7 days)                           | No       |
+
+### Database Configuration
+
+| Variable       | Description                  | Example                                              | Required |
+| -------------- | ---------------------------- | ---------------------------------------------------- | -------- |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host:5432/db?schema=public` | Yes      |
+
+### AWS Configuration
+
+| Variable                      | Description                      | Example       | Required           |
+| ----------------------------- | -------------------------------- | ------------- | ------------------ |
+| `AWS_ACCESS_KEY`              | AWS IAM access key               | -             | For AWS features   |
+| `AWS_SECRET_KEY`              | AWS IAM secret key               | -             | For AWS features   |
+| `AWS_S3_REGION`               | S3 bucket region                 | `us-east-1`   | For S3 uploads     |
+| `AWS_S3_BUCKET`               | S3 bucket name                   | `my-bucket`   | For S3 uploads     |
+| `AWS_S3_PRESIGN_LINK_EXPIRES` | Pre-signed URL expiration (sec)  | `1200`        | No                 |
+| `AWS_SES_REGION`              | SES service region               | `us-east-1`   | For email service  |
+| `AWS_SES_SOURCE_EMAIL`        | Verified sender email            | `no-reply@example.com` | For email service |
+
+### Redis Configuration
+
+| Variable           | Description           | Default     | Required |
+| ------------------ | --------------------- | ----------- | -------- |
+| `REDIS_HOST`       | Redis host            | `redis`     | Yes      |
+| `REDIS_PORT`       | Redis port            | `6379`      | No       |
+| `REDIS_PASSWORD`   | Redis password        | -           | No       |
+| `REDIS_ENABLE_TLS` | Enable TLS for Redis  | `false`     | No       |
+
+### Model Context Protocol (MCP)
+
+| Variable              | Description           | Default              | Required |
+| --------------------- | --------------------- | -------------------- | -------- |
+| `MCP_SERVER_NAME`     | MCP server name       | `nestjs-starter-mcp` | No       |
+| `MCP_SERVER_VERSION`  | MCP server version    | `1.0.0`              | No       |
+| `MCP_LOG_LEVEL`       | MCP logging level     | `info`               | No       |
+
+### Error Tracking
+
+| Variable      | Description                | Example | Required |
+| ------------- | -------------------------- | ------- | -------- |
+| `SENTRY_DSN`  | Sentry error tracking DSN  | -       | No       |
+
+### Quick Setup
+
+```bash
+# Copy environment template
+cp .env.docker .env
+
+# Generate JWT secrets
+echo "AUTH_ACCESS_TOKEN_SECRET=$(openssl rand -base64 32)" >> .env
+echo "AUTH_REFRESH_TOKEN_SECRET=$(openssl rand -base64 32)" >> .env
+
+# Edit remaining values
+nano .env
+```
 
 ## 🐳 Docker Setup
 
@@ -500,6 +640,180 @@ yarn seed:email
 yarn rollback:email
 ```
 
+## ☸️ Kubernetes Deployment
+
+The project includes complete Kubernetes manifests in the `k8s/` directory for production deployment.
+
+### Available Kubernetes Resources
+
+```
+k8s/
+├── namespace.yaml              # Namespace isolation
+├── configmap.yaml             # Non-sensitive configuration
+├── secret.yaml                # Sensitive data (base64 encoded)
+├── postgres-pvc.yaml          # PostgreSQL persistent storage
+├── postgres-deployment.yaml   # PostgreSQL database
+├── postgres-service.yaml      # PostgreSQL service
+├── redis-pvc.yaml            # Redis persistent storage
+├── redis-deployment.yaml     # Redis cache/queue
+├── redis-service.yaml        # Redis service
+├── app-deployment.yaml       # NestJS application
+├── app-service.yaml          # Application service
+├── ingress.yaml              # Ingress controller config
+└── hpa.yaml                  # Horizontal Pod Autoscaler
+```
+
+### Deploy to Kubernetes
+
+#### 1. Configure Secrets
+
+```bash
+# Create namespace first
+kubectl apply -f k8s/namespace.yaml
+
+# Update k8s/secret.yaml with your base64-encoded secrets
+# Generate base64 values:
+echo -n "your-secret-value" | base64
+
+# Or use this helper to create secrets directly:
+kubectl create secret generic nestjs-secrets \
+  --from-literal=database-url='postgresql://user:pass@postgres:5432/db' \
+  --from-literal=jwt-access-secret='your-access-secret' \
+  --from-literal=jwt-refresh-secret='your-refresh-secret' \
+  --from-literal=aws-access-key='your-aws-key' \
+  --from-literal=aws-secret-key='your-aws-secret' \
+  -n nestjs-starter
+```
+
+#### 2. Update ConfigMap
+
+```bash
+# Edit k8s/configmap.yaml with your configuration
+# Then apply:
+kubectl apply -f k8s/configmap.yaml
+```
+
+#### 3. Deploy Infrastructure (Database & Redis)
+
+```bash
+# Deploy PostgreSQL
+kubectl apply -f k8s/postgres-pvc.yaml
+kubectl apply -f k8s/postgres-deployment.yaml
+kubectl apply -f k8s/postgres-service.yaml
+
+# Deploy Redis
+kubectl apply -f k8s/redis-pvc.yaml
+kubectl apply -f k8s/redis-deployment.yaml
+kubectl apply -f k8s/redis-service.yaml
+
+# Wait for databases to be ready
+kubectl wait --for=condition=ready pod -l app=postgres -n nestjs-starter --timeout=300s
+kubectl wait --for=condition=ready pod -l app=redis -n nestjs-starter --timeout=300s
+```
+
+#### 4. Deploy Application
+
+```bash
+# Deploy the NestJS application
+kubectl apply -f k8s/app-deployment.yaml
+kubectl apply -f k8s/app-service.yaml
+
+# Deploy ingress (configure your domain first)
+kubectl apply -f k8s/ingress.yaml
+
+# (Optional) Enable auto-scaling
+kubectl apply -f k8s/hpa.yaml
+```
+
+#### 5. Verify Deployment
+
+```bash
+# Check all resources
+kubectl get all -n nestjs-starter
+
+# Check pods
+kubectl get pods -n nestjs-starter
+
+# Check logs
+kubectl logs -f deployment/nestjs-app -n nestjs-starter
+
+# Check service
+kubectl get svc -n nestjs-starter
+
+# Describe pod for troubleshooting
+kubectl describe pod <pod-name> -n nestjs-starter
+```
+
+#### 6. Run Database Migrations
+
+```bash
+# Execute migrations in a running pod
+kubectl exec -it deployment/nestjs-app -n nestjs-starter -- yarn migrate:prod
+
+# Or run as a one-off job
+kubectl run migration-job \
+  --image=your-registry/nestjs-starter:latest \
+  --restart=Never \
+  --env="DATABASE_URL=..." \
+  -n nestjs-starter \
+  -- yarn migrate:prod
+```
+
+### Accessing the Application
+
+```bash
+# Port forward for local testing
+kubectl port-forward svc/nestjs-service 3001:3001 -n nestjs-starter
+
+# Or access via ingress (configure DNS first)
+# https://your-domain.com
+```
+
+### Scaling
+
+```bash
+# Manual scaling
+kubectl scale deployment/nestjs-app --replicas=5 -n nestjs-starter
+
+# Horizontal Pod Autoscaler (HPA) is configured to scale between 2-10 replicas
+# based on CPU utilization (70% threshold)
+kubectl get hpa -n nestjs-starter
+```
+
+### Updating the Application
+
+```bash
+# Build and push new image
+docker build -f ci/Dockerfile -t your-registry/nestjs-starter:v2.0.0 .
+docker push your-registry/nestjs-starter:v2.0.0
+
+# Update deployment
+kubectl set image deployment/nestjs-app \
+  nestjs-app=your-registry/nestjs-starter:v2.0.0 \
+  -n nestjs-starter
+
+# Or use rolling update
+kubectl rollout restart deployment/nestjs-app -n nestjs-starter
+
+# Check rollout status
+kubectl rollout status deployment/nestjs-app -n nestjs-starter
+
+# Rollback if needed
+kubectl rollout undo deployment/nestjs-app -n nestjs-starter
+```
+
+### Clean Up
+
+```bash
+# Delete all resources
+kubectl delete namespace nestjs-starter
+
+# Or delete individual resources
+kubectl delete -f k8s/
+```
+
+---
+
 ## 🚀 Deployment
 
 ### Docker Production (Recommended)
@@ -601,6 +915,263 @@ heroku container:release web -a your-app-name
 10. **HTTPS**: Always use TLS in production
 11. **Monitoring**: Sentry integration for error tracking and monitoring
 12. **Soft Deletes**: Models support soft deletion to prevent data loss
+
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions
+
+#### Database Connection Issues
+
+**Problem**: `Error: Can't reach database server`
+
+```bash
+# Check if PostgreSQL is running
+docker-compose ps postgres
+# or
+kubectl get pods -n nestjs-starter | grep postgres
+
+# Check DATABASE_URL format
+# Correct: postgresql://username:password@host:5432/database?schema=public
+
+# For Docker: use service name as host
+DATABASE_URL="postgresql://postgres:password@postgres:5432/db"
+
+# For local: use localhost
+DATABASE_URL="postgresql://postgres:password@localhost:5432/db"
+
+# For Kubernetes: use service name
+DATABASE_URL="postgresql://postgres:password@postgres.nestjs-starter.svc.cluster.local:5432/db"
+```
+
+#### Redis Connection Issues
+
+**Problem**: `Error: Redis connection refused`
+
+```bash
+# Check if Redis is running
+docker-compose ps redis
+# or
+kubectl get pods -n nestjs-starter | grep redis
+
+# Verify REDIS_HOST matches your setup
+# Docker: REDIS_HOST=redis
+# Local: REDIS_HOST=localhost
+# K8s: REDIS_HOST=redis.nestjs-starter.svc.cluster.local
+```
+
+#### Prisma Migration Errors
+
+**Problem**: `Migration failed` or `Schema is out of sync`
+
+```bash
+# Reset database (⚠️ DESTRUCTIVE - development only)
+docker-compose down -v
+docker-compose up -d postgres redis
+yarn generate
+yarn migrate
+
+# For production, run migrations explicitly
+yarn migrate:prod
+
+# If stuck, check migration status
+npx prisma migrate status
+```
+
+#### Port Already in Use
+
+**Problem**: `Error: listen EADDRINUSE: address already in use :::3001`
+
+```bash
+# Find process using the port (macOS/Linux)
+lsof -i :3001
+
+# Kill the process
+kill -9 <PID>
+
+# Or use a different port
+HTTP_PORT=3002 yarn dev
+```
+
+#### Docker Build Fails
+
+**Problem**: `ERROR [builder X/Y] RUN yarn install --frozen-lockfile`
+
+```bash
+# Clear Docker build cache
+docker builder prune -af
+
+# Rebuild without cache
+docker-compose build --no-cache
+
+# Check Docker resources (ensure enough memory/disk)
+docker system df
+docker system prune
+```
+
+#### JWT Token Issues
+
+**Problem**: `Unauthorized` or `Invalid token`
+
+```bash
+# Ensure secrets are properly set
+echo $AUTH_ACCESS_TOKEN_SECRET
+echo $AUTH_REFRESH_TOKEN_SECRET
+
+# Secrets must be the same across restarts
+# Use strong random values (min 32 characters)
+openssl rand -base64 32
+
+# Check token expiration settings
+AUTH_ACCESS_TOKEN_EXP=1d   # 1 day
+AUTH_REFRESH_TOKEN_EXP=7d  # 7 days
+```
+
+#### AWS S3/SES Integration Issues
+
+**Problem**: `AccessDenied` or `InvalidAccessKeyId`
+
+```bash
+# Verify AWS credentials
+aws configure list
+aws sts get-caller-identity
+
+# Check IAM permissions for S3
+# Required: s3:PutObject, s3:GetObject, s3:DeleteObject
+
+# Check IAM permissions for SES
+# Required: ses:SendEmail, ses:SendRawEmail
+
+# Verify email is verified in SES (sandbox mode)
+aws ses list-verified-email-addresses
+
+# Check S3 bucket exists and region matches
+aws s3 ls s3://your-bucket-name --region us-east-1
+```
+
+#### Tests Failing
+
+**Problem**: Tests fail unexpectedly
+
+```bash
+# Clear test cache
+yarn test --clearCache
+
+# Run tests with verbose output
+yarn test --verbose
+
+# Run specific test file
+yarn test --testPathPattern=user.service.spec.ts
+
+# Check for missing mocks
+# Ensure all external dependencies are properly mocked
+```
+
+#### TypeScript Compilation Errors
+
+**Problem**: `error TS2307: Cannot find module`
+
+```bash
+# Clear build cache and reinstall
+rm -rf dist node_modules yarn.lock
+yarn install
+yarn build
+
+# Regenerate Prisma client
+yarn generate
+
+# Check tsconfig.json paths configuration
+```
+
+#### Memory/Performance Issues
+
+**Problem**: Application crashes or runs slowly
+
+```bash
+# Check memory usage
+docker stats
+
+# Increase Node.js memory limit
+NODE_OPTIONS="--max-old-space-size=4096" yarn start
+
+# Enable garbage collection logs
+NODE_OPTIONS="--trace-gc" yarn dev
+
+# Check for memory leaks in production
+# Use clinic.js or node --inspect
+```
+
+#### Kubernetes Pod CrashLoopBackOff
+
+**Problem**: Pod keeps restarting
+
+```bash
+# Check pod logs
+kubectl logs -f <pod-name> -n nestjs-starter
+kubectl logs <pod-name> --previous -n nestjs-starter
+
+# Describe pod for events
+kubectl describe pod <pod-name> -n nestjs-starter
+
+# Common causes:
+# 1. Missing environment variables
+# 2. Database not ready (add init containers)
+# 3. Health check failing too quickly (adjust liveness/readiness probes)
+# 4. Insufficient resources (increase limits)
+
+# Check events
+kubectl get events -n nestjs-starter --sort-by='.lastTimestamp'
+```
+
+#### Email Not Sending (SES)
+
+**Problem**: Emails not being sent
+
+```bash
+# Check SES sandbox mode
+# In sandbox, you can only send to verified emails
+
+# Verify sender email
+aws ses verify-email-identity --email-address your-email@domain.com
+
+# Check SES sending quota
+aws ses get-send-quota
+
+# Check email queue (Bull)
+# Visit Bull Board or check Redis
+redis-cli KEYS "bull:email:*"
+
+# Check worker logs
+docker-compose logs worker
+```
+
+### Getting Help
+
+If you encounter issues not covered here:
+
+1. **Check Logs**: Always start with application logs
+   ```bash
+   # Docker
+   docker-compose logs -f app
+
+   # Kubernetes
+   kubectl logs -f deployment/nestjs-app -n nestjs-starter
+   ```
+
+2. **Enable Debug Mode**:
+   ```bash
+   APP_DEBUG=true
+   APP_LOG_LEVEL=debug
+   ```
+
+3. **Search Issues**: Check [GitHub Issues](https://github.com/hmake98/nestjs-starter/issues)
+
+4. **Create an Issue**: Provide:
+   - Error message
+   - Steps to reproduce
+   - Environment (Node version, OS, Docker/K8s)
+   - Relevant logs
+
+---
 
 ## 🤝 Contributing
 

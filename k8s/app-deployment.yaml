@@ -1,0 +1,221 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: nestjs-app
+    namespace: nestjs-starter
+    labels:
+        app: nestjs-app
+        tier: backend
+spec:
+    replicas: 2
+    strategy:
+        type: RollingUpdate
+        rollingUpdate:
+            maxSurge: 1
+            maxUnavailable: 0
+    selector:
+        matchLabels:
+            app: nestjs-app
+    template:
+        metadata:
+            labels:
+                app: nestjs-app
+                tier: backend
+        spec:
+            initContainers:
+                - name: wait-for-postgres
+                  image: busybox:1.36
+                  command:
+                      - sh
+                      - -c
+                      - |
+                          until nc -z postgres-service 5432; do
+                            echo "Waiting for PostgreSQL..."
+                            sleep 2
+                          done
+                          echo "PostgreSQL is ready!"
+                - name: wait-for-redis
+                  image: busybox:1.36
+                  command:
+                      - sh
+                      - -c
+                      - |
+                          until nc -z redis-service 6379; do
+                            echo "Waiting for Redis..."
+                            sleep 2
+                          done
+                          echo "Redis is ready!"
+            containers:
+                - name: nestjs-app
+                  image: your-registry/nestjs-starter:latest
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 3001
+                        name: http
+                        protocol: TCP
+                  env:
+                      # ConfigMap values
+                      - name: APP_ENV
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: APP_ENV
+                      - name: APP_NAME
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: APP_NAME
+                      - name: APP_DEBUG
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: APP_DEBUG
+                      - name: APP_LOG_LEVEL
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: APP_LOG_LEVEL
+                      - name: HTTP_HOST
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: HTTP_HOST
+                      - name: HTTP_PORT
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: HTTP_PORT
+                      - name: HTTP_VERSIONING_ENABLE
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: HTTP_VERSIONING_ENABLE
+                      - name: HTTP_VERSION
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: HTTP_VERSION
+                      - name: APP_CORS_ORIGINS
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: APP_CORS_ORIGINS
+                      # Redis configuration
+                      - name: REDIS_HOST
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: REDIS_HOST
+                      - name: REDIS_PORT
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: REDIS_PORT
+                      - name: REDIS_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: REDIS_PASSWORD
+                      # Database configuration
+                      - name: POSTGRES_USER
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: POSTGRES_USER
+                      - name: POSTGRES_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: POSTGRES_PASSWORD
+                      - name: POSTGRES_HOST
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: POSTGRES_HOST
+                      - name: POSTGRES_PORT
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: POSTGRES_PORT
+                      - name: POSTGRES_DB
+                        valueFrom:
+                            configMapKeyRef:
+                                name: nestjs-config
+                                key: POSTGRES_DB
+                      # Construct DATABASE_URL from components
+                      - name: DATABASE_URL
+                        value: 'postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)?schema=public'
+                      # JWT Secrets
+                      - name: AUTH_ACCESS_TOKEN_SECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: AUTH_ACCESS_TOKEN_SECRET
+                      - name: AUTH_REFRESH_TOKEN_SECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: AUTH_REFRESH_TOKEN_SECRET
+                      - name: AUTH_ACCESS_TOKEN_EXP
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: AUTH_ACCESS_TOKEN_EXP
+                      - name: AUTH_REFRESH_TOKEN_EXP
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: AUTH_REFRESH_TOKEN_EXP
+                      # AWS Configuration (optional)
+                      - name: AWS_ACCESS_KEY
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: AWS_ACCESS_KEY
+                      - name: AWS_SECRET_KEY
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: AWS_SECRET_KEY
+                      - name: AWS_REGION
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: AWS_REGION
+                      - name: AWS_S3_BUCKET
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: AWS_S3_BUCKET
+                      # Sentry DSN (optional)
+                      - name: SENTRY_DSN
+                        valueFrom:
+                            secretKeyRef:
+                                name: nestjs-secret
+                                key: SENTRY_DSN
+                  resources:
+                      requests:
+                          memory: '256Mi'
+                          cpu: '250m'
+                      limits:
+                          memory: '512Mi'
+                          cpu: '500m'
+                  livenessProbe:
+                      httpGet:
+                          path: /health
+                          port: 3001
+                          scheme: HTTP
+                      initialDelaySeconds: 60
+                      periodSeconds: 30
+                      timeoutSeconds: 5
+                      failureThreshold: 3
+                  readinessProbe:
+                      httpGet:
+                          path: /health
+                          port: 3001
+                          scheme: HTTP
+                      initialDelaySeconds: 30
+                      periodSeconds: 10
+                      timeoutSeconds: 3
+                      failureThreshold: 3
+            restartPolicy: Always

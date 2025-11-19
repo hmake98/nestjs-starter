@@ -3,6 +3,8 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.yarn/cache
+.pnp.*
 
 # Build outputs
 dist
@@ -51,6 +53,14 @@ jest.config.js
 
 # Husky
 .husky
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Kubernetes
+k8s/
 
 # Database
 prisma/migrations

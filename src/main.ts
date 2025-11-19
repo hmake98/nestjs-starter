@@ -56,15 +56,20 @@ async function bootstrap(): Promise<void> {
             setupSwagger(app);
         }
 
-        // Graceful shutdown
-        const gracefulShutdown = async (signal: string) => {
-            logger.log(`Received ${signal}, shutting down gracefully...`);
-            await app.close();
-            process.exit(0);
-        };
+        // Graceful shutdown (only in production - watch mode handles this differently)
+        if (env === APP_ENVIRONMENT.PRODUCTION) {
+            const gracefulShutdown = async (signal: string) => {
+                logger.log(`Received ${signal}, shutting down gracefully...`);
+                await app.close();
+                process.exit(0);
+            };
 
-        process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-        process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+            process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+            process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+        } else {
+            // In development, enable shutdown hooks for proper cleanup
+            app.enableShutdownHooks();
+        }
 
         // Start server
         await app.listen(port, host);

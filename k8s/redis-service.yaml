@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: redis-service
+    namespace: nestjs-starter
+    labels:
+        app: redis
+        tier: cache
+spec:
+    type: ClusterIP
+    ports:
+        - port: 6379
+          targetPort: 6379
+          protocol: TCP
+          name: redis
+    selector:
+        app: redis

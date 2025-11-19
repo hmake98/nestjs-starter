@@ -23,6 +23,8 @@ import { MCPToolsService } from './services/mcp.tools.service';
                 autoDiscoverTools: true,
                 autoDiscoverResources: true,
                 autoDiscoverPrompts: true,
+                // Enable root path detection
+                rootPath: true,
                 // Logging level
                 logLevel: configService.get('mcp.logLevel', 'info'),
             }),

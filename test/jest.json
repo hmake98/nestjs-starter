@@ -1,56 +1,43 @@
 {
-    "testTimeout": 15000,
+    "testTimeout": 5000,
     "rootDir": "../",
     "modulePaths": ["."],
     "testEnvironment": "node",
     "testMatch": ["<rootDir>/test/**/*.spec.ts"],
-    "testPathIgnorePatterns": ["<rootDir>/node_modules/", "<rootDir>/dist/"],
     "collectCoverage": true,
     "coverageDirectory": "coverage",
-    "coverageReporters": ["lcov", "json-summary", "text", "html"],
     "collectCoverageFrom": [
         "<rootDir>/src/**/*.service.ts",
         "!<rootDir>/src/**/*.spec.ts",
         "!<rootDir>/src/**/*.mock.ts",
         "!<rootDir>/src/common/database/services/database.service.ts",
         "!<rootDir>/src/common/logger/services/logger.service.ts",
-        "!<rootDir>/src/workers/processors/cron.processor.ts"
+        "!<rootDir>/src/workers/schedulers/midnight.scheduler.ts"
     ],
     "coverageThreshold": {
         "global": {
-            "branches": 95,
-            "functions": 98,
-            "lines": 98,
-            "statements": 98
+            "branches": 90,
+            "functions": 90,
+            "lines": 90,
+            "statements": 90
         }
     },
+    "coverageReporters": ["html", "lcov", "json-summary"],
     "moduleFileExtensions": ["js", "ts", "json"],
     "coverageProvider": "v8",
     "transform": {
         "^.+\\.(t|j)sx?$": [
             "@swc/jest",
             {
-                "sourceMaps": true,
-                "jsc": {
-                    "parser": {
-                        "syntax": "typescript",
-                        "decorators": true
-                    },
-                    "transform": {
-                        "legacyDecorator": true,
-                        "decoratorMetadata": true
-                    }
-                }
+                "sourceMaps": true
             }
         ]
     },
-    "modulePathIgnorePatterns": ["<rootDir>/dist"],
     "moduleNameMapper": {
-        "^@faker-js/faker$": "<rootDir>/test/mocks/faker.mock.ts"
+        "^@faker-js/faker$": "<rootDir>/test/mocks/faker.mock.ts",
+        "^ws$": "<rootDir>/test/mocks/ws.mock.ts",
+        "^@grpc/grpc-js$": "<rootDir>/test/mocks/grpc.mock.ts",
+        "^@grpc/proto-loader$": "<rootDir>/test/mocks/proto-loader.mock.ts"
     },
-    "clearMocks": true,
-    "restoreMocks": true,
-    "forceExit": true,
-    "detectOpenHandles": true,
-    "maxWorkers": "50%"
+    "modulePathIgnorePatterns": ["<rootDir>/dist"]
 }

@@ -1,40 +1,26 @@
-FROM node:lts-alpine
+FROM node:20-alpine
 
-# Install build dependencies
-RUN apk add --no-cache --virtual .build-deps \
-    alpine-sdk \
-    python3
+# Install dependencies needed for native modules
+RUN apk add --no-cache python3 make g++
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files first for better caching
+# Copy dependency files
 COPY package.json yarn.lock ./
 
-# Install ALL dependencies (including devDependencies needed for ts-node)
-RUN yarn install --frozen-lockfile
+# Install dependencies with cache mount for faster rebuilds
+RUN --mount=type=cache,target=/root/.yarn \
+    --mount=type=cache,target=/app/.yarn/cache \
+    yarn install --frozen-lockfile --prefer-offline
 
-# Copy Prisma schema
+# Copy prisma schema and generate client
 COPY prisma ./prisma/
-
-# Generate Prisma client
 RUN yarn generate
 
-# Copy source code
+# Copy source code (this layer changes most frequently)
 COPY . .
 
-# Build the application for development
-RUN yarn build
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
-
-# Change ownership
-RUN chown -R nestjs:nodejs /app
-USER nestjs
-
-# Expose port
+# Expose application port
 EXPOSE 3001
 
 # Start development server with hot reload

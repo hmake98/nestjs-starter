@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: nestjs-config
+    namespace: nestjs-starter
+data:
+    APP_ENV: 'production'
+    APP_NAME: 'nestjs-starter'
+    APP_DEBUG: 'false'
+    APP_LOG_LEVEL: 'info'
+    HTTP_HOST: '0.0.0.0'
+    HTTP_PORT: '3001'
+    HTTP_VERSIONING_ENABLE: 'true'
+    HTTP_VERSION: '1'
+    # Database URL will be constructed from secret + service
+    POSTGRES_HOST: 'postgres-service'
+    POSTGRES_PORT: '5432'
+    POSTGRES_DB: 'postgres'
+    # Redis configuration
+    REDIS_HOST: 'redis-service'
+    REDIS_PORT: '6379'
+    # CORS
+    APP_CORS_ORIGINS: '*'

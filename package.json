@@ -1,7 +1,7 @@
 {
   "name": "nestjs-starter",
   "version": "1.0.0",
-  "description": "A NestJS starter project with comprehensive setup",
+  "description": "Production-ready NestJS boilerplate with JWT auth, PostgreSQL/Prisma, AWS S3/SES, Bull/Redis queues, Docker/K8s support, and MCP integration for AI capabilities",
   "author": "hmake98",
   "license": "MIT",
   "private": true,
@@ -26,7 +26,7 @@
     "rollback:email": "nestjs-command rollback:emails",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "test": "jest --config test/jest.json --runInBand --passWithNoTests --forceExit",
+    "test": "jest --config test/jest.json --coverage --runInBand --passWithNoTests --forceExit",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --config test/jest.json --runInBand"
   },
   "dependencies": {
@@ -34,7 +34,7 @@
     "@aws-sdk/client-ses": "^3.932.0",
     "@aws-sdk/s3-request-presigner": "^3.932.0",
     "@faker-js/faker": "^10.1.0",
-    "@hmake98/nestjs-mcp": "^1.0.1",
+    "@hmake98/nestjs-mcp": "^1.0.4",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.1.9",
@@ -62,7 +62,6 @@
     "dotenv": "^17.2.3",
     "handlebars": "^4.7.8",
     "helmet": "^8.1.0",
-    "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "nestjs-command": "^3.1.5",
@@ -97,6 +96,7 @@
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.3",
     "@types/swagger-ui-express": "^4.1.8",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
     "cross-env": "^10.1.0",
@@ -121,7 +121,8 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "^8.46.4"
+    "typescript-eslint": "^8.46.4",
+    "ws": "^8.18.3"
   },
   "lint-staged": {
     "{src,test}/**/*.{ts,js,json}": [

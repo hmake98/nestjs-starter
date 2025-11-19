@@ -667,5 +667,79 @@ describe('HelperPrismaQueryBuilderService', () => {
                 take: 10,
             });
         });
+
+        it('should skip non-allowed filter fields', async () => {
+            mockDelegate.findMany.mockResolvedValue([]);
+            mockDelegate.count.mockResolvedValue(0);
+
+            const options: IQueryOptions = {
+                filters: {
+                    name: 'John',
+                    secretField: 'secret',
+                    role: 'admin',
+                },
+            };
+
+            const builderOptions = {
+                allowedFilterFields: ['name', 'role'], // secretField not allowed
+            };
+
+            await service.buildQuery(mockDelegate, options, builderOptions);
+
+            expect(mockDelegate.findMany).toHaveBeenCalledWith({
+                where: {
+                    AND: [
+                        {
+                            name: 'John',
+                            role: 'admin',
+                        },
+                    ],
+                },
+                orderBy: { createdAt: 'desc' },
+                skip: 0,
+                take: 10,
+            });
+        });
+
+        it('should handle search without allowedSearchFields restriction', async () => {
+            mockDelegate.findMany.mockResolvedValue([]);
+            mockDelegate.count.mockResolvedValue(0);
+
+            const options: IQueryOptions = {
+                searchQuery: 'test',
+                searchFields: ['name', 'email'],
+            };
+
+            const builderOptions = {}; // No allowedSearchFields specified
+
+            await service.buildQuery(mockDelegate, options, builderOptions);
+
+            // Should include all search fields when no restriction is set
+            expect(mockDelegate.findMany).toHaveBeenCalledWith({
+                where: {
+                    AND: [
+                        {
+                            OR: [
+                                {
+                                    name: {
+                                        contains: 'test',
+                                        mode: 'insensitive',
+                                    },
+                                },
+                                {
+                                    email: {
+                                        contains: 'test',
+                                        mode: 'insensitive',
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                },
+                orderBy: { createdAt: 'desc' },
+                skip: 0,
+                take: 10,
+            });
+        });
     });
 });
