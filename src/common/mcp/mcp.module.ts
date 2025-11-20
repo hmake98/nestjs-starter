@@ -28,8 +28,7 @@ import { MCPToolsService } from './services/mcp.tools.service';
                 autoDiscoverResources: true,
                 autoDiscoverPrompts: true,
                 // Logging level
-                // logLevel: configService.get('mcp.logLevel', 'info'),
-                logLevel: 'debug',
+                logLevel: configService.get('mcp.logLevel', 'info'),
             }),
         }),
     ],
