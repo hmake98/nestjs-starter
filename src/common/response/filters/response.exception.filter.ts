@@ -85,10 +85,12 @@ export class ResponseExceptionFilter implements ExceptionFilter {
             timestamp: new Date().toISOString(),
         };
 
-        if (validationMessages) {
-            errorResponse.error = validationMessages;
-        } else if (this.isDebug && exception instanceof Error) {
-            errorResponse.error = exception.stack;
+        if (this.isDebug) {
+            if (validationMessages) {
+                errorResponse.error = validationMessages;
+            } else if (exception instanceof Error) {
+                errorResponse.error = exception.stack;
+            }
         }
 
         // Log errors

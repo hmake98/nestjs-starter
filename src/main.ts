@@ -6,8 +6,8 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { useContainer } from 'class-validator';
 import compression from 'compression';
 import express from 'express';
-import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
+import { getMCPHelmetConfig } from '@hmake98/nestjs-mcp';
 
 import { AppModule } from './app/app.module';
 import { APP_ENVIRONMENT } from './app/enums/app.enum';
@@ -30,7 +30,7 @@ async function bootstrap(): Promise<void> {
         const port = config.getOrThrow('app.http.port');
 
         // Middleware
-        app.use(helmet());
+        app.use(getMCPHelmetConfig()); // Helmet with MCP playground support
         app.use(compression());
         app.useLogger(logger);
         app.enableCors(config.get('app.cors'));
@@ -44,6 +44,7 @@ async function bootstrap(): Promise<void> {
             })
         );
 
+        // Enable versioning (MCP routes use VERSION_NEUTRAL to bypass this)
         app.enableVersioning({
             type: VersioningType.URI,
             defaultVersion: '1',

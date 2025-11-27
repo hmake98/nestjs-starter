@@ -1471,10 +1471,10 @@
   resolved "https://registry.npmjs.org/@faker-js/faker/-/faker-10.1.0.tgz"
   integrity sha512-C3mrr3b5dRVlKPJdfrAXS8+dq+rq8Qm5SNRazca0JKgw1HQERFmrVb0towvMmw5uu8hHKNiQasMaR/tydf3Zsg==
 
-"@hmake98/nestjs-mcp@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@hmake98/nestjs-mcp/-/nestjs-mcp-1.0.5.tgz#c38e88ad13c533ab3e026f40334e3e77cb12350e"
-  integrity sha512-PUnvxpuG9FTgAIkyBoiLH3t/908m9RksSR2buA3AtkSpoICGvGWYA+bCFLmDGd2ptFB5kmKfVMYVZsnLZLlAHA==
+"@hmake98/nestjs-mcp@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@hmake98/nestjs-mcp/-/nestjs-mcp-1.0.6.tgz#7607fdcf0bd163df530ac26c8d1e66204addebb0"
+  integrity sha512-msbEaVg8n5jCti7VaCFPygSxNSAiwUzIITqUjP7hw/UCgKZxp5KGLDkda86Z9Qb4afCMoOHYsW1cnQPiMWJ2yQ==
   dependencies:
     "@modelcontextprotocol/sdk" "^1.21.1"
     axios "^1.13.2"
