@@ -18,65 +18,59 @@ describe('MCPResourcesService', () => {
     });
 
     describe('getApiOverview', () => {
-        it('should return API overview resource', async () => {
+        it('should return API overview content', async () => {
             const result = await service.getApiOverview();
 
             expect(result).toBeDefined();
-            expect(result.uri).toBe('docs://api/overview');
-            expect(result.mimeType).toBe('text/markdown');
-            expect(result.text).toBeDefined();
+            expect(typeof result).toBe('string');
         });
 
         it('should include NestJS Starter API title', async () => {
             const result = await service.getApiOverview();
 
-            expect(result.text).toContain('# NestJS Starter API');
+            expect(result).toContain('# NestJS Starter API');
         });
 
         it('should include features section', async () => {
             const result = await service.getApiOverview();
-            const text = result.text;
 
-            expect(text).toContain('## Features');
-            expect(text).toContain('Authentication & Authorization (JWT)');
-            expect(text).toContain(
+            expect(result).toContain('## Features');
+            expect(result).toContain('Authentication & Authorization (JWT)');
+            expect(result).toContain(
                 'Database Integration (PostgreSQL + Prisma)'
             );
-            expect(text).toContain('Email Service (AWS SES)');
-            expect(text).toContain('File Upload (AWS S3)');
-            expect(text).toContain('Background Jobs (Bull + Redis)');
-            expect(text).toContain('API Documentation (Swagger)');
-            expect(text).toContain('Logging (Pino)');
-            expect(text).toContain('Rate Limiting');
-            expect(text).toContain('Health Checks');
+            expect(result).toContain('Email Service (AWS SES)');
+            expect(result).toContain('File Upload (AWS S3)');
+            expect(result).toContain('Background Jobs (Bull + Redis)');
+            expect(result).toContain('API Documentation (Swagger)');
+            expect(result).toContain('Logging (Pino)');
+            expect(result).toContain('Rate Limiting');
+            expect(result).toContain('Health Checks');
         });
 
         it('should include endpoints section', async () => {
             const result = await service.getApiOverview();
-            const text = result.text;
 
-            expect(text).toContain('## Endpoints');
-            expect(text).toContain('/v1/auth/*');
-            expect(text).toContain('/v1/user/*');
-            expect(text).toContain('/v1/post/*');
-            expect(text).toContain('/health');
-            expect(text).toContain('/docs');
+            expect(result).toContain('## Endpoints');
+            expect(result).toContain('/v1/auth/*');
+            expect(result).toContain('/v1/user/*');
+            expect(result).toContain('/v1/post/*');
+            expect(result).toContain('/health');
+            expect(result).toContain('/docs');
         });
     });
 
     describe('getServerStatus', () => {
-        it('should return server status resource', async () => {
+        it('should return server status as JSON string', async () => {
             const result = await service.getServerStatus();
 
             expect(result).toBeDefined();
-            expect(result.uri).toBe('status://server');
-            expect(result.mimeType).toBe('application/json');
-            expect(result.text).toBeDefined();
+            expect(typeof result).toBe('string');
         });
 
         it('should return valid JSON', async () => {
             const result = await service.getServerStatus();
-            const parsed = JSON.parse(result.text);
+            const parsed = JSON.parse(result);
 
             expect(parsed).toBeDefined();
             expect(typeof parsed).toBe('object');
@@ -84,14 +78,14 @@ describe('MCPResourcesService', () => {
 
         it('should include status field', async () => {
             const result = await service.getServerStatus();
-            const parsed = JSON.parse(result.text);
+            const parsed = JSON.parse(result);
 
             expect(parsed.status).toBe('running');
         });
 
         it('should include environment field', async () => {
             const result = await service.getServerStatus();
-            const parsed = JSON.parse(result.text);
+            const parsed = JSON.parse(result);
 
             expect(parsed.environment).toBeDefined();
             expect(typeof parsed.environment).toBe('string');
@@ -99,21 +93,21 @@ describe('MCPResourcesService', () => {
 
         it('should include nodeVersion field', async () => {
             const result = await service.getServerStatus();
-            const parsed = JSON.parse(result.text);
+            const parsed = JSON.parse(result);
 
             expect(parsed.nodeVersion).toBe(process.version);
         });
 
         it('should include platform field', async () => {
             const result = await service.getServerStatus();
-            const parsed = JSON.parse(result.text);
+            const parsed = JSON.parse(result);
 
             expect(parsed.platform).toBe(process.platform);
         });
 
         it('should include uptime field', async () => {
             const result = await service.getServerStatus();
-            const parsed = JSON.parse(result.text);
+            const parsed = JSON.parse(result);
 
             expect(parsed.uptime).toBeDefined();
             expect(typeof parsed.uptime).toBe('number');
@@ -122,7 +116,7 @@ describe('MCPResourcesService', () => {
 
         it('should include timestamp field', async () => {
             const result = await service.getServerStatus();
-            const parsed = JSON.parse(result.text);
+            const parsed = JSON.parse(result);
 
             expect(parsed.timestamp).toBeDefined();
             expect(typeof parsed.timestamp).toBe('string');
@@ -130,125 +124,82 @@ describe('MCPResourcesService', () => {
         });
     });
 
-    describe('getDocumentation', () => {
+    describe('getAuthDocs', () => {
         it('should return auth documentation', async () => {
-            const result = await service.getDocumentation({ section: 'auth' });
+            const result = await service.getAuthDocs();
 
             expect(result).toBeDefined();
-            expect(result.uri).toBe('docs://api/auth');
-            expect(result.mimeType).toBe('text/markdown');
-            expect(result.text).toContain('# Authentication');
-            expect(result.text).toContain('POST /v1/auth/login');
-            expect(result.text).toContain('email');
-            expect(result.text).toContain('password');
-            expect(result.text).toContain('accessToken');
-            expect(result.text).toContain('refreshToken');
-        });
-
-        it('should return user documentation', async () => {
-            const result = await service.getDocumentation({ section: 'user' });
-
-            expect(result).toBeDefined();
-            expect(result.uri).toBe('docs://api/user');
-            expect(result.mimeType).toBe('text/markdown');
-            expect(result.text).toContain('# User Management');
-            expect(result.text).toContain('GET /v1/user/profile');
-            expect(result.text).toContain('Authorization: Bearer');
-            expect(result.text).toContain('firstName');
-            expect(result.text).toContain('lastName');
-        });
-
-        it('should return post documentation', async () => {
-            const result = await service.getDocumentation({ section: 'post' });
-
-            expect(result).toBeDefined();
-            expect(result.uri).toBe('docs://api/post');
-            expect(result.mimeType).toBe('text/markdown');
-            expect(result.text).toContain('# Post Management');
-            expect(result.text).toContain('GET /v1/post');
-            expect(result.text).toContain('page');
-            expect(result.text).toContain('limit');
-            expect(result.text).toContain('meta');
-        });
-
-        it('should return unknown section message for invalid section', async () => {
-            const result = await service.getDocumentation({
-                section: 'invalid',
-            });
-
-            expect(result).toBeDefined();
-            expect(result.uri).toBe('docs://api/invalid');
-            expect(result.mimeType).toBe('text/markdown');
-            expect(result.text).toContain('# Unknown Section');
-            expect(result.text).toContain("Section 'invalid' not found");
-        });
-
-        it('should handle empty section name', async () => {
-            const result = await service.getDocumentation({ section: '' });
-
-            expect(result).toBeDefined();
-            expect(result.text).toContain('# Unknown Section');
+            expect(typeof result).toBe('string');
+            expect(result).toContain('# Authentication');
+            expect(result).toContain('POST /v1/auth/login');
+            expect(result).toContain('email');
+            expect(result).toContain('password');
+            expect(result).toContain('accessToken');
+            expect(result).toContain('refreshToken');
         });
     });
 
-    describe('getConfig', () => {
-        it('should return nodeVersion config', async () => {
-            const result = await service.getConfig({ key: 'nodeVersion' });
+    describe('getUserDocs', () => {
+        it('should return user documentation', async () => {
+            const result = await service.getUserDocs();
 
             expect(result).toBeDefined();
-            expect(result.uri).toBe('config://nodeVersion');
-            expect(result.mimeType).toBe('text/plain');
-            expect(result.text).toBe(process.version);
+            expect(typeof result).toBe('string');
+            expect(result).toContain('# User Management');
+            expect(result).toContain('GET /v1/user/profile');
+            expect(result).toContain('Authorization: Bearer');
+            expect(result).toContain('firstName');
+            expect(result).toContain('lastName');
         });
+    });
 
-        it('should return platform config', async () => {
-            const result = await service.getConfig({ key: 'platform' });
+    describe('getPostDocs', () => {
+        it('should return post documentation', async () => {
+            const result = await service.getPostDocs();
 
             expect(result).toBeDefined();
-            expect(result.uri).toBe('config://platform');
-            expect(result.mimeType).toBe('text/plain');
-            expect(result.text).toBe(process.platform);
+            expect(typeof result).toBe('string');
+            expect(result).toContain('# Post Management');
+            expect(result).toContain('GET /v1/post');
+            expect(result).toContain('page');
+            expect(result).toContain('limit');
+            expect(result).toContain('meta');
         });
+    });
 
-        it('should return environment config', async () => {
-            const result = await service.getConfig({ key: 'environment' });
+    describe('getNodeVersion', () => {
+        it('should return current Node.js version', async () => {
+            const result = await service.getNodeVersion();
 
             expect(result).toBeDefined();
-            expect(result.uri).toBe('config://environment');
-            expect(result.mimeType).toBe('text/plain');
-            expect(result.text).toBeDefined();
+            expect(result).toBe(process.version);
         });
+    });
 
-        it('should return port config', async () => {
-            const result = await service.getConfig({ key: 'port' });
+    describe('getPlatform', () => {
+        it('should return current platform', async () => {
+            const result = await service.getPlatform();
 
             expect(result).toBeDefined();
-            expect(result.uri).toBe('config://port');
-            expect(result.mimeType).toBe('text/plain');
-            expect(result.text).toBeDefined();
+            expect(result).toBe(process.platform);
         });
+    });
 
-        it('should return error message for non-allowed config', async () => {
-            const result = await service.getConfig({ key: 'secretKey' });
+    describe('getEnvironment', () => {
+        it('should return current environment', async () => {
+            const result = await service.getEnvironment();
 
             expect(result).toBeDefined();
-            expect(result.uri).toBe('config://secretKey');
-            expect(result.mimeType).toBe('text/plain');
-            expect(result.text).toBe('Config not found or not allowed');
+            expect(typeof result).toBe('string');
         });
+    });
 
-        it('should handle empty config key', async () => {
-            const result = await service.getConfig({ key: '' });
-
-            expect(result).toBeDefined();
-            expect(result.text).toBe('Config not found or not allowed');
-        });
-
-        it('should handle undefined config key', async () => {
-            const result = await service.getConfig({ key: 'nonExistentKey' });
+    describe('getPort', () => {
+        it('should return HTTP port', async () => {
+            const result = await service.getPort();
 
             expect(result).toBeDefined();
-            expect(result.text).toBe('Config not found or not allowed');
+            expect(typeof result).toBe('string');
         });
     });
 });

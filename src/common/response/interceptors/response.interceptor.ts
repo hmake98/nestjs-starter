@@ -7,7 +7,6 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { Observable, map } from 'rxjs';
-import { MCP_IS_PUBLIC } from '@hmake98/nestjs-mcp';
 
 import {
     DOC_RESPONSE_MESSAGE_META_KEY,
@@ -27,14 +26,6 @@ export class ResponseInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle().pipe(
             map(responseBody => {
-                // Skip response wrapping for MCP routes
-                const isMCPPublic = this.reflector.getAllAndOverride<boolean>(
-                    MCP_IS_PUBLIC,
-                    [context.getHandler(), context.getClass()]
-                );
-                if (isMCPPublic) {
-                    return responseBody; // Return raw response for MCP routes
-                }
                 const ctx = context.switchToHttp();
                 const response = ctx.getResponse();
                 const statusCode: number = response.statusCode;

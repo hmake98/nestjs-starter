@@ -6,8 +6,8 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { useContainer } from 'class-validator';
 import compression from 'compression';
 import express from 'express';
+import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
-import { getMCPHelmetConfig } from '@hmake98/nestjs-mcp';
 
 import { AppModule } from './app/app.module';
 import { APP_ENVIRONMENT } from './app/enums/app.enum';
@@ -30,7 +30,21 @@ async function bootstrap(): Promise<void> {
         const port = config.getOrThrow('app.http.port');
 
         // Middleware
-        app.use(getMCPHelmetConfig()); // Helmet with MCP playground support
+        // Configure helmet to skip CSP for playground routes (handled by PlaygroundRouterService)
+        app.use(
+            helmet({
+                contentSecurityPolicy: {
+                    directives: {
+                        defaultSrc: ["'self'"],
+                        scriptSrc: ["'self'"],
+                        styleSrc: ["'self'", "'unsafe-inline'"],
+                        imgSrc: ["'self'", 'data:'],
+                    },
+                    // Skip CSP for playground routes - they have their own CSP
+                    skip: req => req.path.startsWith('/mcp/playground'),
+                },
+            })
+        );
         app.use(compression());
         app.useLogger(logger);
         app.enableCors(config.get('app.cors'));

@@ -1,39 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { MCPPrompt } from '@hmake98/nestjs-mcp';
+import { Prompt, PromptParam } from '@hmake98/nest-mcp';
 
 @Injectable()
 export class MCPPromptsService {
     /**
      * Code review prompt
      */
-    @MCPPrompt({
+    @Prompt({
         name: 'code-review',
         description:
             'Generate a comprehensive code review prompt for any programming language',
-        arguments: [
-            {
-                name: 'language',
-                description: 'Programming language (e.g., TypeScript, Python)',
-                required: true,
-            },
-            {
-                name: 'code',
-                description: 'Code snippet to review',
-                required: true,
-            },
-            {
-                name: 'focus',
-                description:
-                    'Specific aspect to focus on (e.g., security, performance)',
-                required: false,
-            },
-        ],
     })
-    async codeReview(args: { language: string; code: string; focus?: string }) {
-        let prompt = `Please review this ${args.language} code:\n\n\`\`\`${args.language}\n${args.code}\n\`\`\`\n\n`;
+    async codeReview(
+        @PromptParam('language', {
+            description: 'Programming language (e.g., TypeScript, Python)',
+            required: true,
+        })
+        language: string,
+        @PromptParam('code', {
+            description: 'Code snippet to review',
+            required: true,
+        })
+        code: string,
+        @PromptParam('focus', {
+            description:
+                'Specific aspect to focus on (e.g., security, performance)',
+            required: false,
+        })
+        focus?: string
+    ): Promise<string> {
+        let prompt = `Please review this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\`\n\n`;
 
-        if (args.focus) {
-            prompt += `Focus specifically on: ${args.focus}\n\n`;
+        if (focus) {
+            prompt += `Focus specifically on: ${focus}\n\n`;
         }
 
         prompt += `Please provide:\n`;
@@ -44,65 +43,54 @@ export class MCPPromptsService {
         prompt += `5. Best practices and improvements\n`;
         prompt += `6. Code maintainability`;
 
-        return [
-            {
-                role: 'user' as const,
-                content: {
-                    type: 'text' as const,
-                    text: prompt,
-                },
-            },
-        ];
+        return prompt;
     }
 
     /**
      * API documentation generator prompt
      */
-    @MCPPrompt({
+    @Prompt({
         name: 'generate-api-docs',
         description: 'Generate API documentation for an endpoint',
-        arguments: [
-            {
-                name: 'method',
-                description: 'HTTP method (GET, POST, PUT, DELETE)',
-                required: true,
-            },
-            { name: 'path', description: 'API endpoint path', required: true },
-            {
-                name: 'description',
-                description: 'Endpoint description',
-                required: true,
-            },
-            {
-                name: 'requestBody',
-                description: 'Request body example (JSON string)',
-                required: false,
-            },
-            {
-                name: 'responseBody',
-                description: 'Response body example (JSON string)',
-                required: false,
-            },
-        ],
     })
-    async generateApiDocs(args: {
-        method: string;
-        path: string;
-        description: string;
-        requestBody?: string;
-        responseBody?: string;
-    }) {
+    async generateApiDocs(
+        @PromptParam('method', {
+            description: 'HTTP method (GET, POST, PUT, DELETE)',
+            required: true,
+        })
+        method: string,
+        @PromptParam('path', {
+            description: 'API endpoint path',
+            required: true,
+        })
+        path: string,
+        @PromptParam('description', {
+            description: 'Endpoint description',
+            required: true,
+        })
+        description: string,
+        @PromptParam('requestBody', {
+            description: 'Request body example (JSON string)',
+            required: false,
+        })
+        requestBody?: string,
+        @PromptParam('responseBody', {
+            description: 'Response body example (JSON string)',
+            required: false,
+        })
+        responseBody?: string
+    ): Promise<string> {
         let prompt = `Generate comprehensive API documentation for the following endpoint:\n\n`;
-        prompt += `**Method:** ${args.method}\n`;
-        prompt += `**Path:** ${args.path}\n`;
-        prompt += `**Description:** ${args.description}\n\n`;
+        prompt += `**Method:** ${method}\n`;
+        prompt += `**Path:** ${path}\n`;
+        prompt += `**Description:** ${description}\n\n`;
 
-        if (args.requestBody) {
-            prompt += `**Request Body Example:**\n\`\`\`json\n${args.requestBody}\n\`\`\`\n\n`;
+        if (requestBody) {
+            prompt += `**Request Body Example:**\n\`\`\`json\n${requestBody}\n\`\`\`\n\n`;
         }
 
-        if (args.responseBody) {
-            prompt += `**Response Body Example:**\n\`\`\`json\n${args.responseBody}\n\`\`\`\n\n`;
+        if (responseBody) {
+            prompt += `**Response Body Example:**\n\`\`\`json\n${responseBody}\n\`\`\`\n\n`;
         }
 
         prompt += `Please generate:\n`;
@@ -114,39 +102,30 @@ export class MCPPromptsService {
         prompt += `6. Example cURL request\n`;
         prompt += `7. Error responses`;
 
-        return [
-            {
-                role: 'user' as const,
-                content: {
-                    type: 'text' as const,
-                    text: prompt,
-                },
-            },
-        ];
+        return prompt;
     }
 
     /**
      * NestJS service generator prompt
      */
-    @MCPPrompt({
+    @Prompt({
         name: 'generate-nestjs-service',
         description: 'Generate a NestJS service with CRUD operations',
-        arguments: [
-            {
-                name: 'entityName',
-                description: 'Name of the entity (e.g., Product, Order)',
-                required: true,
-            },
-            {
-                name: 'fields',
-                description:
-                    'Entity fields as comma-separated list (e.g., name:string,price:number)',
-                required: true,
-            },
-        ],
     })
-    async generateNestJsService(args: { entityName: string; fields: string }) {
-        const prompt = `Generate a complete NestJS service for the entity "${args.entityName}" with the following fields:\n\n${args.fields}\n\n`;
+    async generateNestJsService(
+        @PromptParam('entityName', {
+            description: 'Name of the entity (e.g., Product, Order)',
+            required: true,
+        })
+        entityName: string,
+        @PromptParam('fields', {
+            description:
+                'Entity fields as comma-separated list (e.g., name:string,price:number)',
+            required: true,
+        })
+        fields: string
+    ): Promise<string> {
+        const prompt = `Generate a complete NestJS service for the entity "${entityName}" with the following fields:\n\n${fields}\n\n`;
 
         const instructions = `Please generate:\n
 1. A NestJS service class with dependency injection
@@ -159,50 +138,37 @@ export class MCPPromptsService {
 
 Follow NestJS best practices and include proper decorator usage.`;
 
-        return [
-            {
-                role: 'user' as const,
-                content: {
-                    type: 'text' as const,
-                    text: prompt + instructions,
-                },
-            },
-        ];
+        return prompt + instructions;
     }
 
     /**
      * Database query optimization prompt
      */
-    @MCPPrompt({
+    @Prompt({
         name: 'optimize-query',
         description: 'Get suggestions for optimizing a database query',
-        arguments: [
-            {
-                name: 'database',
-                description: 'Database type (PostgreSQL, MySQL, MongoDB)',
-                required: true,
-            },
-            {
-                name: 'query',
-                description: 'The query to optimize',
-                required: true,
-            },
-            {
-                name: 'schema',
-                description: 'Table/collection schema information',
-                required: false,
-            },
-        ],
     })
-    async optimizeQuery(args: {
-        database: string;
-        query: string;
-        schema?: string;
-    }) {
-        let prompt = `Optimize this ${args.database} query:\n\n\`\`\`sql\n${args.query}\n\`\`\`\n\n`;
+    async optimizeQuery(
+        @PromptParam('database', {
+            description: 'Database type (PostgreSQL, MySQL, MongoDB)',
+            required: true,
+        })
+        database: string,
+        @PromptParam('query', {
+            description: 'The query to optimize',
+            required: true,
+        })
+        query: string,
+        @PromptParam('schema', {
+            description: 'Table/collection schema information',
+            required: false,
+        })
+        schema?: string
+    ): Promise<string> {
+        let prompt = `Optimize this ${database} query:\n\n\`\`\`sql\n${query}\n\`\`\`\n\n`;
 
-        if (args.schema) {
-            prompt += `**Schema Information:**\n${args.schema}\n\n`;
+        if (schema) {
+            prompt += `**Schema Information:**\n${schema}\n\n`;
         }
 
         prompt += `Please provide:\n`;
@@ -212,35 +178,30 @@ Follow NestJS best practices and include proper decorator usage.`;
         prompt += `4. Explanation of improvements\n`;
         prompt += `5. Additional optimization tips`;
 
-        return [
-            {
-                role: 'user' as const,
-                content: {
-                    type: 'text' as const,
-                    text: prompt,
-                },
-            },
-        ];
+        return prompt;
     }
 
     /**
      * Unit test generator prompt
      */
-    @MCPPrompt({
+    @Prompt({
         name: 'generate-unit-tests',
         description: 'Generate unit tests for a function or class',
-        arguments: [
-            { name: 'code', description: 'The code to test', required: true },
-            {
-                name: 'framework',
-                description: 'Testing framework (Jest, Mocha, Vitest)',
-                required: false,
-            },
-        ],
     })
-    async generateUnitTests(args: { code: string; framework?: string }) {
-        const framework = args.framework || 'Jest';
-        const prompt = `Generate comprehensive unit tests using ${framework} for the following code:\n\n\`\`\`typescript\n${args.code}\n\`\`\`\n\n`;
+    async generateUnitTests(
+        @PromptParam('code', {
+            description: 'The code to test',
+            required: true,
+        })
+        code: string,
+        @PromptParam('framework', {
+            description: 'Testing framework (Jest, Mocha, Vitest)',
+            required: false,
+        })
+        framework?: string
+    ): Promise<string> {
+        const fw = framework || 'Jest';
+        const prompt = `Generate comprehensive unit tests using ${fw} for the following code:\n\n\`\`\`typescript\n${code}\n\`\`\`\n\n`;
 
         const instructions = `Please generate:\n
 1. Complete test suite with describe blocks
@@ -252,16 +213,8 @@ Follow NestJS best practices and include proper decorator usage.`;
 7. Clear test descriptions
 8. Assertions with expected behavior
 
-Use ${framework} best practices and maintain high code coverage.`;
+Use ${fw} best practices and maintain high code coverage.`;
 
-        return [
-            {
-                role: 'user' as const,
-                content: {
-                    type: 'text' as const,
-                    text: prompt + instructions,
-                },
-            },
-        ];
+        return prompt + instructions;
     }
 }

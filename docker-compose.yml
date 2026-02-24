@@ -49,7 +49,10 @@ services:
         ports:
             - '3001:3001'
         env_file:
-            - .env.docker
+            - .env
+        environment:
+            DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-master123}@postgres:5432/${POSTGRES_DB:-postgres}
+            REDIS_URL: redis://redis:6379
         networks:
             - app-network
         volumes:

@@ -1,22 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { MCPResource, MCPResourceTemplate } from '@hmake98/nestjs-mcp';
+import { Resource } from '@hmake98/nest-mcp';
 
 @Injectable()
 export class MCPResourcesService {
     /**
-     * Static resource - API documentation
+     * Static resource - API documentation overview
      */
-    @MCPResource({
+    @Resource({
         uri: 'docs://api/overview',
         name: 'API Overview',
         description: 'Overview of the NestJS Starter API',
         mimeType: 'text/markdown',
     })
-    async getApiOverview() {
-        return {
-            uri: 'docs://api/overview',
-            mimeType: 'text/markdown',
-            text: `# NestJS Starter API
+    async getApiOverview(): Promise<string> {
+        return `# NestJS Starter API
 
 This is a production-ready NestJS boilerplate with comprehensive features:
 
@@ -36,50 +33,44 @@ This is a production-ready NestJS boilerplate with comprehensive features:
 - \`/v1/user/*\` - User management
 - \`/v1/post/*\` - Post management
 - \`/health\` - Health check endpoint
-- \`/docs\` - API documentation`,
-        };
+- \`/docs\` - API documentation`;
     }
 
     /**
      * Static resource - Server status
      */
-    @MCPResource({
+    @Resource({
         uri: 'status://server',
         name: 'Server Status',
         description: 'Current server status and configuration',
         mimeType: 'application/json',
     })
-    async getServerStatus() {
-        return {
-            uri: 'status://server',
-            mimeType: 'application/json',
-            text: JSON.stringify(
-                {
-                    status: 'running',
-                    environment: process.env.APP_ENV || 'development',
-                    nodeVersion: process.version,
-                    platform: process.platform,
-                    uptime: process.uptime(),
-                    timestamp: new Date().toISOString(),
-                },
-                null,
-                2
-            ),
-        };
+    async getServerStatus(): Promise<string> {
+        return JSON.stringify(
+            {
+                status: 'running',
+                environment: process.env.APP_ENV || 'development',
+                nodeVersion: process.version,
+                platform: process.platform,
+                uptime: process.uptime(),
+                timestamp: new Date().toISOString(),
+            },
+            null,
+            2
+        );
     }
 
     /**
-     * Dynamic resource template - Documentation by section
+     * Static resource - Authentication documentation
      */
-    @MCPResourceTemplate({
-        uriTemplate: 'docs://api/{section}',
-        name: 'API Documentation',
-        description: 'Access API documentation by section (auth, user, post)',
+    @Resource({
+        uri: 'docs://api/auth',
+        name: 'Auth Documentation',
+        description: 'Authentication API documentation',
         mimeType: 'text/markdown',
     })
-    async getDocumentation(variables: { section: string }) {
-        const docs: Record<string, string> = {
-            auth: `# Authentication
+    async getAuthDocs(): Promise<string> {
+        return `# Authentication
 
 ## POST /v1/auth/login
 Login with email and password
@@ -98,9 +89,20 @@ Login with email and password
   "accessToken": "...",
   "refreshToken": "..."
 }
-\`\`\``,
+\`\`\``;
+    }
 
-            user: `# User Management
+    /**
+     * Static resource - User management documentation
+     */
+    @Resource({
+        uri: 'docs://api/user',
+        name: 'User Documentation',
+        description: 'User management API documentation',
+        mimeType: 'text/markdown',
+    })
+    async getUserDocs(): Promise<string> {
+        return `# User Management
 
 ## GET /v1/user/profile
 Get current user profile (requires authentication)
@@ -118,9 +120,20 @@ Authorization: Bearer <access_token>
   "firstName": "John",
   "lastName": "Doe"
 }
-\`\`\``,
+\`\`\``;
+    }
 
-            post: `# Post Management
+    /**
+     * Static resource - Post management documentation
+     */
+    @Resource({
+        uri: 'docs://api/post',
+        name: 'Post Documentation',
+        description: 'Post management API documentation',
+        mimeType: 'text/markdown',
+    })
+    async getPostDocs(): Promise<string> {
+        return `# Post Management
 
 ## GET /v1/post
 List all posts
@@ -139,44 +152,58 @@ List all posts
     "total": 100
   }
 }
-\`\`\``,
-        };
-
-        const content =
-            docs[variables.section] ||
-            `# Unknown Section\n\nSection '${variables.section}' not found.`;
-
-        return {
-            uri: `docs://api/${variables.section}`,
-            mimeType: 'text/markdown',
-            text: content,
-        };
+\`\`\``;
     }
 
     /**
-     * Dynamic resource template - Environment info
+     * Static resource - Node.js version config
      */
-    @MCPResourceTemplate({
-        uriTemplate: 'config://{key}',
-        name: 'Configuration',
-        description: 'Access configuration values by key (non-sensitive only)',
+    @Resource({
+        uri: 'config://nodeVersion',
+        name: 'Node Version',
+        description: 'Current Node.js version',
         mimeType: 'text/plain',
     })
-    async getConfig(variables: { key: string }) {
-        const allowedConfigs: Record<string, string> = {
-            nodeVersion: process.version,
-            platform: process.platform,
-            environment: process.env.APP_ENV || 'development',
-            port: process.env.HTTP_PORT || '3001',
-        };
+    async getNodeVersion(): Promise<string> {
+        return process.version;
+    }
 
-        const value =
-            allowedConfigs[variables.key] || 'Config not found or not allowed';
+    /**
+     * Static resource - Platform config
+     */
+    @Resource({
+        uri: 'config://platform',
+        name: 'Platform',
+        description: 'Current platform',
+        mimeType: 'text/plain',
+    })
+    async getPlatform(): Promise<string> {
+        return process.platform;
+    }
 
-        return {
-            uri: `config://${variables.key}`,
-            mimeType: 'text/plain',
-            text: value,
-        };
+    /**
+     * Static resource - Environment config
+     */
+    @Resource({
+        uri: 'config://environment',
+        name: 'Environment',
+        description: 'Current application environment',
+        mimeType: 'text/plain',
+    })
+    async getEnvironment(): Promise<string> {
+        return process.env.APP_ENV || 'development';
+    }
+
+    /**
+     * Static resource - Port config
+     */
+    @Resource({
+        uri: 'config://port',
+        name: 'Port',
+        description: 'HTTP server port',
+        mimeType: 'text/plain',
+    })
+    async getPort(): Promise<string> {
+        return process.env.HTTP_PORT || '3001';
     }
 }

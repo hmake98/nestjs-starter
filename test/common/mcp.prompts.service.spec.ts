@@ -19,287 +19,230 @@ describe('MCPPromptsService', () => {
 
     describe('codeReview', () => {
         it('should generate code review prompt without focus', async () => {
-            const args = {
-                language: 'TypeScript',
-                code: 'const sum = (a, b) => a + b;',
-            };
+            const code = 'const sum = (a, b) => a + b;';
+            const result = await service.codeReview('TypeScript', code);
 
-            const result = await service.codeReview(args);
-
-            expect(result).toHaveLength(1);
-            expect(result[0].role).toBe('user');
-            expect(result[0].content.type).toBe('text');
-            expect(result[0].content.text).toContain('TypeScript');
-            expect(result[0].content.text).toContain(args.code);
-            expect(result[0].content.text).toContain('code quality assessment');
-            expect(result[0].content.text).toContain(
-                'Security vulnerabilities'
-            );
-            expect(result[0].content.text).toContain(
-                'Performance considerations'
-            );
+            expect(typeof result).toBe('string');
+            expect(result).toContain('TypeScript');
+            expect(result).toContain(code);
+            expect(result).toContain('code quality assessment');
+            expect(result).toContain('Security vulnerabilities');
+            expect(result).toContain('Performance considerations');
         });
 
         it('should generate code review prompt with focus', async () => {
-            const args = {
-                language: 'Python',
-                code: 'def calculate(x): return x * 2',
-                focus: 'security',
-            };
+            const code = 'def calculate(x): return x * 2';
+            const result = await service.codeReview('Python', code, 'security');
 
-            const result = await service.codeReview(args);
-
-            expect(result).toHaveLength(1);
-            expect(result[0].role).toBe('user');
-            expect(result[0].content.text).toContain('Python');
-            expect(result[0].content.text).toContain(args.code);
-            expect(result[0].content.text).toContain(
-                'Focus specifically on: security'
-            );
+            expect(typeof result).toBe('string');
+            expect(result).toContain('Python');
+            expect(result).toContain(code);
+            expect(result).toContain('Focus specifically on: security');
         });
 
         it('should include all required review points', async () => {
-            const args = {
-                language: 'JavaScript',
-                code: 'function test() {}',
-            };
+            const result = await service.codeReview(
+                'JavaScript',
+                'function test() {}'
+            );
 
-            const result = await service.codeReview(args);
-            const text = result[0].content.text;
-
-            expect(text).toContain('Overall code quality assessment');
-            expect(text).toContain('Potential bugs or issues');
-            expect(text).toContain('Security vulnerabilities');
-            expect(text).toContain('Performance considerations');
-            expect(text).toContain('Best practices and improvements');
-            expect(text).toContain('Code maintainability');
+            expect(result).toContain('Overall code quality assessment');
+            expect(result).toContain('Potential bugs or issues');
+            expect(result).toContain('Security vulnerabilities');
+            expect(result).toContain('Performance considerations');
+            expect(result).toContain('Best practices and improvements');
+            expect(result).toContain('Code maintainability');
         });
     });
 
     describe('generateApiDocs', () => {
         it('should generate API docs without request and response bodies', async () => {
-            const args = {
-                method: 'GET',
-                path: '/api/users',
-                description: 'Get all users',
-            };
-
-            const result = await service.generateApiDocs(args);
-
-            expect(result).toHaveLength(1);
-            expect(result[0].role).toBe('user');
-            expect(result[0].content.type).toBe('text');
-            expect(result[0].content.text).toContain('GET');
-            expect(result[0].content.text).toContain('/api/users');
-            expect(result[0].content.text).toContain('Get all users');
-            expect(result[0].content.text).toContain(
-                'Detailed endpoint description'
+            const result = await service.generateApiDocs(
+                'GET',
+                '/api/users',
+                'Get all users'
             );
+
+            expect(typeof result).toBe('string');
+            expect(result).toContain('GET');
+            expect(result).toContain('/api/users');
+            expect(result).toContain('Get all users');
+            expect(result).toContain('Detailed endpoint description');
         });
 
         it('should generate API docs with request body', async () => {
-            const args = {
-                method: 'POST',
-                path: '/api/users',
-                description: 'Create a user',
-                requestBody: '{"name": "John", "email": "john@example.com"}',
-            };
+            const requestBody = '{"name": "John", "email": "john@example.com"}';
+            const result = await service.generateApiDocs(
+                'POST',
+                '/api/users',
+                'Create a user',
+                requestBody
+            );
 
-            const result = await service.generateApiDocs(args);
-
-            expect(result[0].content.text).toContain('POST');
-            expect(result[0].content.text).toContain('Request Body Example');
-            expect(result[0].content.text).toContain(args.requestBody);
+            expect(result).toContain('POST');
+            expect(result).toContain('Request Body Example');
+            expect(result).toContain(requestBody);
         });
 
         it('should generate API docs with response body', async () => {
-            const args = {
-                method: 'GET',
-                path: '/api/users/1',
-                description: 'Get user by ID',
-                responseBody: '{"id": 1, "name": "John"}',
-            };
+            const responseBody = '{"id": 1, "name": "John"}';
+            const result = await service.generateApiDocs(
+                'GET',
+                '/api/users/1',
+                'Get user by ID',
+                undefined,
+                responseBody
+            );
 
-            const result = await service.generateApiDocs(args);
-
-            expect(result[0].content.text).toContain('Response Body Example');
-            expect(result[0].content.text).toContain(args.responseBody);
+            expect(result).toContain('Response Body Example');
+            expect(result).toContain(responseBody);
         });
 
         it('should generate API docs with both request and response bodies', async () => {
-            const args = {
-                method: 'PUT',
-                path: '/api/users/1',
-                description: 'Update user',
-                requestBody: '{"name": "Jane"}',
-                responseBody: '{"id": 1, "name": "Jane"}',
-            };
+            const requestBody = '{"name": "Jane"}';
+            const responseBody = '{"id": 1, "name": "Jane"}';
+            const result = await service.generateApiDocs(
+                'PUT',
+                '/api/users/1',
+                'Update user',
+                requestBody,
+                responseBody
+            );
 
-            const result = await service.generateApiDocs(args);
-            const text = result[0].content.text;
-
-            expect(text).toContain('PUT');
-            expect(text).toContain('Request Body Example');
-            expect(text).toContain(args.requestBody);
-            expect(text).toContain('Response Body Example');
-            expect(text).toContain(args.responseBody);
+            expect(result).toContain('PUT');
+            expect(result).toContain('Request Body Example');
+            expect(result).toContain(requestBody);
+            expect(result).toContain('Response Body Example');
+            expect(result).toContain(responseBody);
         });
 
         it('should include all required documentation sections', async () => {
-            const args = {
-                method: 'DELETE',
-                path: '/api/users/1',
-                description: 'Delete user',
-            };
+            const result = await service.generateApiDocs(
+                'DELETE',
+                '/api/users/1',
+                'Delete user'
+            );
 
-            const result = await service.generateApiDocs(args);
-            const text = result[0].content.text;
-
-            expect(text).toContain('Detailed endpoint description');
-            expect(text).toContain('Request parameters and headers');
-            expect(text).toContain('Response status codes and meanings');
-            expect(text).toContain('Response body schema');
-            expect(text).toContain('Example cURL request');
-            expect(text).toContain('Error responses');
+            expect(result).toContain('Detailed endpoint description');
+            expect(result).toContain('Request parameters and headers');
+            expect(result).toContain('Response status codes and meanings');
+            expect(result).toContain('Response body schema');
+            expect(result).toContain('Example cURL request');
+            expect(result).toContain('Error responses');
         });
     });
 
     describe('generateNestJsService', () => {
         it('should generate NestJS service prompt', async () => {
-            const args = {
-                entityName: 'Product',
-                fields: 'name:string,price:number,inStock:boolean',
-            };
+            const fields = 'name:string,price:number,inStock:boolean';
+            const result = await service.generateNestJsService(
+                'Product',
+                fields
+            );
 
-            const result = await service.generateNestJsService(args);
-
-            expect(result).toHaveLength(1);
-            expect(result[0].role).toBe('user');
-            expect(result[0].content.type).toBe('text');
-            expect(result[0].content.text).toContain('Product');
-            expect(result[0].content.text).toContain(args.fields);
+            expect(typeof result).toBe('string');
+            expect(result).toContain('Product');
+            expect(result).toContain(fields);
         });
 
         it('should include all required service generation instructions', async () => {
-            const args = {
-                entityName: 'Order',
-                fields: 'orderId:string,total:number',
-            };
+            const result = await service.generateNestJsService(
+                'Order',
+                'orderId:string,total:number'
+            );
 
-            const result = await service.generateNestJsService(args);
-            const text = result[0].content.text;
-
-            expect(text).toContain(
+            expect(result).toContain(
                 'NestJS service class with dependency injection'
             );
-            expect(text).toContain('CRUD operations');
-            expect(text).toContain('create, findAll, findOne, update, delete');
-            expect(text).toContain('TypeScript typing');
-            expect(text).toContain('Error handling');
-            expect(text).toContain('Prisma ORM');
-            expect(text).toContain('JSDoc comments');
-            expect(text).toContain('class-validator DTOs');
-            expect(text).toContain('NestJS best practices');
+            expect(result).toContain('CRUD operations');
+            expect(result).toContain(
+                'create, findAll, findOne, update, delete'
+            );
+            expect(result).toContain('TypeScript typing');
+            expect(result).toContain('Error handling');
+            expect(result).toContain('Prisma ORM');
+            expect(result).toContain('JSDoc comments');
+            expect(result).toContain('class-validator DTOs');
+            expect(result).toContain('NestJS best practices');
         });
     });
 
     describe('optimizeQuery', () => {
         it('should generate query optimization prompt without schema', async () => {
-            const args = {
-                database: 'PostgreSQL',
-                query: 'SELECT * FROM users WHERE email = "test@example.com"',
-            };
+            const query =
+                'SELECT * FROM users WHERE email = "test@example.com"';
+            const result = await service.optimizeQuery('PostgreSQL', query);
 
-            const result = await service.optimizeQuery(args);
-
-            expect(result).toHaveLength(1);
-            expect(result[0].role).toBe('user');
-            expect(result[0].content.type).toBe('text');
-            expect(result[0].content.text).toContain('PostgreSQL');
-            expect(result[0].content.text).toContain(args.query);
-            expect(result[0].content.text).toContain('query performance');
+            expect(typeof result).toBe('string');
+            expect(result).toContain('PostgreSQL');
+            expect(result).toContain(query);
+            expect(result).toContain('query performance');
         });
 
         it('should generate query optimization prompt with schema', async () => {
-            const args = {
-                database: 'MySQL',
-                query: 'SELECT * FROM orders WHERE status = "pending"',
-                schema: 'users(id, email, created_at), orders(id, user_id, status)',
-            };
+            const query = 'SELECT * FROM orders WHERE status = "pending"';
+            const schema =
+                'users(id, email, created_at), orders(id, user_id, status)';
+            const result = await service.optimizeQuery('MySQL', query, schema);
 
-            const result = await service.optimizeQuery(args);
-            const text = result[0].content.text;
-
-            expect(text).toContain('MySQL');
-            expect(text).toContain(args.query);
-            expect(text).toContain('Schema Information');
-            expect(text).toContain(args.schema);
+            expect(result).toContain('MySQL');
+            expect(result).toContain(query);
+            expect(result).toContain('Schema Information');
+            expect(result).toContain(schema);
         });
 
         it('should include all required optimization points', async () => {
-            const args = {
-                database: 'MongoDB',
-                query: 'db.collection.find({status: "active"})',
-            };
+            const result = await service.optimizeQuery(
+                'MongoDB',
+                'db.collection.find({status: "active"})'
+            );
 
-            const result = await service.optimizeQuery(args);
-            const text = result[0].content.text;
-
-            expect(text).toContain('Analysis of the current query performance');
-            expect(text).toContain('Recommended indexes');
-            expect(text).toContain('Optimized query version');
-            expect(text).toContain('Explanation of improvements');
-            expect(text).toContain('Additional optimization tips');
+            expect(result).toContain(
+                'Analysis of the current query performance'
+            );
+            expect(result).toContain('Recommended indexes');
+            expect(result).toContain('Optimized query version');
+            expect(result).toContain('Explanation of improvements');
+            expect(result).toContain('Additional optimization tips');
         });
     });
 
     describe('generateUnitTests', () => {
         it('should generate unit tests with default framework', async () => {
-            const args = {
-                code: 'function add(a, b) { return a + b; }',
-            };
+            const code = 'function add(a, b) { return a + b; }';
+            const result = await service.generateUnitTests(code);
 
-            const result = await service.generateUnitTests(args);
-
-            expect(result).toHaveLength(1);
-            expect(result[0].role).toBe('user');
-            expect(result[0].content.type).toBe('text');
-            expect(result[0].content.text).toContain('Jest');
-            expect(result[0].content.text).toContain(args.code);
+            expect(typeof result).toBe('string');
+            expect(result).toContain('Jest');
+            expect(result).toContain(code);
         });
 
         it('should generate unit tests with specified framework', async () => {
-            const args = {
-                code: 'class Calculator { add(a, b) { return a + b; } }',
-                framework: 'Mocha',
-            };
+            const code = 'class Calculator { add(a, b) { return a + b; } }';
+            const result = await service.generateUnitTests(code, 'Mocha');
 
-            const result = await service.generateUnitTests(args);
-            const text = result[0].content.text;
-
-            expect(text).toContain('Mocha');
-            expect(text).toContain(args.code);
+            expect(result).toContain('Mocha');
+            expect(result).toContain(code);
         });
 
         it('should include all required test generation instructions', async () => {
-            const args = {
-                code: 'const multiply = (x, y) => x * y;',
-                framework: 'Vitest',
-            };
+            const result = await service.generateUnitTests(
+                'const multiply = (x, y) => x * y;',
+                'Vitest'
+            );
 
-            const result = await service.generateUnitTests(args);
-            const text = result[0].content.text;
-
-            expect(text).toContain('Vitest');
-            expect(text).toContain('Complete test suite with describe blocks');
-            expect(text).toContain('happy path scenarios');
-            expect(text).toContain('edge cases');
-            expect(text).toContain('error conditions');
-            expect(text).toContain('Mock dependencies');
-            expect(text).toContain('Setup and teardown');
-            expect(text).toContain('Clear test descriptions');
-            expect(text).toContain('Assertions');
-            expect(text).toContain('high code coverage');
+            expect(result).toContain('Vitest');
+            expect(result).toContain(
+                'Complete test suite with describe blocks'
+            );
+            expect(result).toContain('happy path scenarios');
+            expect(result).toContain('edge cases');
+            expect(result).toContain('error conditions');
+            expect(result).toContain('Mock dependencies');
+            expect(result).toContain('Setup and teardown');
+            expect(result).toContain('Clear test descriptions');
+            expect(result).toContain('Assertions');
+            expect(result).toContain('high code coverage');
         });
     });
 });

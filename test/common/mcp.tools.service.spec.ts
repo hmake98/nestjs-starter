@@ -19,216 +19,208 @@ describe('MCPToolsService', () => {
 
     describe('add', () => {
         it('should add two positive numbers', async () => {
-            const result = await service.add({ a: 5, b: 3 });
+            const result = await service.add(5, 3);
             expect(result).toBe(8);
         });
 
         it('should add two negative numbers', async () => {
-            const result = await service.add({ a: -5, b: -3 });
+            const result = await service.add(-5, -3);
             expect(result).toBe(-8);
         });
 
         it('should add positive and negative numbers', async () => {
-            const result = await service.add({ a: 10, b: -3 });
+            const result = await service.add(10, -3);
             expect(result).toBe(7);
         });
 
         it('should add zero to a number', async () => {
-            const result = await service.add({ a: 5, b: 0 });
+            const result = await service.add(5, 0);
             expect(result).toBe(5);
         });
 
         it('should add decimal numbers', async () => {
-            const result = await service.add({ a: 1.5, b: 2.3 });
+            const result = await service.add(1.5, 2.3);
             expect(result).toBeCloseTo(3.8);
         });
     });
 
     describe('subtract', () => {
         it('should subtract two positive numbers', async () => {
-            const result = await service.subtract({ a: 10, b: 3 });
+            const result = await service.subtract(10, 3);
             expect(result).toBe(7);
         });
 
         it('should subtract two negative numbers', async () => {
-            const result = await service.subtract({ a: -5, b: -3 });
+            const result = await service.subtract(-5, -3);
             expect(result).toBe(-2);
         });
 
         it('should subtract negative from positive', async () => {
-            const result = await service.subtract({ a: 10, b: -5 });
+            const result = await service.subtract(10, -5);
             expect(result).toBe(15);
         });
 
         it('should subtract zero from a number', async () => {
-            const result = await service.subtract({ a: 5, b: 0 });
+            const result = await service.subtract(5, 0);
             expect(result).toBe(5);
         });
 
         it('should subtract decimal numbers', async () => {
-            const result = await service.subtract({ a: 5.5, b: 2.3 });
+            const result = await service.subtract(5.5, 2.3);
             expect(result).toBeCloseTo(3.2);
         });
 
         it('should handle result being zero', async () => {
-            const result = await service.subtract({ a: 5, b: 5 });
+            const result = await service.subtract(5, 5);
             expect(result).toBe(0);
         });
     });
 
     describe('multiply', () => {
         it('should multiply two positive numbers', async () => {
-            const result = await service.multiply({ a: 5, b: 3 });
+            const result = await service.multiply(5, 3);
             expect(result).toBe(15);
         });
 
         it('should multiply two negative numbers', async () => {
-            const result = await service.multiply({ a: -5, b: -3 });
+            const result = await service.multiply(-5, -3);
             expect(result).toBe(15);
         });
 
         it('should multiply positive and negative numbers', async () => {
-            const result = await service.multiply({ a: 5, b: -3 });
+            const result = await service.multiply(5, -3);
             expect(result).toBe(-15);
         });
 
         it('should multiply by zero', async () => {
-            const result = await service.multiply({ a: 5, b: 0 });
+            const result = await service.multiply(5, 0);
             expect(result).toBe(0);
         });
 
         it('should multiply by one', async () => {
-            const result = await service.multiply({ a: 5, b: 1 });
+            const result = await service.multiply(5, 1);
             expect(result).toBe(5);
         });
 
         it('should multiply decimal numbers', async () => {
-            const result = await service.multiply({ a: 2.5, b: 4 });
+            const result = await service.multiply(2.5, 4);
             expect(result).toBe(10);
         });
     });
 
     describe('divide', () => {
         it('should divide two positive numbers', async () => {
-            const result = await service.divide({ a: 10, b: 2 });
+            const result = await service.divide(10, 2);
             expect(result).toBe(5);
         });
 
         it('should divide two negative numbers', async () => {
-            const result = await service.divide({ a: -10, b: -2 });
+            const result = await service.divide(-10, -2);
             expect(result).toBe(5);
         });
 
         it('should divide positive by negative', async () => {
-            const result = await service.divide({ a: 10, b: -2 });
+            const result = await service.divide(10, -2);
             expect(result).toBe(-5);
         });
 
         it('should divide by one', async () => {
-            const result = await service.divide({ a: 5, b: 1 });
+            const result = await service.divide(5, 1);
             expect(result).toBe(5);
         });
 
         it('should divide decimal numbers', async () => {
-            const result = await service.divide({ a: 7.5, b: 2.5 });
+            const result = await service.divide(7.5, 2.5);
             expect(result).toBe(3);
         });
 
         it('should throw error when dividing by zero', async () => {
-            await expect(service.divide({ a: 10, b: 0 })).rejects.toThrow(
+            await expect(service.divide(10, 0)).rejects.toThrow(
                 'Cannot divide by zero'
             );
         });
 
         it('should handle zero dividend', async () => {
-            const result = await service.divide({ a: 0, b: 5 });
+            const result = await service.divide(0, 5);
             expect(result).toBe(0);
         });
 
         it('should handle fractional results', async () => {
-            const result = await service.divide({ a: 10, b: 3 });
+            const result = await service.divide(10, 3);
             expect(result).toBeCloseTo(3.333, 2);
         });
     });
 
     describe('toUpperCase', () => {
         it('should convert lowercase text to uppercase', async () => {
-            const result = await service.toUpperCase({ text: 'hello' });
+            const result = await service.toUpperCase('hello');
             expect(result).toBe('HELLO');
         });
 
         it('should handle already uppercase text', async () => {
-            const result = await service.toUpperCase({ text: 'HELLO' });
+            const result = await service.toUpperCase('HELLO');
             expect(result).toBe('HELLO');
         });
 
         it('should handle mixed case text', async () => {
-            const result = await service.toUpperCase({
-                text: 'Hello World',
-            });
+            const result = await service.toUpperCase('Hello World');
             expect(result).toBe('HELLO WORLD');
         });
 
         it('should handle empty string', async () => {
-            const result = await service.toUpperCase({ text: '' });
+            const result = await service.toUpperCase('');
             expect(result).toBe('');
         });
 
         it('should handle text with numbers', async () => {
-            const result = await service.toUpperCase({ text: 'hello123' });
+            const result = await service.toUpperCase('hello123');
             expect(result).toBe('HELLO123');
         });
 
         it('should handle text with special characters', async () => {
-            const result = await service.toUpperCase({
-                text: 'hello-world!',
-            });
+            const result = await service.toUpperCase('hello-world!');
             expect(result).toBe('HELLO-WORLD!');
         });
 
         it('should handle unicode characters', async () => {
-            const result = await service.toUpperCase({ text: 'café' });
+            const result = await service.toUpperCase('café');
             expect(result).toBe('CAFÉ');
         });
     });
 
     describe('toLowerCase', () => {
         it('should convert uppercase text to lowercase', async () => {
-            const result = await service.toLowerCase({ text: 'HELLO' });
+            const result = await service.toLowerCase('HELLO');
             expect(result).toBe('hello');
         });
 
         it('should handle already lowercase text', async () => {
-            const result = await service.toLowerCase({ text: 'hello' });
+            const result = await service.toLowerCase('hello');
             expect(result).toBe('hello');
         });
 
         it('should handle mixed case text', async () => {
-            const result = await service.toLowerCase({
-                text: 'Hello World',
-            });
+            const result = await service.toLowerCase('Hello World');
             expect(result).toBe('hello world');
         });
 
         it('should handle empty string', async () => {
-            const result = await service.toLowerCase({ text: '' });
+            const result = await service.toLowerCase('');
             expect(result).toBe('');
         });
 
         it('should handle text with numbers', async () => {
-            const result = await service.toLowerCase({ text: 'HELLO123' });
+            const result = await service.toLowerCase('HELLO123');
             expect(result).toBe('hello123');
         });
 
         it('should handle text with special characters', async () => {
-            const result = await service.toLowerCase({
-                text: 'HELLO-WORLD!',
-            });
+            const result = await service.toLowerCase('HELLO-WORLD!');
             expect(result).toBe('hello-world!');
         });
 
         it('should handle unicode characters', async () => {
-            const result = await service.toLowerCase({ text: 'CAFÉ' });
+            const result = await service.toLowerCase('CAFÉ');
             expect(result).toBe('café');
         });
     });

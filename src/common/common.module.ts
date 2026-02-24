@@ -1,10 +1,9 @@
 import { BullModule } from '@nestjs/bull';
-import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as redisStore from 'cache-manager-ioredis';
 
 import { AuthModule } from './auth/auth.module';
+import { CacheModule } from './cache/cache.module';
 import configs from './config';
 import { DatabaseModule } from './database/database.module';
 import { FileModule } from './file/file.module';
@@ -32,35 +31,17 @@ import { ResponseModule } from './response/response.module';
         CustomLoggerModule,
         RequestModule,
         ResponseModule,
-
-        // Caching - Redis
-        CacheModule.registerAsync({
-            imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => ({
-                isGlobal: true,
-                store: redisStore,
-                host: configService.get('redis.host'),
-                port: configService.get('redis.port'),
-                password: configService.get('redis.password'),
-                tls: configService.get('redis.tls'),
-                ttl: 5000,
-            }),
-            inject: [ConfigService],
-        }),
+        CacheModule,
 
         // Queue Management - Bull/Redis
         BullModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
-                redis: {
-                    host: configService.get('redis.host'),
-                    port: Number(configService.get('redis.port')),
-                    password: configService.get('redis.password'),
-                },
+                redis: configService.get<string>('redis.url'),
             }),
             inject: [ConfigService],
         }),
     ],
-    exports: [DatabaseModule],
+    exports: [DatabaseModule, CacheModule],
 })
 export class CommonModule {}

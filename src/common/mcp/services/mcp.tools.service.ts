@@ -1,125 +1,147 @@
 import { Injectable } from '@nestjs/common';
-import { MCPTool, MCPToolWithParams } from '@hmake98/nestjs-mcp';
+import { Tool, ToolParam } from '@hmake98/nest-mcp';
 
 @Injectable()
 export class MCPToolsService {
     /**
      * Simple calculator tool - Add two numbers
      */
-    @MCPTool({
+    @Tool({
         name: 'add',
         description: 'Add two numbers together',
     })
-    async add(params: { a: number; b: number }): Promise<number> {
-        return params.a + params.b;
+    async add(
+        @ToolParam('a', {
+            description: 'First number',
+            type: 'number',
+            required: true,
+        })
+        a: number,
+        @ToolParam('b', {
+            description: 'Second number',
+            type: 'number',
+            required: true,
+        })
+        b: number
+    ): Promise<number> {
+        return a + b;
     }
 
     /**
      * Simple calculator tool - Subtract two numbers
      */
-    @MCPTool({
+    @Tool({
         name: 'subtract',
         description: 'Subtract second number from first number',
     })
-    async subtract(params: { a: number; b: number }): Promise<number> {
-        return params.a - params.b;
+    async subtract(
+        @ToolParam('a', {
+            description: 'First number',
+            type: 'number',
+            required: true,
+        })
+        a: number,
+        @ToolParam('b', {
+            description: 'Second number',
+            type: 'number',
+            required: true,
+        })
+        b: number
+    ): Promise<number> {
+        return a - b;
     }
 
     /**
-     * Calculator tool with explicit parameters - Multiply
+     * Calculator tool - Multiply two numbers
      */
-    @MCPToolWithParams({
+    @Tool({
         name: 'multiply',
         description: 'Multiply two numbers',
-        parameters: [
-            {
-                name: 'a',
-                type: 'number',
-                description: 'First number',
-                required: true,
-            },
-            {
-                name: 'b',
-                type: 'number',
-                description: 'Second number',
-                required: true,
-            },
-        ],
     })
-    async multiply(params: { a: number; b: number }): Promise<number> {
-        return params.a * params.b;
+    async multiply(
+        @ToolParam('a', {
+            description: 'First number',
+            type: 'number',
+            required: true,
+        })
+        a: number,
+        @ToolParam('b', {
+            description: 'Second number',
+            type: 'number',
+            required: true,
+        })
+        b: number
+    ): Promise<number> {
+        return a * b;
     }
 
     /**
-     * Calculator tool with explicit parameters - Divide
+     * Calculator tool - Divide two numbers
      */
-    @MCPToolWithParams({
+    @Tool({
         name: 'divide',
         description: 'Divide first number by second number',
-        parameters: [
-            {
-                name: 'a',
-                type: 'number',
-                description: 'Numerator',
-                required: true,
-            },
-            {
-                name: 'b',
-                type: 'number',
-                description: 'Denominator',
-                required: true,
-            },
-        ],
     })
-    async divide(params: { a: number; b: number }): Promise<number> {
-        if (params.b === 0) {
+    async divide(
+        @ToolParam('a', {
+            description: 'Numerator',
+            type: 'number',
+            required: true,
+        })
+        a: number,
+        @ToolParam('b', {
+            description: 'Denominator',
+            type: 'number',
+            required: true,
+        })
+        b: number
+    ): Promise<number> {
+        if (b === 0) {
             throw new Error('Cannot divide by zero');
         }
-        return params.a / params.b;
+        return a / b;
     }
 
     /**
      * Text utility tool - Convert to uppercase
      */
-    @MCPToolWithParams({
+    @Tool({
         name: 'toUpperCase',
         description: 'Convert text to uppercase',
-        parameters: [
-            {
-                name: 'text',
-                type: 'string',
-                description: 'Text to convert',
-                required: true,
-            },
-        ],
     })
-    async toUpperCase(params: { text: string }): Promise<string> {
-        return params.text.toUpperCase();
+    async toUpperCase(
+        @ToolParam('text', {
+            description: 'Text to convert',
+            type: 'string',
+            required: true,
+        })
+        text: string
+    ): Promise<string> {
+        return text.toUpperCase();
     }
 
     /**
      * Text utility tool - Convert to lowercase
      */
-    @MCPToolWithParams({
+    @Tool({
         name: 'toLowerCase',
         description: 'Convert text to lowercase',
-        parameters: [
-            {
-                name: 'text',
-                type: 'string',
-                description: 'Text to convert',
-                required: true,
-            },
-        ],
     })
-    async toLowerCase(params: { text: string }): Promise<string> {
-        return params.text.toLowerCase();
+    async toLowerCase(
+        @ToolParam('text', {
+            description: 'Text to convert',
+            type: 'string',
+            required: true,
+        })
+        text: string
+    ): Promise<string> {
+        return text.toLowerCase();
     }
 
     /**
      * UUID generator tool
      */
-    @MCPTool({
+    @Tool({
         name: 'generateUUID',
         description: 'Generate a random UUID v4',
     })
@@ -130,7 +152,7 @@ export class MCPToolsService {
     /**
      * Current timestamp tool
      */
-    @MCPTool({
+    @Tool({
         name: 'getCurrentTimestamp',
         description: 'Get current Unix timestamp in milliseconds',
     })

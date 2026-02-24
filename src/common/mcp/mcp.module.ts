@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MCPModule as NestMCPModule } from '@hmake98/nestjs-mcp';
+import { ConfigService } from '@nestjs/config';
+import { McpModule } from '@hmake98/nest-mcp';
 
 import { MCPPromptsService } from './services/mcp.prompts.service';
 import { MCPResourcesService } from './services/mcp.resources.service';
@@ -8,21 +8,18 @@ import { MCPToolsService } from './services/mcp.tools.service';
 
 @Module({
     imports: [
-        NestMCPModule.forRootAsync({
-            imports: [ConfigModule],
+        McpModule.registerAsync({
+            // ConfigService is globally available via CommonModule's ConfigModule.forRoot({ isGlobal: true })
             inject: [ConfigService],
-            rootPath: true, // Use VERSION_NEUTRAL to bypass versioning and global prefix
-            useFactory: async (configService: ConfigService) => ({
-                serverInfo: {
-                    name: configService.get('mcp.serverName'),
-                    version: configService.get('mcp.serverVersion'),
+            useFactory: (configService: ConfigService) => ({
+                transport: 'websocket',
+                serverName: configService.get<string>('mcp.serverName'),
+                serverVersion: configService.get<string>('mcp.serverVersion'),
+                enablePlayground: true,
+                websocket: {
+                    port: configService.get<number>('mcp.websocket.port'),
+                    host: configService.get<string>('mcp.websocket.host'),
                 },
-                // Auto-discover decorated tools, resources, and prompts
-                autoDiscoverTools: true,
-                autoDiscoverResources: true,
-                autoDiscoverPrompts: true,
-                // Logging level
-                logLevel: configService.get('mcp.logLevel'),
             }),
         }),
     ],
