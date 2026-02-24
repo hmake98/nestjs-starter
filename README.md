@@ -115,7 +115,6 @@ This boilerplate is **fully production-ready** with comprehensive features and b
 - 🐳 **Containerization** - Docker and Docker Compose ready
 - 🚀 **CI/CD** - GitHub Actions workflows
 - 🔍 **Code Quality** - ESLint, Prettier, Husky pre-commit hooks
-- 🔍 **Code Quality** - ESLint, Prettier, Husky pre-commit hooks
 - 📈 **Monitoring** - Sentry integration for error tracking
 - 🚦 **Rate Limiting** - Built-in request throttling
 - 🌐 **CORS** - Configurable cross-origin resource sharing
