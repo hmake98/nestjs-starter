@@ -41,7 +41,8 @@ export interface ISelectOptions {
 }
 
 export interface IQueryOptions
-    extends IPaginationOptions,
+    extends
+        IPaginationOptions,
         ISearchOptions,
         IFilterOptions,
         ISortOptions,
