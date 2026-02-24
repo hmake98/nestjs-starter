@@ -12,9 +12,7 @@ type PrismaDelegate = {
 };
 
 @Injectable()
-export class HelperPrismaQueryBuilderService
-    implements IHelperPrismaQueryBuilderService
-{
+export class HelperPrismaQueryBuilderService implements IHelperPrismaQueryBuilderService {
     private readonly defaultOptions: IPrismaQueryBuilderOptions = {
         defaultLimit: 10,
         maxLimit: 100,
