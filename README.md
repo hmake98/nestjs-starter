@@ -3,7 +3,6 @@
 <div align="center">
 
 [![CodeQL](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/github-code-scanning/codeql)
-[![Test](https://github.com/hmake98/nestjs-starter/actions/workflows/test.yml/badge.svg)](https://github.com/hmake98/nestjs-starter/actions/workflows/test.yml)
 ![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)
 ![Statements](https://img.shields.io/badge/statements-100%25-brightgreen.svg?style=flat)
 ![Branches](https://img.shields.io/badge/branches-97.84%25-brightgreen.svg?style=flat)
@@ -18,7 +17,7 @@
 </p>
 
 <p align="center">
-  <strong>⚡️ Quick Start</strong> • <strong>🐳 Docker Ready</strong> • <strong>☸️ Kubernetes Ready</strong> • <strong>🤖 AI/MCP Integrated</strong>
+  <strong>⚡️ Quick Start</strong> • <strong>🐳 Docker Ready</strong> • <strong>🤖 AI/MCP Integrated</strong> • <strong>✅ Production Ready</strong>
 </p>
 
 ---
@@ -44,9 +43,8 @@
 
 **Developer Experience**
 - ✅ Docker & Docker Compose
-- ✅ Kubernetes Manifests (HPA, Ingress)
 - ✅ GitHub Actions CI/CD
-- ✅ Jest Testing (75%+ Coverage)
+- ✅ Jest Testing (90%+ Coverage)
 - ✅ ESLint + Prettier + Husky
 - ✅ Structured Logging (Pino)
 - ✅ Model Context Protocol (MCP)
@@ -70,7 +68,6 @@
   - [Start Development Server](#4-start-development-server)
 - [Environment Configuration](#-environment-configuration)
 - [Docker Setup](#-docker-setup)
-- [Kubernetes Deployment](#️-kubernetes-deployment)
 - [API Documentation](#-api-documentation)
 - [Model Context Protocol (MCP)](#-model-context-protocol-mcp-integration)
 - [Testing](#-testing)
@@ -85,6 +82,25 @@
 
 ---
 
+## ✅ Implementation Status
+
+This boilerplate is **fully production-ready** with comprehensive features and best practices:
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| JWT Authentication & RBAC | ✅ Complete | Access/Refresh tokens, role-based access control |
+| PostgreSQL + Prisma ORM | ✅ Complete | Full schema with 3 models (User, Post, PostImage) |
+| Redis Cache & Bull Queues | ✅ Complete | Email queue processor, task scheduling |
+| AWS S3 & SES | ✅ Complete | File uploads, email templating |
+| Docker & Docker Compose | ✅ Complete | Multi-service setup with health checks |
+| GitHub Actions CI/CD | ✅ Complete | Automated testing, linting, badge generation |
+| Jest Testing | ✅ Complete | 18 test suites, 90%+ coverage |
+| MCP Integration | ✅ Complete | 8 tools, 10 resources, 5 prompts |
+| Swagger Documentation | ✅ Complete | Auto-generated API docs |
+| i18n Support | ✅ Complete | Multi-language message service |
+
+---
+
 ## ✨ Features
 
 - 🔐 **Authentication & Authorization** - JWT-based auth with access/refresh tokens
@@ -95,10 +111,10 @@
 - 🔄 **Background Jobs** - Bull queue with Redis for async processing
 - 🤖 **MCP Integration** - Model Context Protocol support for AI tools, resources, and prompts
 - 📊 **Logging** - Structured logging with Pino
-- 🧪 **Testing** - Comprehensive unit tests with Jest
+- 🧪 **Testing** - Comprehensive unit tests with Jest (90%+ coverage)
 - 🐳 **Containerization** - Docker and Docker Compose ready
-- ☸️ **Kubernetes** - Production deployment configurations
 - 🚀 **CI/CD** - GitHub Actions workflows
+- 🔍 **Code Quality** - ESLint, Prettier, Husky pre-commit hooks
 - 🔍 **Code Quality** - ESLint, Prettier, Husky pre-commit hooks
 - 📈 **Monitoring** - Sentry integration for error tracking
 - 🚦 **Rate Limiting** - Built-in request throttling
@@ -148,7 +164,7 @@ yarn install
 
 ```bash
 # Copy environment template
-cp .env.docker .env
+cp .env.example .env
 
 # Edit the environment file with your configuration
 nano .env  # or use your preferred editor
@@ -184,7 +200,7 @@ The API will be available at:
 
 ## 📋 Environment Configuration
 
-Create a `.env` file based on `.env.docker` template. All environment variables are documented with comments in the template file.
+Create a `.env` file based on `.env.example` template. All environment variables are documented with comments in the template file.
 
 ### Application Settings
 
@@ -259,7 +275,7 @@ Create a `.env` file based on `.env.docker` template. All environment variables 
 
 ```bash
 # Copy environment template
-cp .env.docker .env
+cp .env.example .env
 
 # Generate JWT secrets
 echo "AUTH_ACCESS_TOKEN_SECRET=$(openssl rand -base64 32)" >> .env
@@ -321,6 +337,27 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   http://localhost:3001/v1/user/profile
 ```
 
+### Available API Endpoints
+
+#### Authentication (Public)
+- `POST /v1/auth/login` - User login (email, password)
+- `POST /v1/auth/signup` - User registration
+- `GET /v1/auth/refresh-token` - Refresh access token
+
+#### User Management (Protected)
+- `GET /v1/user/profile` - Get current user profile
+- `PUT /v1/user` - Update current user profile
+- `DELETE /v1/admin/user/:id` - Delete user (Admin only)
+
+#### Post Management (Protected)
+- `POST /v1/post` - Create post
+- `GET /v1/post` - List posts with pagination
+- `PUT /v1/post/:id` - Update post (Author only)
+- `DELETE /v1/post/:id` - Delete post (Author only)
+
+#### Health Check (Public)
+- `GET /health` - Application health status
+
 ## 🤖 Model Context Protocol (MCP) Integration
 
 This boilerplate includes built-in support for the Model Context Protocol (MCP), enabling AI-powered features through tools, resources, and prompts.
@@ -343,31 +380,22 @@ Access the interactive MCP playground at `http://localhost:3001/mcp/playground` 
 
 The boilerplate includes example MCP implementations in `src/common/mcp/services/`:
 
-#### Tools (Calculator & Utilities)
-```typescript
-// Mathematical operations
-- add(a, b)          // Add two numbers
-- subtract(a, b)     // Subtract two numbers
-- multiply(a, b)     // Multiply two numbers
-- divide(a, b)       // Divide two numbers
+#### Tools (8 implemented)
+- **Math Operations**: `add`, `subtract`, `multiply`, `divide`
+- **Text Utilities**: `toUpperCase`, `toLowerCase`
+- **System Tools**: `generateUUID`, `getCurrentTimestamp`
 
-// Text utilities
-- toUpperCase(text)  // Convert text to uppercase
-- toLowerCase(text)  // Convert text to lowercase
-- reverse(text)      // Reverse text string
-```
+#### Resources (10 implemented)
+- **API Documentation**: `docs://api/overview`, `docs://api/auth`, `docs://api/user`, `docs://api/post`
+- **Server Status**: `status://server`
+- **Configuration**: `config://nodeVersion`, `config://platform`, `config://environment`, `config://port`
 
-#### Resources (Documentation & Data)
-```typescript
-// System information
-- system://info      // Application metadata and version
-- system://config    // Configuration overview
-- docs://api         // API documentation
-
-// Data resources
-- data://users       // User statistics
-- data://posts       // Post statistics
-```
+#### Prompts (5 implemented)
+- `code-review` - Review code for best practices
+- `generate-api-docs` - Generate API documentation
+- `generate-nestjs-service` - Generate NestJS service with CRUD
+- `optimize-query` - Get query optimization suggestions
+- `generate-unit-tests` - Generate Jest test cases
 
 #### Prompts (AI Templates)
 ```typescript
@@ -545,10 +573,11 @@ jest --config test/jest.json --watch
 yarn test:debug
 ```
 
-**Test Structure**:
-- `test/common/` - Tests for shared services (auth, database, helpers, AWS)
-- `test/modules/` - Tests for feature modules (user, post)
-- `test/workers/` - Tests for background processors
+**Test Coverage** (18 test suites with 90%+ coverage threshold):
+- `test/common/` - 11 test suites for shared services (auth, AWS, cache, database, file, helpers, MCP, message)
+- `test/modules/` - 2 test suites for feature modules (user, post)
+- `test/workers/` - 1 test suite for email processor
+- `test/mcp/` - 3 test suites for MCP services (tools, resources, prompts)
 - `test/mocks/` - Mock data generators using @faker-js/faker
 
 **Example Test**:
@@ -577,26 +606,40 @@ describe('UserService', () => {
 
 ```
 src/
-├── app/                    # Application module and health checks
-├── common/                 # Shared modules and utilities
-│   ├── auth/              # Authentication logic
-│   ├── aws/               # AWS services (S3, SES)
-│   ├── config/            # Configuration files
-│   ├── database/          # Database service and connection
-│   ├── file/              # File upload handling
-│   ├── helper/            # Utility services
-│   ├── logger/            # Logging configuration
-│   ├── mcp/               # Model Context Protocol integration
-│   │   └── services/      # MCP tools, resources, and prompts
-│   ├── message/           # Internationalization
-│   ├── request/           # Request decorators and guards
-│   └── response/          # Response interceptors and filters
-├── languages/             # Translation files
-├── migrations/            # Database seeders and migrations
-├── modules/               # Feature modules
-│   ├── post/              # Post management
-│   └── user/              # User management
-└── workers/               # Background job processors
+├── app/                          # Application module and health checks
+├── common/                       # Shared modules (14 services)
+│   ├── auth/                    # JWT authentication with strategies
+│   ├── aws/                     # AWS S3 & SES services
+│   ├── cache/                   # Redis cache management
+│   ├── config/                  # Configuration management
+│   ├── database/                # Prisma ORM integration
+│   ├── doc/                     # Documentation decorators
+│   ├── file/                    # File upload handling
+│   ├── helper/                  # Email, encryption, pagination utilities
+│   ├── logger/                  # Pino structured logging
+│   ├── mcp/                     # Model Context Protocol (AI integration)
+│   │   ├── services/
+│   │   │   ├── mcp.tools.service.ts        # Math, text, system tools
+│   │   │   ├── mcp.resources.service.ts    # API docs, config resources
+│   │   │   └── mcp.prompts.service.ts      # AI prompt templates
+│   │   └── mcp.module.ts
+│   ├── message/                 # i18n message service
+│   ├── request/                 # Guards, decorators, middleware
+│   └── response/                # Response formatting, error filters
+├── languages/                   # i18n translation files
+├── migrations/                  # Database migrations & seeders
+├── modules/                     # Feature modules (2 implemented)
+│   ├── post/                    # Post CRUD operations
+│   │   ├── controllers/         # API endpoints
+│   │   ├── services/            # Business logic
+│   │   └── dto/                 # Data transfer objects
+│   └── user/                    # User management & authentication
+│       ├── controllers/         # API endpoints (public & admin)
+│       ├── services/            # Business logic
+│       └── dto/                 # Data transfer objects
+└── workers/                     # Background job processors
+    ├── processors/              # Bull queue processors (email)
+    └── schedulers/              # Cron jobs (midnight scheduler)
 ```
 
 ## 🔧 Development Workflow
@@ -639,180 +682,6 @@ yarn seed:email
 # Remove email templates
 yarn rollback:email
 ```
-
-## ☸️ Kubernetes Deployment
-
-The project includes complete Kubernetes manifests in the `k8s/` directory for production deployment.
-
-### Available Kubernetes Resources
-
-```
-k8s/
-├── namespace.yaml              # Namespace isolation
-├── configmap.yaml             # Non-sensitive configuration
-├── secret.yaml                # Sensitive data (base64 encoded)
-├── postgres-pvc.yaml          # PostgreSQL persistent storage
-├── postgres-deployment.yaml   # PostgreSQL database
-├── postgres-service.yaml      # PostgreSQL service
-├── redis-pvc.yaml            # Redis persistent storage
-├── redis-deployment.yaml     # Redis cache/queue
-├── redis-service.yaml        # Redis service
-├── app-deployment.yaml       # NestJS application
-├── app-service.yaml          # Application service
-├── ingress.yaml              # Ingress controller config
-└── hpa.yaml                  # Horizontal Pod Autoscaler
-```
-
-### Deploy to Kubernetes
-
-#### 1. Configure Secrets
-
-```bash
-# Create namespace first
-kubectl apply -f k8s/namespace.yaml
-
-# Update k8s/secret.yaml with your base64-encoded secrets
-# Generate base64 values:
-echo -n "your-secret-value" | base64
-
-# Or use this helper to create secrets directly:
-kubectl create secret generic nestjs-secrets \
-  --from-literal=database-url='postgresql://user:pass@postgres:5432/db' \
-  --from-literal=jwt-access-secret='your-access-secret' \
-  --from-literal=jwt-refresh-secret='your-refresh-secret' \
-  --from-literal=aws-access-key='your-aws-key' \
-  --from-literal=aws-secret-key='your-aws-secret' \
-  -n nestjs-starter
-```
-
-#### 2. Update ConfigMap
-
-```bash
-# Edit k8s/configmap.yaml with your configuration
-# Then apply:
-kubectl apply -f k8s/configmap.yaml
-```
-
-#### 3. Deploy Infrastructure (Database & Redis)
-
-```bash
-# Deploy PostgreSQL
-kubectl apply -f k8s/postgres-pvc.yaml
-kubectl apply -f k8s/postgres-deployment.yaml
-kubectl apply -f k8s/postgres-service.yaml
-
-# Deploy Redis
-kubectl apply -f k8s/redis-pvc.yaml
-kubectl apply -f k8s/redis-deployment.yaml
-kubectl apply -f k8s/redis-service.yaml
-
-# Wait for databases to be ready
-kubectl wait --for=condition=ready pod -l app=postgres -n nestjs-starter --timeout=300s
-kubectl wait --for=condition=ready pod -l app=redis -n nestjs-starter --timeout=300s
-```
-
-#### 4. Deploy Application
-
-```bash
-# Deploy the NestJS application
-kubectl apply -f k8s/app-deployment.yaml
-kubectl apply -f k8s/app-service.yaml
-
-# Deploy ingress (configure your domain first)
-kubectl apply -f k8s/ingress.yaml
-
-# (Optional) Enable auto-scaling
-kubectl apply -f k8s/hpa.yaml
-```
-
-#### 5. Verify Deployment
-
-```bash
-# Check all resources
-kubectl get all -n nestjs-starter
-
-# Check pods
-kubectl get pods -n nestjs-starter
-
-# Check logs
-kubectl logs -f deployment/nestjs-app -n nestjs-starter
-
-# Check service
-kubectl get svc -n nestjs-starter
-
-# Describe pod for troubleshooting
-kubectl describe pod <pod-name> -n nestjs-starter
-```
-
-#### 6. Run Database Migrations
-
-```bash
-# Execute migrations in a running pod
-kubectl exec -it deployment/nestjs-app -n nestjs-starter -- yarn migrate:prod
-
-# Or run as a one-off job
-kubectl run migration-job \
-  --image=your-registry/nestjs-starter:latest \
-  --restart=Never \
-  --env="DATABASE_URL=..." \
-  -n nestjs-starter \
-  -- yarn migrate:prod
-```
-
-### Accessing the Application
-
-```bash
-# Port forward for local testing
-kubectl port-forward svc/nestjs-service 3001:3001 -n nestjs-starter
-
-# Or access via ingress (configure DNS first)
-# https://your-domain.com
-```
-
-### Scaling
-
-```bash
-# Manual scaling
-kubectl scale deployment/nestjs-app --replicas=5 -n nestjs-starter
-
-# Horizontal Pod Autoscaler (HPA) is configured to scale between 2-10 replicas
-# based on CPU utilization (70% threshold)
-kubectl get hpa -n nestjs-starter
-```
-
-### Updating the Application
-
-```bash
-# Build and push new image
-docker build -f ci/Dockerfile -t your-registry/nestjs-starter:v2.0.0 .
-docker push your-registry/nestjs-starter:v2.0.0
-
-# Update deployment
-kubectl set image deployment/nestjs-app \
-  nestjs-app=your-registry/nestjs-starter:v2.0.0 \
-  -n nestjs-starter
-
-# Or use rolling update
-kubectl rollout restart deployment/nestjs-app -n nestjs-starter
-
-# Check rollout status
-kubectl rollout status deployment/nestjs-app -n nestjs-starter
-
-# Rollback if needed
-kubectl rollout undo deployment/nestjs-app -n nestjs-starter
-```
-
-### Clean Up
-
-```bash
-# Delete all resources
-kubectl delete namespace nestjs-starter
-
-# Or delete individual resources
-kubectl delete -f k8s/
-```
-
----
 
 ## 🚀 Deployment
 
@@ -900,7 +769,7 @@ heroku container:release web -a your-app-name
 
 ## 🔐 Security Best Practices
 
-1. **Environment Variables**: Never commit sensitive data - use `.env.docker` as template only
+1. **Environment Variables**: Never commit sensitive data - use `.env.example` as template only
 2. **JWT Secrets**: Use strong, randomly generated secrets (minimum 32 characters)
    ```bash
    openssl rand -base64 32
