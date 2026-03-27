@@ -59,7 +59,7 @@
         "compression": "^1.8.1",
         "date-fns": "^4.1.0",
         "dotenv": "^17.3.1",
-        "handlebars": "^4.7.8",
+        "handlebars": "^4.7.9",
         "helmet": "^8.1.0",
         "jsonwebtoken": "^9.0.3",
         "lodash": "^4.17.23",
