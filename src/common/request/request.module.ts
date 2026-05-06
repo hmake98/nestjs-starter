@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
-import { JwtAccessGuard } from './guards/jwt.access.guard';
+import { JwtAccessGuard } from './guards/jwt-access.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { RequestLoggerMiddleware } from './middlewares/request.middleware';
 
@@ -14,8 +14,12 @@ import { RequestLoggerMiddleware } from './middlewares/request.middleware';
             useFactory: (configService: ConfigService) => ({
                 throttlers: [
                     {
-                        ttl: configService.get('app.throttle.ttl'),
-                        limit: configService.get('app.throttle.limit'),
+                        ttl: configService.getOrThrow<number>(
+                            'app.throttle.ttl'
+                        ),
+                        limit: configService.getOrThrow<number>(
+                            'app.throttle.limit'
+                        ),
                     },
                 ],
             }),

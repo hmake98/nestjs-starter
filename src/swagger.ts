@@ -1,10 +1,8 @@
-import { INestApplication, Logger } from '@nestjs/common';
+import { Logger, type INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-export default async function setupSwagger(
-    app: INestApplication
-): Promise<void> {
+export default function setupSwagger(app: INestApplication): void {
     const configService = app.get(ConfigService);
     const logger = new Logger('SwaggerSetup');
 

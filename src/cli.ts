@@ -1,23 +1,27 @@
+import 'reflect-metadata';
+
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { CommandModule, CommandService } from 'nestjs-command';
 
-import { MigrationModule } from './migrations/migration.module';
+import { MigrationModule } from './migration/migration.module';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
     const app = await NestFactory.createApplicationContext(MigrationModule, {
-        logger: ['error'],
+        logger: ['error', 'warn', 'log'],
     });
-
-    const logger = new Logger();
 
     try {
         await app.select(CommandModule).get(CommandService).exec();
-        process.exit(0);
-    } catch (err: unknown) {
-        logger.error(err);
-        process.exit(1);
+    } catch (err) {
+        new Logger('CLI').error(err);
+        process.exitCode = 1;
+    } finally {
+        await app.close();
     }
 }
 
-bootstrap();
+bootstrap().catch(err => {
+    console.error('CLI failed to start:', err);
+    process.exit(1);
+});

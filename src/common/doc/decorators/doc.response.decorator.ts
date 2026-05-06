@@ -2,7 +2,7 @@ import { applyDecorators, SetMetadata } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 import { ApiSuccessResponseDto } from 'src/common/response/dtos/response.success.dto';
-import { IResponseDocOptions } from 'src/common/response/interfaces/response.interface';
+import { type IResponseDocOptions } from 'src/common/response/interfaces/response.interface';
 
 import {
     DOC_RESPONSE_MESSAGE_META_KEY,
@@ -14,7 +14,7 @@ export function DocResponse<T>(
 ): MethodDecorator {
     const { httpStatus, serialization, messageKey } = options;
 
-    const schema: Record<string, any> = {
+    const schema: Record<string, unknown> = {
         allOf: [
             { $ref: getSchemaPath(ApiSuccessResponseDto) },
             {

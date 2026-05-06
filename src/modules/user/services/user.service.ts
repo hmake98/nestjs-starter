@@ -1,72 +1,20 @@
-import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { DatabaseService } from 'src/common/database/services/database.service';
 import { ApiGenericResponseDto } from 'src/common/response/dtos/response.generic.dto';
 
-import { UserUpdateDto } from '../dtos/request/user.update.request';
 import {
     UserGetProfileResponseDto,
     UserUpdateProfileResponseDto,
-} from '../dtos/response/user.response';
-import { IUserService } from '../interfaces/user.service.interface';
+} from '../dtos/user.dto';
+import { UserUpdateDto } from '../dtos/user.update.dto';
+import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
-export class UserService implements IUserService {
-    constructor(private readonly databaseService: DatabaseService) {}
+export class UserService {
+    constructor(private readonly userRepository: UserRepository) {}
 
-    async updateUser(
-        userId: string,
-        data: UserUpdateDto
-    ): Promise<UserUpdateProfileResponseDto> {
-        try {
-            const user = await this.databaseService.user.findUnique({
-                where: { id: userId },
-            });
-            if (!user) {
-                throw new HttpException(
-                    'user.error.userNotFound',
-                    HttpStatus.NOT_FOUND
-                );
-            }
-            const updatedUser = await this.databaseService.user.update({
-                where: { id: userId },
-                data,
-            });
-            return updatedUser;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async deleteUser(userId: string): Promise<ApiGenericResponseDto> {
-        try {
-            const user = await this.databaseService.user.findUnique({
-                where: { id: userId },
-            });
-            if (!user) {
-                throw new HttpException(
-                    'user.error.userNotFound',
-                    HttpStatus.NOT_FOUND
-                );
-            }
-            await this.databaseService.user.update({
-                where: { id: userId },
-                data: { deletedAt: new Date() },
-            });
-
-            return {
-                success: true,
-                message: 'user.success.userDeleted',
-            };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getProfile(id: string): Promise<UserGetProfileResponseDto> {
-        const user = await this.databaseService.user.findUnique({
-            where: { id },
-        });
+    async getProfile(userId: string): Promise<UserGetProfileResponseDto> {
+        const user = await this.userRepository.findById(userId);
         if (!user) {
             throw new HttpException(
                 'user.error.userNotFound',
@@ -74,5 +22,29 @@ export class UserService implements IUserService {
             );
         }
         return user;
+    }
+
+    async updateUser(
+        userId: string,
+        data: UserUpdateDto
+    ): Promise<UserUpdateProfileResponseDto> {
+        await this.assertExists(userId);
+        return this.userRepository.update(userId, data);
+    }
+
+    async deleteUser(userId: string): Promise<ApiGenericResponseDto> {
+        await this.assertExists(userId);
+        await this.userRepository.softDelete(userId);
+        return { success: true, message: 'user.success.userDeleted' };
+    }
+
+    private async assertExists(userId: string): Promise<void> {
+        const exists = await this.userRepository.existsById(userId);
+        if (!exists) {
+            throw new HttpException(
+                'user.error.userNotFound',
+                HttpStatus.NOT_FOUND
+            );
+        }
     }
 }

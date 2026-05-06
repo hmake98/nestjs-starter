@@ -23,14 +23,17 @@ export class ResponseInterceptor implements NestInterceptor {
         private readonly messageService: MessageService
     ) {}
 
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    intercept(
+        context: ExecutionContext,
+        next: CallHandler
+    ): Observable<unknown> {
         return next.handle().pipe(
             map(responseBody => {
                 const ctx = context.switchToHttp();
-                const response = ctx.getResponse();
+                const response = ctx.getResponse<{ statusCode: number }>();
                 const statusCode: number = response.statusCode;
 
-                const classSerialization: ClassConstructor<any> =
+                const classSerialization: ClassConstructor<unknown> =
                     this.reflector.get(
                         DOC_RESPONSE_SERIALIZATION_META_KEY,
                         context.getHandler()

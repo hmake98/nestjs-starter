@@ -21,11 +21,5 @@
         }
     },
     "minify": false,
-    "exclude": [
-        "node_modules",
-        "dist",
-        "coverage",
-        "templates",
-        "src/metadata.ts"
-    ]
+    "exclude": ["node_modules", "dist", "coverage", "templates"]
 }

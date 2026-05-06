@@ -1,5 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import Redis from 'ioredis';
+import { Test, type TestingModule } from '@nestjs/testing';
 
 import { REDIS_CLIENT } from 'src/common/cache/constants/cache.constant';
 import { CacheService } from 'src/common/cache/services/cache.service';

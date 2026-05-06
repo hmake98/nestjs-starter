@@ -3,7 +3,7 @@ import { Cron } from '@nestjs/schedule';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class MidNightScheduleWorker {
-    private logger = new Logger(MidNightScheduleWorker.name);
+    private readonly logger = new Logger(MidNightScheduleWorker.name);
 
     @Cron('0 0 * * *')
     handleCron() {

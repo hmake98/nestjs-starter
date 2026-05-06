@@ -1,4 +1,4 @@
-import { ClassConstructor } from 'class-transformer';
+import { type ClassConstructor } from 'class-transformer';
 
 export interface IPaginationMetadata {
     currentPage: number;

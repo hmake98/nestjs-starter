@@ -11,7 +11,7 @@ coverage/
 !.env.docker
 config.yaml
 config.yml
-yarn-error.log
+npm-debug.log*
 
 # IDE - VSCode
 .vscode/*
@@ -19,16 +19,6 @@ yarn-error.log
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-# yarn
-.yarn/*
-.pnp.*
-!.yarn/cache
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 
 # yalc
 .yalc

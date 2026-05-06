@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 
 import { MessageService } from 'src/common/message/services/message.service';

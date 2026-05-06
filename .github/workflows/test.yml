@@ -29,35 +29,22 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
-                  cache: 'yarn'
-
-            - name: Get yarn cache directory path
-              id: yarn-cache-dir-path
-              run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-            - name: Cache yarn dependencies
-              uses: actions/cache@v4
-              id: yarn-cache
-              with:
-                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
+                  cache: 'npm'
 
             - name: Install dependencies
-              run: yarn install --frozen-lockfile
+              run: npm ci
 
             - name: Run linting fix
-              run: yarn lint
+              run: npm run lint
 
             - name: Run format fix
-              run: yarn format
+              run: npm run format
 
             - name: Run unit tests
-              run: yarn test
+              run: npm test
 
             - name: Generate badges
-              run: yarn make-badges
+              run: npm run make-badges
               continue-on-error: true
 
             - name: Commit changes

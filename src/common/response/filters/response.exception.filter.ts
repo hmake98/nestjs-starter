@@ -1,11 +1,11 @@
 import {
-    ExceptionFilter,
-    Catch,
     ArgumentsHost,
+    BadRequestException,
+    Catch,
+    ExceptionFilter,
     HttpException,
     HttpStatus,
     Logger,
-    BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Sentry from '@sentry/node';
@@ -22,10 +22,9 @@ export class ResponseExceptionFilter implements ExceptionFilter {
 
     constructor(
         private readonly messageService: MessageService,
-        private readonly configService: ConfigService
+        configService: ConfigService
     ) {
-        this.isDebug = this.configService.get<boolean>('app.debug');
-        this.initializeSentry();
+        this.isDebug = configService.get<boolean>('app.debug') ?? false;
     }
 
     catch(exception: unknown, host: ArgumentsHost): void {
@@ -38,46 +37,10 @@ export class ResponseExceptionFilter implements ExceptionFilter {
                 ? exception.getStatus()
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
-        let message: string;
-        let validationMessages: string[] | undefined;
-
-        if (exception instanceof BadRequestException) {
-            const exceptionResponse = exception.getResponse() as any;
-            const exceptionMessage = exceptionResponse.message;
-
-            if (Array.isArray(exceptionMessage)) {
-                // Handle validation errors
-                validationMessages =
-                    this.translateValidationMessages(exceptionMessage);
-                message = this.messageService.translateKey(
-                    ['http', 'error', statusCode],
-                    {
-                        defaultValue: 'Bad Request',
-                    }
-                );
-            } else {
-                // Handle single error message
-                message = this.messageService.translate(
-                    exceptionMessage || 'http.error.400',
-                    {
-                        defaultValue: exceptionMessage || 'Bad Request',
-                    }
-                );
-            }
-        } else if (exception instanceof HttpException) {
-            // Handle HTTP exceptions
-            message = this.messageService.translate(exception.message, {
-                defaultValue: exception.message,
-            });
-        } else {
-            // Handle unknown errors
-            message = this.messageService.translateKey(
-                ['http', 'error', statusCode],
-                {
-                    defaultValue: 'Internal Server Error',
-                }
-            );
-        }
+        const { message, validationMessages } = this.resolveMessage(
+            exception,
+            statusCode
+        );
 
         const errorResponse: IApiErrorResponse = {
             statusCode,
@@ -93,15 +56,12 @@ export class ResponseExceptionFilter implements ExceptionFilter {
             }
         }
 
-        // Log errors
         if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
             this.logger.error(
                 `${request.method} ${request.url} - ${statusCode}: ${message}`,
                 exception instanceof Error ? exception.stack : undefined
             );
-
-            // Capture in Sentry for production errors
-            this.captureSentryException(exception, request, errorResponse);
+            this.captureSentry(exception, request);
         } else if (statusCode >= HttpStatus.BAD_REQUEST) {
             this.logger.warn(
                 `${request.method} ${request.url} - ${statusCode}: ${message}`
@@ -111,23 +71,58 @@ export class ResponseExceptionFilter implements ExceptionFilter {
         response.status(statusCode).json(errorResponse);
     }
 
-    /**
-     * Translate validation error messages
-     * Supports format: "key|{json_params}"
-     *
-     * @param messages - Array of validation messages
-     * @returns Array of translated messages
-     */
+    private resolveMessage(
+        exception: unknown,
+        statusCode: number
+    ): { message: string; validationMessages?: string[] } {
+        if (exception instanceof BadRequestException) {
+            const exceptionResponse = exception.getResponse() as {
+                message?: string | string[];
+            };
+            const exceptionMessage = exceptionResponse.message;
+
+            if (Array.isArray(exceptionMessage)) {
+                return {
+                    message: this.messageService.translateKey(
+                        ['http', 'error', statusCode],
+                        { defaultValue: 'Bad Request' }
+                    ),
+                    validationMessages:
+                        this.translateValidationMessages(exceptionMessage),
+                };
+            }
+
+            return {
+                message: this.messageService.translate(
+                    exceptionMessage ?? 'http.error.400',
+                    { defaultValue: exceptionMessage ?? 'Bad Request' }
+                ),
+            };
+        }
+
+        if (exception instanceof HttpException) {
+            return {
+                message: this.messageService.translate(exception.message, {
+                    defaultValue: exception.message,
+                }),
+            };
+        }
+
+        return {
+            message: this.messageService.translateKey(
+                ['http', 'error', statusCode],
+                { defaultValue: 'Internal Server Error' }
+            ),
+        };
+    }
+
     private translateValidationMessages(messages: string[]): string[] {
         return messages.map(msg => {
             try {
-                // Support format: "validation.key|{\"param\":\"value\"}"
                 const [key, paramsString] = msg.split('|');
                 const args = paramsString ? JSON.parse(paramsString) : {};
-
                 return this.messageService.translate(key, { args });
             } catch {
-                // If parsing fails, try translating as-is
                 return this.messageService.translate(msg, {
                     defaultValue: msg,
                 });
@@ -135,26 +130,12 @@ export class ResponseExceptionFilter implements ExceptionFilter {
         });
     }
 
-    private initializeSentry(): void {
-        const sentryDsn = this.configService.get<string>('sentry.dsn');
-        if (sentryDsn) {
-            Sentry.init({
-                dsn: sentryDsn,
-                environment: this.configService.get<string>('app.env'),
-                tracesSampleRate: 1.0,
-            });
-        }
-    }
+    private captureSentry(exception: unknown, request: Request): void {
+        if (!Sentry.getClient()) return;
 
-    private captureSentryException(
-        exception: unknown,
-        request: Request,
-        errorResponse: IApiErrorResponse
-    ): void {
         Sentry.withScope(scope => {
             scope.setExtra('requestUrl', request.url);
             scope.setExtra('method', request.method);
-            scope.setExtra('timestamp', errorResponse.timestamp);
             scope.setExtra('body', request.body);
             scope.setExtra('query', request.query);
             scope.setExtra('params', request.params);
@@ -163,12 +144,14 @@ export class ResponseExceptionFilter implements ExceptionFilter {
             if (exception instanceof Error) {
                 Sentry.captureException(exception);
             } else {
-                Sentry.captureMessage(errorResponse.message);
+                Sentry.captureMessage('Non-Error exception thrown');
             }
         });
     }
 
-    private sanitizeHeaders(headers: any): any {
+    private sanitizeHeaders(
+        headers: Record<string, unknown>
+    ): Record<string, unknown> {
         const sanitized = { ...headers };
         delete sanitized.authorization;
         delete sanitized.cookie;

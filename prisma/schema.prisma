@@ -11,61 +11,25 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(uuid())
-  userName   String    @unique
-  email      String    @unique
-  password   String
-  firstName  String?   @map("first_name")
-  lastName   String?   @map("last_name")
-  isVerified Boolean   @default(false) @map("is_verified")
-  phone      String?
-  role       Role      @default(USER)
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at")
-  avatar     String?
-  posts      Post[]
+  id           String    @id @default(uuid())
+  userName     String    @unique
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  firstName    String?   @map("first_name")
+  lastName     String?   @map("last_name")
+  isVerified   Boolean   @default(false) @map("is_verified")
+  phone        String?
+  role         Role      @default(MEMBER)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  avatar       String?
 
   @@map("users")
 }
 
-model Post {
-  id        String      @id @default(uuid())
-  title     String      @db.VarChar(255)
-  content   String      @db.Text
-  status    PostStatus  @default(DRAFT)
-  images    PostImage[]
-  author    User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String      @map("author_id")
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
-  deletedAt DateTime?   @map("deleted_at")
-
-  @@index([authorId])
-  @@map("posts")
-}
-
-model PostImage {
-  id        String    @id @default(uuid())
-  key       String
-  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String    @map("post_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@index([postId])
-  @@map("post_images")
-}
-
-enum PostStatus {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
-}
-
 enum Role {
-  USER
   ADMIN
+  MEMBER
   DEVELOPER
 }

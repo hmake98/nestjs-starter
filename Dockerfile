@@ -6,12 +6,12 @@ RUN apk add --no-cache python3 make g++
 WORKDIR /app
 
 # Copy dependency files
-COPY package.json yarn.lock ./
+COPY package.json package-lock.json ./
 
 # Copy prisma schema and generate client
 COPY prisma ./prisma/
-RUN yarn install --frozen-lockfile
-RUN yarn prisma:generate
+
+RUN npm ci & npm run db:generate
 
 # Copy source code (this layer changes most frequently)
 COPY . .
@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 3001
 
 # Start development server with hot reload
-CMD ["yarn", "dev"]
+CMD ["npm", "run", "dev"]
