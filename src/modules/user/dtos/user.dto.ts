@@ -1,18 +1,20 @@
 import { faker } from '@faker-js/faker';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { $Enums, User } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
 import {
+    IsBoolean,
     IsDate,
     IsEmail,
     IsEnum,
     IsOptional,
     IsString,
     IsUUID,
-    IsBoolean,
 } from 'class-validator';
 
-export class UserResponseDto implements Partial<User> {
+import { UserRole } from 'src/common/database/enums/role.enum';
+import type { UserEntity } from 'src/common/database/interfaces/user.interface';
+
+export class UserResponseDto implements Omit<UserEntity, 'passwordHash'> {
     @ApiProperty({
         example: faker.string.uuid(),
     })
@@ -75,12 +77,12 @@ export class UserResponseDto implements Partial<User> {
     phone: string | null;
 
     @ApiProperty({
-        enum: $Enums.Role,
-        example: faker.helpers.arrayElement(Object.values($Enums.Role)),
+        enum: UserRole,
+        example: faker.helpers.arrayElement(Object.values(UserRole)),
     })
     @Expose()
-    @IsEnum($Enums.Role)
-    role: $Enums.Role;
+    @IsEnum(UserRole)
+    role: UserRole;
 
     @ApiProperty({
         example: faker.datatype.boolean(),
@@ -115,7 +117,7 @@ export class UserResponseDto implements Partial<User> {
 
     @ApiHideProperty()
     @Exclude()
-    password: string;
+    passwordHash: string;
 }
 
 export class UserGetProfileResponseDto extends UserResponseDto {}

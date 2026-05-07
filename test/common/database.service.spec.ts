@@ -1,24 +1,68 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, type TestingModule } from '@nestjs/testing';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
 
 import { DatabaseService } from 'src/common/database/services/database.service';
+
+jest.mock('pg');
+jest.mock('@prisma/adapter-pg');
+jest.mock('@prisma/client');
+
+const MockPool = Pool as jest.MockedClass<typeof Pool>;
+const MockPrismaPg = PrismaPg as jest.MockedClass<typeof PrismaPg>;
+const MockPrismaClient = PrismaClient;
 
 describe('DatabaseService', () => {
     let service: DatabaseService;
     let module: TestingModule;
+    let mockPrismaInstance: {
+        $connect: jest.Mock;
+        $disconnect: jest.Mock;
+        $queryRaw: jest.Mock;
+        user: object;
+    };
+    let mockPoolInstance: { end: jest.Mock };
 
     beforeEach(async () => {
+        mockPrismaInstance = {
+            $connect: jest.fn().mockResolvedValue(undefined),
+            $disconnect: jest.fn().mockResolvedValue(undefined),
+            $queryRaw: jest.fn().mockResolvedValue([{ '1': 1 }]),
+            user: {},
+        };
+
+        mockPoolInstance = {
+            end: jest.fn().mockResolvedValue(undefined),
+        };
+
+        MockPool.mockImplementation(() => mockPoolInstance as unknown as Pool);
+        MockPrismaPg.mockImplementation(() => ({}) as unknown as PrismaPg);
+        MockPrismaClient.mockImplementation(
+            () => mockPrismaInstance as unknown as PrismaClient
+        );
+
         module = await Test.createTestingModule({
-            providers: [DatabaseService],
+            providers: [
+                DatabaseService,
+                {
+                    provide: ConfigService,
+                    useValue: {
+                        getOrThrow: jest
+                            .fn()
+                            .mockReturnValue(
+                                'postgresql://localhost:5432/test'
+                            ),
+                    },
+                },
+            ],
         }).compile();
 
         service = module.get<DatabaseService>(DatabaseService);
     });
 
     afterEach(async () => {
-        // Clean up mocks
-        jest.restoreAllMocks();
-
-        // Close the testing module
         if (module) {
             await module.close();
         }
@@ -26,127 +70,85 @@ describe('DatabaseService', () => {
 
     describe('onModuleInit', () => {
         it('should call $connect on module initialization', async () => {
-            // Arrange
-            const connectSpy = jest
-                .spyOn(service, '$connect')
-                .mockResolvedValue(undefined);
-
-            // Act
             await service.onModuleInit();
 
-            // Assert
-            expect(connectSpy).toHaveBeenCalledTimes(1);
-            expect(connectSpy).toHaveBeenCalledWith();
+            expect(mockPrismaInstance.$connect).toHaveBeenCalledTimes(1);
         });
 
         it('should handle connection errors during module initialization', async () => {
-            // Arrange
             const connectionError = new Error('Failed to connect to database');
-            const connectSpy = jest
-                .spyOn(service, '$connect')
-                .mockRejectedValue(connectionError);
+            mockPrismaInstance.$connect.mockRejectedValueOnce(connectionError);
 
-            // Act & Assert
             await expect(service.onModuleInit()).rejects.toThrow(
                 'Failed to connect to database'
             );
-            expect(connectSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('onModuleDestroy', () => {
+        it('should call $disconnect and pool.end on destroy', async () => {
+            await service.onModuleDestroy();
+
+            expect(mockPrismaInstance.$disconnect).toHaveBeenCalledTimes(1);
+            expect(mockPoolInstance.end).toHaveBeenCalledTimes(1);
+        });
+
+        it('should handle errors during disconnect', async () => {
+            const disconnectError = new Error('Disconnect failed');
+            mockPrismaInstance.$disconnect.mockRejectedValueOnce(
+                disconnectError
+            );
+
+            await expect(service.onModuleDestroy()).rejects.toThrow(
+                'Disconnect failed'
+            );
         });
     });
 
     describe('isHealthy', () => {
         it('should return status "up" when database query succeeds', async () => {
-            // Arrange
-            const queryRawSpy = jest
-                .spyOn(service, '$queryRaw')
-                .mockResolvedValue([{ '1': 1 }]);
+            mockPrismaInstance.$queryRaw.mockResolvedValueOnce([{ '1': 1 }]);
 
-            // Act
             const result = await service.isHealthy();
 
-            // Assert
-            expect(result).toEqual({
-                prisma: {
-                    status: 'up',
-                },
-            });
-            expect(queryRawSpy).toHaveBeenCalledTimes(1);
-            expect(queryRawSpy).toHaveBeenCalledWith(['SELECT 1']);
+            expect(result).toEqual({ prisma: { status: 'up' } });
+            expect(mockPrismaInstance.$queryRaw).toHaveBeenCalledTimes(1);
         });
 
         it('should return status "down" when database query fails', async () => {
-            // Arrange
-            const queryError = new Error('Database connection failed');
-            const queryRawSpy = jest
-                .spyOn(service, '$queryRaw')
-                .mockRejectedValue(queryError);
+            mockPrismaInstance.$queryRaw.mockRejectedValueOnce(
+                new Error('Database connection failed')
+            );
 
-            // Act
             const result = await service.isHealthy();
 
-            // Assert
-            expect(result).toEqual({
-                prisma: {
-                    status: 'down',
-                },
-            });
-            expect(queryRawSpy).toHaveBeenCalledTimes(1);
+            expect(result).toEqual({ prisma: { status: 'down' } });
         });
 
-        it('should return status "down" when database query throws unexpected error', async () => {
-            // Arrange
-            const queryRawSpy = jest
-                .spyOn(service, '$queryRaw')
-                .mockImplementation(() => {
-                    throw new Error('Unexpected database error');
-                });
+        it('should return status "down" when database query throws synchronously', async () => {
+            mockPrismaInstance.$queryRaw.mockImplementationOnce(() => {
+                throw new Error('Unexpected database error');
+            });
 
-            // Act
             const result = await service.isHealthy();
 
-            // Assert
-            expect(result).toEqual({
-                prisma: {
-                    status: 'down',
-                },
-            });
-            expect(queryRawSpy).toHaveBeenCalledTimes(1);
+            expect(result).toEqual({ prisma: { status: 'down' } });
         });
 
-        it('should handle non-Error exceptions in database query', async () => {
-            // Arrange
-            const queryRawSpy = jest
-                .spyOn(service, '$queryRaw')
-                .mockRejectedValue('String error');
+        it('should handle non-Error exceptions', async () => {
+            mockPrismaInstance.$queryRaw.mockRejectedValueOnce('String error');
 
-            // Act
             const result = await service.isHealthy();
 
-            // Assert
-            expect(result).toEqual({
-                prisma: {
-                    status: 'down',
-                },
-            });
-            expect(queryRawSpy).toHaveBeenCalledTimes(1);
+            expect(result).toEqual({ prisma: { status: 'down' } });
         });
 
-        it('should handle null/undefined rejections in database query', async () => {
-            // Arrange
-            const queryRawSpy = jest
-                .spyOn(service, '$queryRaw')
-                .mockRejectedValue(null);
+        it('should handle null rejections', async () => {
+            mockPrismaInstance.$queryRaw.mockRejectedValueOnce(null);
 
-            // Act
             const result = await service.isHealthy();
 
-            // Assert
-            expect(result).toEqual({
-                prisma: {
-                    status: 'down',
-                },
-            });
-            expect(queryRawSpy).toHaveBeenCalledTimes(1);
+            expect(result).toEqual({ prisma: { status: 'down' } });
         });
     });
 
@@ -159,83 +161,54 @@ describe('DatabaseService', () => {
             expect(typeof service.onModuleInit).toBe('function');
         });
 
+        it('should implement OnModuleDestroy interface', () => {
+            expect(typeof service.onModuleDestroy).toBe('function');
+        });
+
         it('should have isHealthy method', () => {
             expect(typeof service.isHealthy).toBe('function');
         });
 
-        it('should have Prisma client methods', () => {
-            expect(typeof service.$connect).toBe('function');
-            expect(typeof service.$disconnect).toBe('function');
-            expect(typeof service.$queryRaw).toBe('function');
+        it('should expose user model', () => {
+            expect(service.user).toBeDefined();
         });
     });
 
     describe('integration scenarios', () => {
         it('should handle module init followed by health check - success scenario', async () => {
-            // Arrange
-            const connectSpy = jest
-                .spyOn(service, '$connect')
-                .mockResolvedValue(undefined);
-            const _queryRawSpy = jest
-                .spyOn(service, '$queryRaw')
-                .mockResolvedValue([{ '1': 1 }]);
+            mockPrismaInstance.$queryRaw.mockResolvedValueOnce([{ '1': 1 }]);
 
-            // Act
             await service.onModuleInit();
             const healthResult = await service.isHealthy();
 
-            // Assert
-            expect(connectSpy).toHaveBeenCalledTimes(1);
-            expect(healthResult).toEqual({
-                prisma: {
-                    status: 'up',
-                },
-            });
+            expect(mockPrismaInstance.$connect).toHaveBeenCalledTimes(1);
+            expect(healthResult).toEqual({ prisma: { status: 'up' } });
         });
 
         it('should handle module init followed by health check - failure scenario', async () => {
-            // Arrange
-            const connectSpy = jest
-                .spyOn(service, '$connect')
-                .mockResolvedValue(undefined);
-            const _queryRawSpy = jest
-                .spyOn(service, '$queryRaw')
-                .mockRejectedValue(new Error('Query failed'));
+            mockPrismaInstance.$queryRaw.mockRejectedValueOnce(
+                new Error('Query failed')
+            );
 
-            // Act
             await service.onModuleInit();
             const healthResult = await service.isHealthy();
 
-            // Assert
-            expect(connectSpy).toHaveBeenCalledTimes(1);
-            expect(healthResult).toEqual({
-                prisma: {
-                    status: 'down',
-                },
-            });
+            expect(mockPrismaInstance.$connect).toHaveBeenCalledTimes(1);
+            expect(healthResult).toEqual({ prisma: { status: 'down' } });
         });
 
         it('should handle connection failure during init but successful health check', async () => {
-            // Arrange
-            const _connectSpy = jest
-                .spyOn(service, '$connect')
-                .mockRejectedValue(new Error('Initial connection failed'));
-            const _queryRawSpy = jest
-                .spyOn(service, '$queryRaw')
-                .mockResolvedValue([{ '1': 1 }]);
+            mockPrismaInstance.$connect.mockRejectedValueOnce(
+                new Error('Initial connection failed')
+            );
+            mockPrismaInstance.$queryRaw.mockResolvedValueOnce([{ '1': 1 }]);
 
-            // Act & Assert
             await expect(service.onModuleInit()).rejects.toThrow(
                 'Initial connection failed'
             );
 
-            // Health check should still work independently
             const healthResult = await service.isHealthy();
-            expect(healthResult).toEqual({
-                prisma: {
-                    status: 'up',
-                },
-            });
+            expect(healthResult).toEqual({ prisma: { status: 'up' } });
         });
     });
 });

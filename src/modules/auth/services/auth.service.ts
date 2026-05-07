@@ -2,11 +2,11 @@ import { faker } from '@faker-js/faker';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { Role } from '@prisma/client';
 import * as argon2 from 'argon2';
 
+import { UserRole } from 'src/common/database/enums/role.enum';
+import { UserRepository } from 'src/common/database/repositories/user.repository';
 import { IAuthUser } from 'src/common/request/interfaces/request.interface';
-import { UserRepository } from 'src/modules/user/repositories/user.repository';
 
 import { UserLoginDto } from '../dtos/auth.login.dto';
 import {
@@ -33,7 +33,7 @@ export class AuthService {
             );
         }
 
-        const matched = await argon2.verify(user.password, password);
+        const matched = await argon2.verify(user.passwordHash, password);
         if (!matched) {
             throw new HttpException(
                 'auth.error.invalidPassword',
@@ -62,7 +62,7 @@ export class AuthService {
             password: hashed,
             firstName: data.firstName?.trim() ?? null,
             lastName: data.lastName?.trim() ?? null,
-            role: Role.MEMBER,
+            role: UserRole.MEMBER,
             userName: faker.internet.username(),
         });
 

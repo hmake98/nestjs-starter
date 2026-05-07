@@ -1,7 +1,7 @@
 import { Controller, Delete, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
 
+import { UserRole } from 'src/common/database/enums/role.enum';
 import { ApiEndpoint } from 'src/common/doc/decorators/doc.api-endpoint.decorator';
 import { AllowedRoles } from 'src/common/request/decorators/roles.decorator';
 import { ApiGenericResponseDto } from 'src/common/response/dtos/response.generic.dto';
@@ -10,7 +10,7 @@ import { UserService } from '../services/user.service';
 
 @ApiTags('admin.user')
 @ApiBearerAuth('accessToken')
-@AllowedRoles([Role.ADMIN])
+@AllowedRoles([UserRole.ADMIN])
 @Controller({ path: '/admin/user', version: '1' })
 export class UserAdminController {
     constructor(private readonly userService: UserService) {}

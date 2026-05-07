@@ -27,8 +27,6 @@ describe('CacheService', () => {
     let redis: typeof mockRedis;
 
     beforeEach(async () => {
-        jest.clearAllMocks();
-
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 CacheService,

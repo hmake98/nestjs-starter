@@ -42,8 +42,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-            cache_from:
-                - nestjs-app:latest
+            target: dev
         container_name: nestjs-app
         restart: unless-stopped
         ports:
@@ -53,11 +52,11 @@ services:
         environment:
             DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-master123}@postgres:5432/${POSTGRES_DB:-postgres}
             REDIS_URL: redis://redis:6379
-        networks:
-            - app-network
         volumes:
             - .:/app
             - /app/node_modules
+        networks:
+            - app-network
         depends_on:
             postgres:
                 condition: service_healthy

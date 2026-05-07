@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { Command } from 'nestjs-command';
 
-import { UserRepository } from 'src/modules/user/repositories/user.repository';
+import { UserRole } from 'src/common/database/enums/role.enum';
+import { UserRepository } from 'src/common/database/repositories/user.repository';
 
 @Injectable()
 export class UserSeed {
@@ -32,7 +32,7 @@ export class UserSeed {
             email,
             userName,
             password: hashed,
-            role: Role.ADMIN,
+            role: UserRole.ADMIN,
             firstName: 'Admin',
             isVerified: true,
         });

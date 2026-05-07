@@ -1,19 +1,19 @@
-import { BullModule } from '@nestjs/bull';
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
     imports: [
-        // Queue Management - Bull/Redis
         BullModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
-                redis: configService.get<string>('redis.url'),
+                connection: {
+                    url: configService.getOrThrow<string>('REDIS_URL'),
+                },
             }),
             inject: [ConfigService],
         }),
     ],
-    providers: [],
-    exports: [],
+    exports: [BullModule],
 })
 export class BullMqModule {}

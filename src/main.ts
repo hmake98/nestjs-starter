@@ -6,6 +6,7 @@ import { NestFactory } from '@nestjs/core';
 import * as Sentry from '@sentry/node';
 import { useContainer } from 'class-validator';
 import compression from 'compression';
+import { type NextFunction, type Request, type Response } from 'express';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 
@@ -30,6 +31,10 @@ async function bootstrap(): Promise<void> {
     const host = config.getOrThrow<string>('app.http.host');
     const port = config.getOrThrow<number>('app.http.port');
 
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        if (req.path === '/favicon.ico') return res.sendStatus(204);
+        next();
+    });
     app.use(helmet());
     app.use(compression());
     app.useLogger(logger);
@@ -53,7 +58,6 @@ async function bootstrap(): Promise<void> {
     if (env !== APP_ENVIRONMENT.PRODUCTION) {
         setupSwagger(app);
     }
-
 
     app.enableShutdownHooks();
 

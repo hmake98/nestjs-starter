@@ -2,7 +2,8 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 import { ApiGenericResponseDto } from 'src/common/response/dtos/response.generic.dto';
-import { type IGenericResponseOptions } from 'src/common/response/interfaces/response.interface';
+
+import { type IGenericResponseOptions } from '../interfaces/doc.interface';
 
 export function DocGenericResponse(
     options: IGenericResponseOptions

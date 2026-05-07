@@ -1,8 +1,8 @@
 import { HttpException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 
+import { UserRepository } from 'src/common/database/repositories/user.repository';
 import { type UserUpdateDto } from 'src/modules/user/dtos/user.update.dto';
-import { UserRepository } from 'src/modules/user/repositories/user.repository';
 import { UserService } from 'src/modules/user/services/user.service';
 
 describe('UserService', () => {
@@ -20,8 +20,6 @@ describe('UserService', () => {
     };
 
     beforeEach(async () => {
-        jest.clearAllMocks();
-
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 UserService,
@@ -67,7 +65,9 @@ describe('UserService', () => {
             mockUserRepository.existsById.mockResolvedValue(true);
             mockUserRepository.update.mockResolvedValue(updated);
 
-            await expect(service.updateUser('1', dto)).resolves.toEqual(updated);
+            await expect(service.updateUser('1', dto)).resolves.toEqual(
+                updated
+            );
             expect(mockUserRepository.update).toHaveBeenCalledWith('1', dto);
         });
     });

@@ -16,14 +16,17 @@
     "allowJs": false,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false,
+    "types": ["node", "jest"]
   },
-  "include": ["src", "test"],
+  "include": ["src", "test", "prisma/prisma.config.ts"],
   "exclude": ["node_modules", "dist", "*coverage"]
 }

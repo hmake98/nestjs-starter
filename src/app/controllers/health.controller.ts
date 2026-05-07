@@ -1,6 +1,10 @@
 import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { HealthCheck, HealthCheckResult, HealthCheckService } from '@nestjs/terminus';
+import {
+    HealthCheck,
+    HealthCheckResult,
+    HealthCheckService,
+} from '@nestjs/terminus';
 
 import { DatabaseService } from 'src/common/database/services/database.service';
 import { PublicRoute } from 'src/common/request/decorators/public.decorator';

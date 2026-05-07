@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
+import { UserRepository } from 'src/common/database/repositories/user.repository';
 import { ApiGenericResponseDto } from 'src/common/response/dtos/response.generic.dto';
 
 import {
@@ -7,7 +8,6 @@ import {
     UserUpdateProfileResponseDto,
 } from '../dtos/user.dto';
 import { UserUpdateDto } from '../dtos/user.update.dto';
-import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class UserService {

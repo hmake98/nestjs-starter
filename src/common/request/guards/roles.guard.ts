@@ -5,7 +5,8 @@ import {
     Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from '@prisma/client';
+
+import { UserRole } from 'src/common/database/enums/role.enum';
 
 import { ROLES_DECORATOR_KEY } from '../constants/request.constant';
 
@@ -14,7 +15,7 @@ export class RolesGuard implements CanActivate {
     constructor(private readonly reflector: Reflector) {}
 
     canActivate(context: ExecutionContext): boolean {
-        const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
+        const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
             ROLES_DECORATOR_KEY,
             [context.getHandler(), context.getClass()]
         );
@@ -24,7 +25,7 @@ export class RolesGuard implements CanActivate {
         }
 
         const { user } = context.switchToHttp().getRequest<{
-            user?: { role?: Role | Role[] };
+            user?: { role?: UserRole | UserRole[] };
         }>();
 
         if (!user?.role) {
@@ -33,7 +34,9 @@ export class RolesGuard implements CanActivate {
 
         const userRole = user.role;
         const hasRole = requiredRoles.some(role =>
-            Array.isArray(userRole) ? userRole.includes(role) : userRole === role
+            Array.isArray(userRole)
+                ? userRole.includes(role)
+                : userRole === role
         );
 
         if (!hasRole) {

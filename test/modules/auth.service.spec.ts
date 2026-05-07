@@ -2,11 +2,11 @@ import { HttpException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, type TestingModule } from '@nestjs/testing';
-import { Role } from '@prisma/client';
 import * as argon2 from 'argon2';
 
+import { UserRole as Role } from 'src/common/database/enums/role.enum';
+import { UserRepository } from 'src/common/database/repositories/user.repository';
 import { AuthService } from 'src/modules/auth/services/auth.service';
-import { UserRepository } from 'src/modules/user/repositories/user.repository';
 
 jest.mock('argon2', () => ({
     hash: jest.fn(),
@@ -44,8 +44,6 @@ describe('AuthService', () => {
     };
 
     beforeEach(async () => {
-        jest.clearAllMocks();
-
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 AuthService,

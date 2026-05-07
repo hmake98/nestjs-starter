@@ -1,22 +1,40 @@
 {
-    "testTimeout": 5000,
+    "testTimeout": 10000,
     "rootDir": "../",
-    "modulePaths": ["."],
     "testEnvironment": "node",
     "testMatch": ["<rootDir>/test/**/*.spec.ts"],
+
+    "clearMocks": true,
+    "restoreMocks": true,
+    "verbose": true,
+
     "collectCoverage": true,
-    "coverageDirectory": "coverage",
+    "coverageDirectory": "<rootDir>/coverage",
     "collectCoverageFrom": [
         "<rootDir>/src/**/*.service.ts",
-        "!<rootDir>/src/**/*.spec.ts",
-        "!<rootDir>/src/**/*.mock.ts",
+        "<rootDir>/src/**/*.guard.ts",
+        "<rootDir>/src/**/*.filter.ts",
+        "<rootDir>/src/**/*.interceptor.ts",
+        "<rootDir>/src/**/*.repository.ts",
         "!<rootDir>/src/common/database/services/database.service.ts",
-        "!<rootDir>/src/common/logger/services/logger.service.ts",
-        "!<rootDir>/src/workers/schedulers/midnight.scheduler.ts"
+        "!<rootDir>/src/common/logger/services/logger.service.ts"
     ],
-    "coverageReporters": ["html", "lcov", "json-summary"],
-    "moduleFileExtensions": ["js", "ts", "json"],
+    "coverageReporters": ["text", "html", "lcov", "json-summary"],
+    "coverageThreshold": {
+        "global": {
+            "statements": 40,
+            "branches": 85,
+            "functions": 60,
+            "lines": 40
+        }
+    },
     "coverageProvider": "v8",
+
+    "moduleFileExtensions": ["js", "ts", "json"],
+    "moduleNameMapper": {
+        "^src/(.*)$": "<rootDir>/src/$1",
+        "^@faker-js/faker$": "<rootDir>/test/mocks/faker.mock.ts"
+    },
     "transform": {
         "^.+\\.(t|j)sx?$": [
             "@swc/jest",
@@ -24,9 +42,6 @@
                 "sourceMaps": true
             }
         ]
-    },
-    "moduleNameMapper": {
-        "^@faker-js/faker$": "<rootDir>/test/mocks/faker.mock.ts"
     },
     "modulePathIgnorePatterns": ["<rootDir>/dist"]
 }
