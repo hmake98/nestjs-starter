@@ -19,6 +19,28 @@ NestJS 11 REST API starter. PostgreSQL via Prisma, Redis cache, BullMQ queues, J
 | `/debug` | `/debug UnknownExportException PostRepository in PostModule` | Diagnoses DI, Prisma, Docker, auth, and validation errors using project-specific knowledge |
 | `/explain` | `/explain how the response interceptor works` | Explains any part of the codebase with file:line references and design rationale |
 | `/review` | `/review src/modules/post/services/post.service.ts` | Audits a file against the full project checklist — module rules, service patterns, DTO conventions, test quality |
+| `/add-plugin` | `/add-plugin temporal` | Installs and wires a third-party integration (see plugin catalogue below) |
+
+### Plugin catalogue — on-demand integrations (`.claude/plugins/`)
+
+Plugins are optional integrations added on demand. Each plugin spec lives in `.claude/plugins/<name>.md` and describes packages, env vars, module structure, and wiring.
+
+| Plugin | Command | What it adds |
+|---|---|---|
+| AWS | `/add-plugin aws` | S3 storage, SES email, Secrets Manager (Key Vault) — single module, install only what you need |
+| Azure | `/add-plugin azure` | Blob Storage, ACS email, Key Vault — `DefaultAzureCredential` / Managed Identity, no static secrets |
+| Temporal | `/add-plugin temporal` | Durable workflow engine (`nestjs-temporal-core`) — workflows, activities, task queues |
+| RabbitMQ | `/add-plugin rabbitmq` | AMQP pub/sub and work queues (`@golevelup/nestjs-rabbitmq`) |
+| gRPC | `/add-plugin grpc` | gRPC microservice transport alongside HTTP (hybrid app) |
+| Stripe | `/add-plugin stripe` | Payment processing — charges, subscriptions, webhooks |
+| SendGrid | `/add-plugin sendgrid` | Transactional email via SendGrid (`@sendgrid/mail`) |
+| Elasticsearch | `/add-plugin elasticsearch` | Full-text search and analytics (`@nestjs/elasticsearch`) |
+| Twilio | `/add-plugin twilio` | SMS and WhatsApp messaging — OTP, alerts |
+| Firebase | `/add-plugin firebase` | Push notifications (FCM), Firebase Auth token verification (`firebase-admin`) |
+
+To see all available plugins without Claude: `npm run plugin:list`
+
+**All generated plugin code must match codebase conventions exactly** — same folder structure as `src/common/cache/`, same Logger/ConfigService usage, same module registration patterns.
 
 ### Skills — multi-step orchestrated workflows (`.claude/skills/`)
 
@@ -43,6 +65,7 @@ npm run db:generate        # generate Prisma client after schema changes
 npm run db:migrate         # run migrations (dev)
 npm run db:migrate-prod    # run migrations (production)
 npm run seed:admin         # create default admin user
+npm run plugin:list        # list all available plugins
 ```
 
 ## Architecture

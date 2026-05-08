@@ -36,6 +36,7 @@
 | **Testing** | Jest + SWC with coverage thresholds |
 | **Code Quality** | ESLint, Prettier, Husky, commitlint (Conventional Commits) |
 | **Docker** | Multi-stage Dockerfile, single Docker Compose with hot reload |
+| **Plugin System** | On-demand third-party integrations (AWS, Azure, Temporal, Stripe, and more) via `/add-plugin` |
 
 ---
 
@@ -112,6 +113,7 @@ npm run dev             # start with watch mode
 | `npm run lint:fix` | Run ESLint with auto-fix |
 | `npm run format` | Format all source files with Prettier |
 | `npm test` | Run all tests with coverage |
+| `npm run plugin:list` | List all available third-party plugins |
 
 ---
 
@@ -144,6 +146,61 @@ src/
 - Feature modules (`AuthModule`, `UserModule`) import `DatabaseModule` directly — they never import each other.
 - `CommonModule` aggregates infrastructure (database, cache, logger, request/response pipeline) for `AppModule`.
 - Global providers (guards, interceptors, filters) are registered via `APP_GUARD` / `APP_INTERCEPTOR` / `APP_FILTER` in `RequestModule` and `ResponseModule`.
+
+---
+
+## Claude Code Integration
+
+This project ships with a full [Claude Code](https://claude.ai/code) developer workflow. Commands and skills automate the most common tasks so you spend time on business logic, not boilerplate.
+
+### Commands — run inside a Claude Code session
+
+| Command | Example | What it does |
+|---|---|---|
+| `/gen-module` | `/gen-module post` | Scaffolds a complete feature module — service, controllers, DTOs, repository, module file |
+| `/gen-prisma-model` | `/gen-prisma-model Post` | Adds a Prisma model, creates the interface and repository, registers in `DatabaseModule` |
+| `/gen-endpoint` | `/gen-endpoint GET /post/:id returns PostResponseDto` | Adds one endpoint with the full decorator stack, updates the service |
+| `/gen-test` | `/gen-test src/modules/post/services/post.service.ts` | Generates a full Jest spec following project conventions |
+| `/add-plugin` | `/add-plugin stripe` | Installs and wires a third-party integration — see Plugin System below |
+| `/debug` | `/debug UnknownExportException PostRepository` | Diagnoses DI, Prisma, auth, and Docker errors |
+| `/explain` | `/explain how the response interceptor works` | Explains any part of the codebase with file references |
+| `/review` | `/review src/modules/post/services/post.service.ts` | Audits a file against the full project checklist |
+
+### Skills — multi-step workflows
+
+| Skill | What it does |
+|---|---|
+| `/scaffold-feature` | Full end-to-end feature: schema → repository → module → tests → lint |
+| `/quality-gate` | Lint → format → typecheck → tests → build — fixes issues at each step |
+| `/db-migrate` | Safe schema change: validate → generate → typecheck → migrate → test |
+| `/security-audit` | Auth bypass, input validation, data exposure, dependency vulnerability scan |
+
+See [.claude/README.md](.claude/README.md) for the complete reference.
+
+---
+
+## Plugin System
+
+Third-party integrations are added on demand via `/add-plugin <name>` rather than bundled upfront. Each plugin installs the required packages, creates a typed module under `src/common/`, wires into `CommonModule`, and updates `.env.example`.
+
+```bash
+npm run plugin:list    # see all available plugins
+```
+
+| Plugin | Command | What it adds |
+|---|---|---|
+| **AWS** | `/add-plugin aws` | S3 storage, SES email, Secrets Manager — IAM role credential chain, no static keys |
+| **Azure** | `/add-plugin azure` | Blob Storage, ACS email, Key Vault — Managed Identity / `DefaultAzureCredential` |
+| **Temporal** | `/add-plugin temporal` | Durable workflows via `nestjs-temporal-core` |
+| **RabbitMQ** | `/add-plugin rabbitmq` | AMQP pub/sub and work queues via `@golevelup/nestjs-rabbitmq` |
+| **gRPC** | `/add-plugin grpc` | gRPC microservice transport alongside HTTP (hybrid app) |
+| **Stripe** | `/add-plugin stripe` | Payment intents, subscriptions, webhook verification |
+| **SendGrid** | `/add-plugin sendgrid` | Transactional email and dynamic templates |
+| **Elasticsearch** | `/add-plugin elasticsearch` | Full-text search via `@nestjs/elasticsearch` |
+| **Twilio** | `/add-plugin twilio` | SMS, WhatsApp, OTP delivery |
+| **Firebase** | `/add-plugin firebase` | FCM push notifications, Firebase Auth token verification |
+
+New plugins can be added by creating a spec file in `.claude/plugins/` — no code changes required to the generator itself.
 
 ---
 
