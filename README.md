@@ -20,23 +20,23 @@
 
 ## Features
 
-| Category | Details |
-|---|---|
-| **Auth** | JWT access + refresh tokens, Role-Based Access Control (RBAC) |
-| **Database** | PostgreSQL via Prisma ORM with connection pooling (`@prisma/adapter-pg`) |
-| **Cache** | Redis via ioredis with a typed `CacheService` wrapper |
-| **Queues** | BullMQ for background job processing |
-| **Logging** | Structured JSON logging via Pino with request correlation IDs and sensitive-field redaction |
-| **API Docs** | Swagger/OpenAPI auto-generated from decorators |
-| **i18n** | Multi-language support via `nestjs-i18n` |
-| **Validation** | Class-validator with `ValidationPipe` (whitelist + forbidNonWhitelisted) |
-| **Rate Limiting** | Per-route throttling via `@nestjs/throttler` |
-| **Health Checks** | `/health` endpoint via `@nestjs/terminus` |
-| **Error Tracking** | Sentry integration for 5xx errors |
-| **Testing** | Jest + SWC with coverage thresholds |
-| **Code Quality** | ESLint, Prettier, Husky, commitlint (Conventional Commits) |
-| **Docker** | Multi-stage Dockerfile, single Docker Compose with hot reload |
-| **Plugin System** | On-demand third-party integrations (AWS, Azure, Temporal, Stripe, and more) via `/add-plugin` |
+| Category           | Details                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| **Auth**           | JWT access + refresh tokens, Role-Based Access Control (RBAC)                                 |
+| **Database**       | PostgreSQL via Prisma ORM with connection pooling (`@prisma/adapter-pg`)                      |
+| **Cache**          | Redis via ioredis with a typed `CacheService` wrapper                                         |
+| **Queues**         | BullMQ for background job processing                                                          |
+| **Logging**        | Structured JSON logging via Pino with request correlation IDs and sensitive-field redaction   |
+| **API Docs**       | Swagger/OpenAPI auto-generated from decorators                                                |
+| **i18n**           | Multi-language support via `nestjs-i18n`                                                      |
+| **Validation**     | Class-validator with `ValidationPipe` (whitelist + forbidNonWhitelisted)                      |
+| **Rate Limiting**  | Per-route throttling via `@nestjs/throttler`                                                  |
+| **Health Checks**  | `/health` endpoint via `@nestjs/terminus`                                                     |
+| **Error Tracking** | Sentry integration for 5xx errors                                                             |
+| **Testing**        | Jest + SWC with coverage thresholds                                                           |
+| **Code Quality**   | ESLint, Prettier, Husky, commitlint (Conventional Commits)                                    |
+| **Docker**         | Multi-stage Dockerfile, single Docker Compose with hot reload                                 |
+| **Plugin System**  | On-demand third-party integrations (AWS, Azure, Temporal, Stripe, and more) via `/add-plugin` |
 
 ---
 
@@ -98,22 +98,22 @@ npm run dev             # start with watch mode
 
 ## Scripts
 
-| Script | Description |
-|---|---|
-| `npm run docker:up` | Build and start all services with hot reload |
-| `npm run docker:down` | Stop all services |
-| `npm run dev` | Start NestJS in watch mode (local) |
-| `npm run build` | Compile TypeScript to `dist/` |
-| `npm run db:generate` | Generate Prisma client from schema |
-| `npm run db:migrate` | Run migrations (development) |
-| `npm run db:migrate-prod` | Run migrations (production/CI) |
-| `npm run seed:admin` | Create the default admin user |
-| `npm run remove:admin` | Delete the default admin user |
-| `npm run lint` | Run ESLint |
-| `npm run lint:fix` | Run ESLint with auto-fix |
-| `npm run format` | Format all source files with Prettier |
-| `npm test` | Run all tests with coverage |
-| `npm run plugin:list` | List all available third-party plugins |
+| Script                    | Description                                  |
+| ------------------------- | -------------------------------------------- |
+| `npm run docker:up`       | Build and start all services with hot reload |
+| `npm run docker:down`     | Stop all services                            |
+| `npm run dev`             | Start NestJS in watch mode (local)           |
+| `npm run build`           | Compile TypeScript to `dist/`                |
+| `npm run db:generate`     | Generate Prisma client from schema           |
+| `npm run db:migrate`      | Run migrations (development)                 |
+| `npm run db:migrate-prod` | Run migrations (production/CI)               |
+| `npm run seed:admin`      | Create the default admin user                |
+| `npm run remove:admin`    | Delete the default admin user                |
+| `npm run lint`            | Run ESLint                                   |
+| `npm run lint:fix`        | Run ESLint with auto-fix                     |
+| `npm run format`          | Format all source files with Prettier        |
+| `npm test`                | Run all tests with coverage                  |
+| `npm run plugin:list`     | List all available third-party plugins       |
 
 ---
 
@@ -155,25 +155,25 @@ This project ships with a full [Claude Code](https://claude.ai/code) developer w
 
 ### Commands — run inside a Claude Code session
 
-| Command | Example | What it does |
-|---|---|---|
-| `/gen-module` | `/gen-module post` | Scaffolds a complete feature module — service, controllers, DTOs, repository, module file |
-| `/gen-prisma-model` | `/gen-prisma-model Post` | Adds a Prisma model, creates the interface and repository, registers in `DatabaseModule` |
-| `/gen-endpoint` | `/gen-endpoint GET /post/:id returns PostResponseDto` | Adds one endpoint with the full decorator stack, updates the service |
-| `/gen-test` | `/gen-test src/modules/post/services/post.service.ts` | Generates a full Jest spec following project conventions |
-| `/add-plugin` | `/add-plugin stripe` | Installs and wires a third-party integration — see Plugin System below |
-| `/debug` | `/debug UnknownExportException PostRepository` | Diagnoses DI, Prisma, auth, and Docker errors |
-| `/explain` | `/explain how the response interceptor works` | Explains any part of the codebase with file references |
-| `/review` | `/review src/modules/post/services/post.service.ts` | Audits a file against the full project checklist |
+| Command             | Example                                               | What it does                                                                              |
+| ------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `/gen-module`       | `/gen-module post`                                    | Scaffolds a complete feature module — service, controllers, DTOs, repository, module file |
+| `/gen-prisma-model` | `/gen-prisma-model Post`                              | Adds a Prisma model, creates the interface and repository, registers in `DatabaseModule`  |
+| `/gen-endpoint`     | `/gen-endpoint GET /post/:id returns PostResponseDto` | Adds one endpoint with the full decorator stack, updates the service                      |
+| `/gen-test`         | `/gen-test src/modules/post/services/post.service.ts` | Generates a full Jest spec following project conventions                                  |
+| `/add-plugin`       | `/add-plugin stripe`                                  | Installs and wires a third-party integration — see Plugin System below                    |
+| `/debug`            | `/debug UnknownExportException PostRepository`        | Diagnoses DI, Prisma, auth, and Docker errors                                             |
+| `/explain`          | `/explain how the response interceptor works`         | Explains any part of the codebase with file references                                    |
+| `/review`           | `/review src/modules/post/services/post.service.ts`   | Audits a file against the full project checklist                                          |
 
 ### Skills — multi-step workflows
 
-| Skill | What it does |
-|---|---|
-| `/scaffold-feature` | Full end-to-end feature: schema → repository → module → tests → lint |
-| `/quality-gate` | Lint → format → typecheck → tests → build — fixes issues at each step |
-| `/db-migrate` | Safe schema change: validate → generate → typecheck → migrate → test |
-| `/security-audit` | Auth bypass, input validation, data exposure, dependency vulnerability scan |
+| Skill               | What it does                                                                |
+| ------------------- | --------------------------------------------------------------------------- |
+| `/scaffold-feature` | Full end-to-end feature: schema → repository → module → tests → lint        |
+| `/quality-gate`     | Lint → format → typecheck → tests → build — fixes issues at each step       |
+| `/db-migrate`       | Safe schema change: validate → generate → typecheck → migrate → test        |
+| `/security-audit`   | Auth bypass, input validation, data exposure, dependency vulnerability scan |
 
 See [.claude/README.md](.claude/README.md) for the complete reference.
 
@@ -187,18 +187,18 @@ Third-party integrations are added on demand via `/add-plugin <name>` rather tha
 npm run plugin:list    # see all available plugins
 ```
 
-| Plugin | Command | What it adds |
-|---|---|---|
-| **AWS** | `/add-plugin aws` | S3 storage, SES email, Secrets Manager — IAM role credential chain, no static keys |
-| **Azure** | `/add-plugin azure` | Blob Storage, ACS email, Key Vault — Managed Identity / `DefaultAzureCredential` |
-| **Temporal** | `/add-plugin temporal` | Durable workflows via `nestjs-temporal-core` |
-| **RabbitMQ** | `/add-plugin rabbitmq` | AMQP pub/sub and work queues via `@golevelup/nestjs-rabbitmq` |
-| **gRPC** | `/add-plugin grpc` | gRPC microservice transport alongside HTTP (hybrid app) |
-| **Stripe** | `/add-plugin stripe` | Payment intents, subscriptions, webhook verification |
-| **SendGrid** | `/add-plugin sendgrid` | Transactional email and dynamic templates |
-| **Elasticsearch** | `/add-plugin elasticsearch` | Full-text search via `@nestjs/elasticsearch` |
-| **Twilio** | `/add-plugin twilio` | SMS, WhatsApp, OTP delivery |
-| **Firebase** | `/add-plugin firebase` | FCM push notifications, Firebase Auth token verification |
+| Plugin            | Command                     | What it adds                                                                       |
+| ----------------- | --------------------------- | ---------------------------------------------------------------------------------- |
+| **AWS**           | `/add-plugin aws`           | S3 storage, SES email, Secrets Manager — IAM role credential chain, no static keys |
+| **Azure**         | `/add-plugin azure`         | Blob Storage, ACS email, Key Vault — Managed Identity / `DefaultAzureCredential`   |
+| **Temporal**      | `/add-plugin temporal`      | Durable workflows via `nestjs-temporal-core`                                       |
+| **RabbitMQ**      | `/add-plugin rabbitmq`      | AMQP pub/sub and work queues via `@golevelup/nestjs-rabbitmq`                      |
+| **gRPC**          | `/add-plugin grpc`          | gRPC microservice transport alongside HTTP (hybrid app)                            |
+| **Stripe**        | `/add-plugin stripe`        | Payment intents, subscriptions, webhook verification                               |
+| **SendGrid**      | `/add-plugin sendgrid`      | Transactional email and dynamic templates                                          |
+| **Elasticsearch** | `/add-plugin elasticsearch` | Full-text search via `@nestjs/elasticsearch`                                       |
+| **Twilio**        | `/add-plugin twilio`        | SMS, WhatsApp, OTP delivery                                                        |
+| **Firebase**      | `/add-plugin firebase`      | FCM push notifications, Firebase Auth token verification                           |
 
 New plugins can be added by creating a spec file in `.claude/plugins/` — no code changes required to the generator itself.
 
@@ -208,15 +208,15 @@ New plugins can be added by creating a spec file in `.claude/plugins/` — no co
 
 All routes are versioned (`/v1/...`) unless marked as version-neutral.
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| `GET` | `/health` | Public | Health check |
-| `POST` | `/v1/auth/signup` | Public | Register a new user |
-| `POST` | `/v1/auth/login` | Public | Login, returns access + refresh tokens |
-| `GET` | `/v1/auth/refresh-token` | Refresh JWT | Issue new token pair |
-| `GET` | `/v1/user/profile` | JWT | Get authenticated user profile |
-| `PUT` | `/v1/user` | JWT | Update authenticated user profile |
-| `DELETE` | `/v1/admin/user/:id` | JWT + ADMIN | Soft-delete a user |
+| Method   | Path                     | Auth        | Description                            |
+| -------- | ------------------------ | ----------- | -------------------------------------- |
+| `GET`    | `/health`                | Public      | Health check                           |
+| `POST`   | `/v1/auth/signup`        | Public      | Register a new user                    |
+| `POST`   | `/v1/auth/login`         | Public      | Login, returns access + refresh tokens |
+| `GET`    | `/v1/auth/refresh-token` | Refresh JWT | Issue new token pair                   |
+| `GET`    | `/v1/user/profile`       | JWT         | Get authenticated user profile         |
+| `PUT`    | `/v1/user`               | JWT         | Update authenticated user profile      |
+| `DELETE` | `/v1/admin/user/:id`     | JWT + ADMIN | Soft-delete a user                     |
 
 Swagger UI is available at `/docs` in non-production environments.
 
@@ -252,11 +252,11 @@ login(@Body() dto: UserLoginDto) { ... }
 
 The Dockerfile has three stages:
 
-| Stage | Purpose |
-|---|---|
-| `dev` | Hot reload — installs all deps, mounts source via volume, runs `nest start --watch` |
-| `builder` | CI/production build — compiles TypeScript, prunes devDependencies |
-| `production` | Minimal runtime image — only `dist/`, pruned `node_modules`, non-root user |
+| Stage        | Purpose                                                                             |
+| ------------ | ----------------------------------------------------------------------------------- |
+| `dev`        | Hot reload — installs all deps, mounts source via volume, runs `nest start --watch` |
+| `builder`    | CI/production build — compiles TypeScript, prunes devDependencies                   |
+| `production` | Minimal runtime image — only `dist/`, pruned `node_modules`, non-root user          |
 
 `docker-compose.yml` always uses the `dev` stage. The `builder`/`production` stages are for producing a deployable image directly via `docker build`.
 
@@ -266,23 +266,23 @@ The entrypoint (`docker-entrypoint.sh`) runs `prisma generate` and `prisma migra
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `APP_ENV` | No | `local` | `local` / `development` / `staging` / `production` |
-| `APP_NAME` | No | `nestjs-starter` | Application name (used in logs) |
-| `APP_DEBUG` | No | `false` | Include stack traces in error responses |
-| `APP_LOG_LEVEL` | No | `info` | Pino log level |
-| `HTTP_HOST` | No | `localhost` | Bind address (`0.0.0.0` in Docker) |
-| `HTTP_PORT` | No | `3000` | HTTP port |
-| `DATABASE_URL` | **Yes** | — | PostgreSQL connection string |
-| `REDIS_URL` | **Yes** | — | Redis connection URL |
-| `AUTH_ACCESS_TOKEN_SECRET` | **Yes** | — | JWT access token signing secret |
-| `AUTH_REFRESH_TOKEN_SECRET` | **Yes** | — | JWT refresh token signing secret |
-| `AUTH_ACCESS_TOKEN_EXP` | No | `1d` | Access token expiry |
-| `AUTH_REFRESH_TOKEN_EXP` | No | `7d` | Refresh token expiry |
-| `SENTRY_DSN` | No | — | Sentry DSN for error tracking |
-| `SEED_ADMIN_EMAIL` | No | — | Admin seed email |
-| `SEED_ADMIN_PASSWORD` | No | — | Admin seed password |
+| Variable                    | Required | Default          | Description                                        |
+| --------------------------- | -------- | ---------------- | -------------------------------------------------- |
+| `APP_ENV`                   | No       | `local`          | `local` / `development` / `staging` / `production` |
+| `APP_NAME`                  | No       | `nestjs-starter` | Application name (used in logs)                    |
+| `APP_DEBUG`                 | No       | `false`          | Include stack traces in error responses            |
+| `APP_LOG_LEVEL`             | No       | `info`           | Pino log level                                     |
+| `HTTP_HOST`                 | No       | `localhost`      | Bind address (`0.0.0.0` in Docker)                 |
+| `HTTP_PORT`                 | No       | `3000`           | HTTP port                                          |
+| `DATABASE_URL`              | **Yes**  | —                | PostgreSQL connection string                       |
+| `REDIS_URL`                 | **Yes**  | —                | Redis connection URL                               |
+| `AUTH_ACCESS_TOKEN_SECRET`  | **Yes**  | —                | JWT access token signing secret                    |
+| `AUTH_REFRESH_TOKEN_SECRET` | **Yes**  | —                | JWT refresh token signing secret                   |
+| `AUTH_ACCESS_TOKEN_EXP`     | No       | `1d`             | Access token expiry                                |
+| `AUTH_REFRESH_TOKEN_EXP`    | No       | `7d`             | Refresh token expiry                               |
+| `SENTRY_DSN`                | No       | —                | Sentry DSN for error tracking                      |
+| `SEED_ADMIN_EMAIL`          | No       | —                | Admin seed email                                   |
+| `SEED_ADMIN_PASSWORD`       | No       | —                | Admin seed password                                |
 
 ---
 

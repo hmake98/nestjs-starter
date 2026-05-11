@@ -17,8 +17,6 @@
         "dev": "nest start --watch",
         "debug": "nest start --debug --watch",
         "update:packages": "npx npm-check-updates -u",
-        "docker:up": "docker compose up --build",
-        "docker:down": "docker compose down",
         "db:generate": "prisma generate --config prisma/prisma.config.ts",
         "db:migrate": "prisma migrate dev --config prisma/prisma.config.ts",
         "db:migrate-prod": "prisma migrate deploy --config prisma/prisma.config.ts",
@@ -31,8 +29,7 @@
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "format:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "test": "jest --config test/jest.json --coverage --runInBand --passWithNoTests --forceExit",
-        "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --config test/jest.json --runInBand",
-        "plugin:list": "node scripts/list-plugins.js"
+        "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --config test/jest.json --runInBand"
     },
     "dependencies": {
         "@faker-js/faker": "^10.4.0",
