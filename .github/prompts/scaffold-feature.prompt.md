@@ -1,7 +1,24 @@
 Scaffold a complete end-to-end feature for: $input
 
-Describe the feature as: `<ModelName> with <field>:<type>, <field>:<type>, ... [and FK to <OtherModel>]`
-Example: `Post with title:String, content:String, authorId:String (FK to User), published:Boolean default false`
+---
+
+## Step 0 — Feature spec (read this first)
+
+Before reading any source file, check if `docs/features/$input.md` exists.
+
+- **If it exists:** attach it with `#file:docs/features/$input.md` and treat it as the
+  authoritative source for the Prisma model, endpoints, business rules, DTO fields, i18n keys,
+  and test scenarios. Do not infer anything the spec already answers.
+- **If it does not exist:** describe the feature as:
+  `<ModelName> with <field>:<type>, <field>:<type>, ... [and FK to <OtherModel>]`
+  Example: `Post with title:String, content:String, authorId:String (FK to User), published:Boolean default false`
+  After scaffolding, remind the developer to create `docs/features/$input.md` using the template
+  at `docs/features/_template.md` so future changes are spec-driven.
+
+If the spec has an **Open Questions** section with unchecked items — stop. List them and wait for
+the developer to resolve them before continuing.
+
+---
 
 Read these files before starting — they are the canonical patterns for every step:
 - `prisma/schema.prisma`
@@ -17,6 +34,8 @@ Read these files before starting — they are the canonical patterns for every s
 ---
 
 ## Step 1 — Prisma Schema
+
+Use the spec's **Prisma Model** section verbatim if available; otherwise infer from the feature description.
 
 Add the model to `prisma/schema.prisma` following these conventions exactly:
 
@@ -58,29 +77,36 @@ Then run: `npm run db:generate`
 
 ## Step 3 — Feature Module (8 files)
 
+Use the spec's **Endpoints** table to split methods between public and admin controllers.
+Use the spec's **Business Rules** for service method logic.
+Use the spec's **DTO Fields** for class-validator decorators and field constraints.
+
 **`src/modules/<name>/dtos/<name>.dto.ts`** (response DTOs)
 - `<Name>ResponseDto` with `@Expose()` + `@ApiProperty({ example: faker.* })` on every field
 - Sensitive fields: `@ApiHideProperty()` + `@Exclude()`
 - Named variants: `<Name>GetResponseDto extends <Name>ResponseDto`, `<Name>CreateResponseDto`, `<Name>UpdateResponseDto`
 
-**`src/modules/<name>/dtos/<name>.update.dto.ts`** (input DTOs)
-- `Create<Name>Dto` with class-validator decorators
-- `Update<Name>Dto` with all fields `@IsOptional()`
+**`src/modules/<name>/dtos/<name>.create.dto.ts`** + **`<name>.update.dto.ts`** (input DTOs)
+- `Create<Name>Dto` with class-validator decorators per spec DTO Fields
+- `Update<Name>Dto` with all fields `@IsOptional()` first
 
 **`src/modules/<name>/services/<name>.service.ts`**
 - Inject `<Name>Repository` (not `DatabaseService`)
 - `private readonly logger = new Logger(<Name>Service.name)`
 - `private async assertExists(id: string)` throws `new HttpException('<name>.error.<name>NotFound', HttpStatus.NOT_FOUND)`
 - All errors: i18n key string + `HttpStatus` constant — never raw messages
+- Implement all business rules from spec
 
 **`src/modules/<name>/controllers/<name>.public.controller.ts`**
 - `@ApiTags('public.<name>')`, `@ApiBearerAuth('accessToken')`
 - `@Controller({ path: '/<name>', version: '1' })`
+- Only JWT/PUBLIC endpoints from spec endpoints table
 - Every method: `@ApiEndpoint({ summary, serialization, messageKey: '<name>.success.<action>' })`
 
 **`src/modules/<name>/controllers/<name>.admin.controller.ts`**
 - `@ApiTags('admin.<name>')`, `@ApiBearerAuth('accessToken')`, `@AllowedRoles([UserRole.ADMIN])` at class level
 - `@Controller({ path: '/admin/<name>', version: '1' })`
+- Only ADMIN endpoints from spec endpoints table
 
 **`src/modules/<name>/<name>.module.ts`**
 - `imports: [DatabaseModule]`
@@ -92,9 +118,32 @@ Then run: `npm run db:generate`
 
 ---
 
-## Step 4 — Tests
+## Step 4 — i18n
 
-Generate `test/modules/<name>.service.spec.ts`:
+Create `src/languages/en/<name>.json` using the spec's **i18n Keys** section, or infer from controller
+`messageKey` values and service throws:
+
+```json
+{
+  "success": {
+    "get": "...",
+    "list": "...",
+    "created": "...",
+    "updated": "...",
+    "deleted": "..."
+  },
+  "error": {
+    "<name>NotFound": "..."
+  }
+}
+```
+
+---
+
+## Step 5 — Tests
+
+Generate `test/modules/<name>.service.spec.ts` using the spec's **Test Scenarios** as the list of
+`it('should...')` blocks (or cover every public method if no spec):
 
 - Mock every dependency as a plain object: `const mock<Name>Repository = { findById: jest.fn(), ... }`
 - Provide via `{ provide: <Name>Repository, useValue: mock<Name>Repository }`
@@ -105,7 +154,7 @@ Generate `test/modules/<name>.service.spec.ts`:
 
 ---
 
-## Step 5 — Lint
+## Step 6 — Lint
 
 ```bash
 npm run lint:fix
@@ -116,13 +165,12 @@ Note any remaining issues.
 
 ---
 
-## Step 6 — Summary
+## Step 7 — Summary
 
-Print a table of all files created/updated with their status.
+Print a status table of every file created/updated.
 
 Then list remaining manual steps:
-- Migration command: `npm run db:migrate -- --name add_<plural_snake>_table`
-- i18n keys to add to `src/languages/en/<name>.json`:
-  - `success.*` keys used in controller `messageKey` values
-  - `error.*` keys used in service throws
-- Any business logic decisions left open (e.g. pagination, filtering, relations)
+- Migration: `npm run db:migrate -- --name add_<plural_snake>_table`
+- Any open business logic decisions not covered by the spec
+- If no spec existed: remind the developer to create `docs/features/<name>.md` from the template
+  at `docs/features/_template.md` for future spec-driven changes

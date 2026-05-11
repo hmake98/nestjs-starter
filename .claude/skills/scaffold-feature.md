@@ -4,102 +4,122 @@ This is a multi-step workflow. Execute every step in order, pause only if a deci
 
 ---
 
-## Step 1 — Understand the domain
+## Step 1 — Read the feature spec
 
-Read these files to understand existing conventions before writing a single line:
-- `prisma/schema.prisma` — schema conventions (naming, soft-delete, timestamps)
-- `src/common/database/interfaces/user.interface.ts` — interface pattern
-- `src/common/database/repositories/user.repository.ts` — repository pattern
-- `src/modules/user/services/user.service.ts` — service pattern
-- `src/modules/user/controllers/user.public.controller.ts` — controller pattern
-- `src/modules/user/user.module.ts` — module wiring pattern
+**Check `docs/features/$ARGUMENTS.md` first.**
 
-From the feature name/description, infer:
-- Prisma model fields (ask if ambiguous)
-- Which operations need public endpoints vs admin-only endpoints
-- Whether a soft-delete or hard-delete pattern applies
+- **If it exists:** read it completely. It defines the model, endpoints, business rules, DTO fields,
+  i18n keys, and test scenarios. This is the ground truth — do not infer or invent anything the
+  spec already answers.
+- **If it does not exist:** read the codebase patterns below and infer a minimal CRUD structure
+  from the feature name. After scaffolding, remind the developer to write a spec at
+  `docs/features/$ARGUMENTS.md` for future changes to be driven by spec.
+
+If the spec has an **Open Questions** section with unchecked items — stop. List the questions
+and wait for the developer to answer them before proceeding.
+
+Then read these codebase reference files:
+- `prisma/schema.prisma`
+- `src/common/database/interfaces/user.interface.ts`
+- `src/common/database/repositories/user.repository.ts`
+- `src/modules/user/services/user.service.ts`
+- `src/modules/user/controllers/user.public.controller.ts`
+- `src/modules/user/user.module.ts`
 
 ---
 
 ## Step 2 — Prisma schema
 
-Add the model to `prisma/schema.prisma`:
-- `id String @id @default(uuid())`
-- `createdAt`, `updatedAt @updatedAt`, `deletedAt DateTime?`
-- camelCase fields mapped to `@map("snake_case")`
-- `@@map("plural_snake_case")` table name
+Add the model to `prisma/schema.prisma` using the spec's **Prisma Model** section verbatim (adjust only if it violates schema conventions).
 
-Then run:
+Conventions:
+- `id String @id @default(uuid())`
+- camelCase fields, `@map("snake_case")` on every field
+- `createdAt`, `updatedAt @updatedAt`, `deletedAt?` — all with `@map`
+- `@@map("plural_snake_case")`
+
+Then run and verify:
 ```bash
 npm run db:generate
 ```
-
-Verify it succeeds before continuing.
 
 ---
 
 ## Step 3 — Data layer
 
 Create in order:
-1. `src/common/database/interfaces/<name>.interface.ts` — entity type + Create/Update input interfaces
-2. `src/common/database/repositories/<name>.repository.ts` — repository with findById, findAll, existsById, create, update, softDelete
+1. `src/common/database/interfaces/<name>.interface.ts` — entity type alias + Create/Update input interfaces
+2. `src/common/database/repositories/<name>.repository.ts` — `findById`, `existsById`, `create`, `update`, `softDelete`, `hardDeleteById`
 3. Edit `src/common/database/database.module.ts` — add repository to `providers` and `exports`
 
 ---
 
 ## Step 4 — Feature module
 
+Use the spec's **Endpoints** table to determine which methods go in the public vs admin controller.
+Use the spec's **Business Rules** for service method logic.
+Use the spec's **DTO Fields** for class-validator decorators.
+
 Create in order:
-1. `src/modules/<name>/dtos/<name>.dto.ts` — response DTOs with `@Expose`, `@ApiProperty(faker example)` on every field
+1. `src/modules/<name>/dtos/<name>.dto.ts` — response DTOs (`@Expose`, `@ApiProperty(faker)` on every field)
 2. `src/modules/<name>/dtos/<name>.create.dto.ts` — create input DTO
-3. `src/modules/<name>/dtos/<name>.update.dto.ts` — update input DTO (all fields optional)
-4. `src/modules/<name>/services/<name>.service.ts` — service with HttpException i18n keys
-5. `src/modules/<name>/controllers/<name>.public.controller.ts` — authenticated user-facing endpoints
-6. `src/modules/<name>/controllers/<name>.admin.controller.ts` — admin-only endpoints
-7. `src/modules/<name>/<name>.module.ts` — imports DatabaseModule, declares controllers + service, exports service
+3. `src/modules/<name>/dtos/<name>.update.dto.ts` — update input DTO (all fields `@IsOptional()`)
+4. `src/modules/<name>/services/<name>.service.ts` — service enforcing business rules from spec
+5. `src/modules/<name>/controllers/<name>.public.controller.ts` — JWT endpoints from spec
+6. `src/modules/<name>/controllers/<name>.admin.controller.ts` — ADMIN endpoints from spec
+7. `src/modules/<name>/<name>.module.ts` — `imports: [DatabaseModule]`, exports service
 
 Edit `src/app/app.module.ts` — import the new module.
 
 ---
 
-## Step 5 — Tests
+## Step 5 — i18n
 
-Generate a full unit test file at `test/modules/<name>.service.spec.ts`:
-- Mock repository with `jest.fn()` for every method
-- Happy path + error path for every service method
-- No `jest.clearAllMocks()` (global in jest config)
+Create `src/languages/en/<name>.json` with all keys from the spec's **i18n Keys** section:
+```json
+{
+  "success": {
+    "get": "...",
+    "created": "..."
+  },
+  "error": {
+    "<name>NotFound": "..."
+  }
+}
+```
 
-Run tests to confirm they pass:
+---
+
+## Step 6 — Tests
+
+Generate `test/modules/<name>.service.spec.ts` using the spec's **Test Scenarios** section as the list of `it('should...')` blocks.
+
+Rules:
+- Mock every dependency as `{ method: jest.fn() }`
+- Never call `jest.clearAllMocks()` (global in jest config)
+- `resolves.toEqual(...)` for happy paths, `rejects.toThrow(HttpException)` for errors
+
+Run and confirm passing:
 ```bash
 npm test
 ```
 
 ---
 
-## Step 6 — Quality gate
+## Step 7 — Quality gate
 
-Run lint and confirm zero errors:
 ```bash
 npm run lint
 ```
 
+Fix any reported errors before continuing.
+
 ---
 
-## Step 7 — Summary
+## Step 8 — Summary
 
-Print a summary table:
+Print a status table of every file created/updated.
 
-| File | Status |
-|---|---|
-| `prisma/schema.prisma` | ✅ added |
-| `src/common/database/interfaces/<name>.interface.ts` | ✅ created |
-| `src/common/database/repositories/<name>.repository.ts` | ✅ created |
-| `src/common/database/database.module.ts` | ✅ updated |
-| `src/modules/<name>/...` | ✅ created (N files) |
-| `src/app/app.module.ts` | ✅ updated |
-| `test/modules/<name>.service.spec.ts` | ✅ created |
-
-Then list any manual follow-up tasks:
-- Migration: `npm run db:migrate -- --name add_<name>_table`
-- i18n keys to add
-- Any business logic decisions left open
+Then list remaining manual steps:
+- Migration: `npm run db:migrate -- --name add_<plural>_table`
+- Any open business logic decisions not covered by the spec

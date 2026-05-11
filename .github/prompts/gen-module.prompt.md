@@ -1,6 +1,26 @@
 Generate a complete NestJS feature module for: $input
 
-Study these reference files before generating anything:
+---
+
+## Step 0 — Feature spec (read this first)
+
+Before anything else, check if `docs/features/$input.md` exists.
+
+- **If it exists:** attach it with `#file:docs/features/$input.md` and treat it as the
+  authoritative source for the model, endpoints, business rules, DTO fields, i18n keys,
+  and test scenarios. Do not infer anything the spec already answers.
+- **If it does not exist:** infer a minimal CRUD structure from the feature name and proceed.
+  After generating, remind the developer to create `docs/features/$input.md` using the
+  template at `docs/features/_template.md`.
+
+If the spec has an **Open Questions** section with unchecked items — stop and list them.
+
+---
+
+## Step 1 — Reference files
+
+Study these to match existing patterns exactly:
+
 - `src/modules/user/user.module.ts`
 - `src/modules/user/services/user.service.ts`
 - `src/modules/user/controllers/user.public.controller.ts`
@@ -12,70 +32,53 @@ Study these reference files before generating anything:
 
 ---
 
-Generate all 8 files below. Follow every constraint exactly — do not simplify or omit.
+## Step 2 — Generate all 8 files
 
-## 1. `src/common/database/interfaces/<name>.interface.ts`
+### 1. `src/common/database/interfaces/<name>.interface.ts`
+- `export type <Name>Entity = <Name>` from `@prisma/client`
+- `Create<Name>Input` and `Update<Name>Input` interfaces
 
-- `export type <Name>Entity = <Name>` imported from `@prisma/client`
-- `Create<Name>Input` interface with all required fields for creation
-- `Update<Name>Input` interface with all fields optional
+### 2. `src/common/database/repositories/<name>.repository.ts`
+- `@Injectable()` injecting `DatabaseService as db`
+- Methods: `findById`, `existsById` (`findUnique({ select: { id: true } })`), `create`, `update`, `softDelete`, `hardDeleteById`
+- Return types use `<Name>Entity`
 
-## 2. `src/common/database/repositories/<name>.repository.ts`
+### 3. `src/modules/<name>/dtos/<name>.dto.ts`
+- `<Name>ResponseDto` with `@Expose()` + `@ApiProperty({ example: faker.* })` on every included field
+- `@ApiHideProperty()` + `@Exclude()` on sensitive fields
+- Named variants: `<Name>GetResponseDto extends <Name>ResponseDto`, etc.
 
-- `@Injectable()` class
-- Inject `DatabaseService` as `private readonly db: DatabaseService`
-- Access Prisma via `this.db.<model>.*`
-- Standard methods: `findById`, `existsById`, `create`, `update`, `softDelete`, `hardDeleteById` (test cleanup)
-- Existence checks: `findUnique({ where: { id }, select: { id: true } })` — never `count` or `findFirst`
-- Soft delete: `update({ where: { id }, data: { deletedAt: new Date() } })`
-- Return types use `<Name>Entity` from the interface file
+### 4. `src/modules/<name>/dtos/<name>.create.dto.ts` + `<name>.update.dto.ts`
+- class-validator decorators per spec DTO Fields section
+- Update DTO: `@IsOptional()` first on every field
 
-## 3. `src/modules/<name>/dtos/<name>.dto.ts` (response DTOs)
+### 5. `src/modules/<name>/services/<name>.service.ts`
+- Inject repository (not `DatabaseService`)
+- `private readonly logger = new Logger(<Name>Service.name)`
+- `private async assertExists(id)` using `existsById`
+- Business rules from spec implemented here
+- Errors: `throw new HttpException('<name>.error.key', HttpStatus.STATUS)`
 
-- `<Name>ResponseDto` class implementing `Omit<<Name>Entity, 'deletedAt'>` (or full entity)
-- Every included field: `@Expose()` + `@ApiProperty({ example: faker.* })`
-- Sensitive fields (e.g. `passwordHash`): `@ApiHideProperty()` + `@Exclude()`
-- Named variants extend the base: `<Name>GetResponseDto`, `<Name>CreateResponseDto`, `<Name>UpdateResponseDto`
-- Import `@faker-js/faker` for examples
-
-## 4. `src/modules/<name>/dtos/<name>.update.dto.ts` (input DTOs)
-
-- `Create<Name>Dto` with class-validator decorators + `@ApiProperty` on every field
-- `Update<Name>Dto` with all fields `@IsOptional()` then their type validators
-
-## 5. `src/modules/<name>/services/<name>.service.ts`
-
-- `@Injectable()` with `private readonly logger = new Logger(<Name>Service.name)`
-- Inject the repository (not `DatabaseService` directly)
-- `private async assertExists(id: string): Promise<void>` helper using `existsById`
-- Every error: `throw new HttpException('<name>.error.<key>', HttpStatus.STATUS)`
-- Never raw string messages — always i18n keys
-- Return typed response DTOs
-
-## 6. `src/modules/<name>/controllers/<name>.public.controller.ts`
-
+### 6. `src/modules/<name>/controllers/<name>.public.controller.ts`
+- JWT and PUBLIC endpoints from spec endpoints table
 - `@ApiTags('public.<name>')`, `@ApiBearerAuth('accessToken')`
 - `@Controller({ path: '/<name>', version: '1' })`
-- Every method: `@ApiEndpoint({ summary, serialization: <Name>XxxResponseDto, messageKey: '<name>.success.<action>' })`
-- Add `@AuthUser() user: IAuthUser` to any method that needs the requesting user
+- `@ApiEndpoint({ summary, serialization, messageKey })` on every method
 
-## 7. `src/modules/<name>/controllers/<name>.admin.controller.ts`
-
-- `@ApiTags('admin.<name>')`, `@ApiBearerAuth('accessToken')`, `@AllowedRoles([UserRole.ADMIN])` at **class** level
+### 7. `src/modules/<name>/controllers/<name>.admin.controller.ts`
+- ADMIN endpoints from spec endpoints table
+- `@AllowedRoles([UserRole.ADMIN])` at class level
 - `@Controller({ path: '/admin/<name>', version: '1' })`
-- Admin operations (list all, delete, etc.)
-- Same `@ApiEndpoint` requirement per method
 
-## 8. `src/modules/<name>/<name>.module.ts`
-
-- `imports: [DatabaseModule]`
-- `controllers: [<Name>PublicController, <Name>AdminController]`
-- `providers: [<Name>Service]`
-- `exports: [<Name>Service]`
+### 8. `src/modules/<name>/<name>.module.ts`
+- `imports: [DatabaseModule]`, `providers: [<Name>Service]`, `exports: [<Name>Service]`
 
 ---
 
-After generating all files, tell me:
-- Which line in `src/common/database/database.module.ts` to add the new repository to `providers` and `exports`
-- Which line in `src/app/app.module.ts` to add the new module to `imports`
-- Which i18n keys to add to `src/languages/en/<name>.json` (list every key used in service throws and controller messageKeys)
+## Step 3 — Post-generation
+
+Tell me:
+- Line to add repository to `src/common/database/database.module.ts` providers + exports
+- Line to add module to `src/app/app.module.ts` imports
+- Complete `src/languages/en/<name>.json` content (all keys from spec)
+- Migration command: `npm run db:migrate -- --name add_<plural>_table`

@@ -559,6 +559,27 @@ feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert
 ```
 Example: `feat(auth): add email verification flow`
 
+## Feature Spec Workflow
+
+Before scaffolding any feature, write a spec at `docs/features/<name>.md` (copy from
+`docs/features/_template.md`). The spec is the single source of truth for:
+
+- Prisma model (exact schema block)
+- Endpoints (method, path, auth, request/response DTOs)
+- Business rules (ownership checks, state transitions, guards)
+- DTO field validation (class-validator decorators)
+- i18n keys (all `messageKey` and `HttpException` key strings)
+- Test scenarios (maps directly to `it('should...')` blocks)
+
+**With a spec:** run `/scaffold-feature <name>` — Claude reads the spec, generates all files,
+runs tests and lint. No back-and-forth.
+
+**Without a spec:** Claude infers a minimal CRUD structure, then reminds you to write one.
+
+Open Questions in the spec (unchecked `- [ ]` items) make Claude stop and ask before generating.
+
+---
+
 ## Claude Code Commands & Skills
 
 | Command | Usage |
