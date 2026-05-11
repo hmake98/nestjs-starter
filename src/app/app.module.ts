@@ -1,29 +1,36 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 
 import { CommonModule } from 'src/common/common.module';
-import { PostModule } from 'src/modules/post/post.module';
+import { AuthModule } from 'src/modules/auth/auth.module';
 import { UserModule } from 'src/modules/user/user.module';
 import { WorkerModule } from 'src/workers/worker.module';
-import { MCPCommonModule } from 'src/common/mcp/mcp.module';
 
+import configs from './config';
 import { HealthController } from './controllers/health.controller';
+
 @Module({
     imports: [
+        // Configuration - Global
+        ConfigModule.forRoot({
+            load: configs,
+            isGlobal: true,
+            cache: true,
+            envFilePath: ['.env'],
+            expandVariables: true,
+        }),
+        // Health Check
+        TerminusModule,
+
         // Shared Common Services
         CommonModule,
-
-        // MCP Integration
-        MCPCommonModule,
 
         // Background Processing
         WorkerModule,
 
-        // Health Check
-        TerminusModule,
-
         // Feature Modules
-        PostModule,
+        AuthModule,
         UserModule,
     ],
     controllers: [HealthController],

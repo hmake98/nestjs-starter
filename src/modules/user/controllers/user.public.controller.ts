@@ -1,48 +1,42 @@
-import { Body, Controller, Get, HttpStatus, Put } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Put } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-import { DocResponse } from 'src/common/doc/decorators/doc.response.decorator';
-import { AuthUser } from 'src/common/request/decorators/request.user.decorator';
-import { IAuthUser } from 'src/common/request/interfaces/request.interface';
+import { ApiEndpoint } from 'src/common/doc/decorators/doc.api-endpoint.decorator';
+import { AuthUser } from 'src/common/request/decorators/auth-user.decorator';
+import type { IAuthUser } from 'src/common/request/interfaces/request.interface';
 
-import { UserUpdateDto } from '../dtos/request/user.update.request';
 import {
     UserGetProfileResponseDto,
     UserUpdateProfileResponseDto,
-} from '../dtos/response/user.response';
+} from '../dtos/user.dto';
+import { UserUpdateDto } from '../dtos/user.update.dto';
 import { UserService } from '../services/user.service';
 
 @ApiTags('public.user')
-@Controller({
-    path: '/user',
-    version: '1',
-})
+@ApiBearerAuth('accessToken')
+@Controller({ path: '/user', version: '1' })
 export class UserPublicController {
     constructor(private readonly userService: UserService) {}
 
     @Get('profile')
-    @ApiBearerAuth('accessToken')
-    @ApiOperation({ summary: 'Get user profile' })
-    @DocResponse({
+    @ApiEndpoint({
+        summary: 'Get user profile',
         serialization: UserGetProfileResponseDto,
-        httpStatus: HttpStatus.OK,
         messageKey: 'user.success.profile',
     })
-    public async getProfile(
+    getProfile(
         @AuthUser() user: IAuthUser
     ): Promise<UserGetProfileResponseDto> {
         return this.userService.getProfile(user.userId);
     }
 
     @Put()
-    @ApiBearerAuth('accessToken')
-    @ApiOperation({ summary: 'Update user' })
-    @DocResponse({
+    @ApiEndpoint({
+        summary: 'Update user profile',
         serialization: UserUpdateProfileResponseDto,
-        httpStatus: HttpStatus.OK,
         messageKey: 'user.success.updated',
     })
-    public async update(
+    updateUser(
         @AuthUser() user: IAuthUser,
         @Body() payload: UserUpdateDto
     ): Promise<UserUpdateProfileResponseDto> {

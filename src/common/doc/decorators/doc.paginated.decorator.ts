@@ -6,19 +6,19 @@ import {
     ApiPaginationMetadataDto,
 } from 'src/common/response/dtos/response.paginated.dto';
 import { ApiSuccessResponseDto } from 'src/common/response/dtos/response.success.dto';
-import { IResponseDocOptions } from 'src/common/response/interfaces/response.interface';
 
 import {
     DOC_RESPONSE_MESSAGE_META_KEY,
     DOC_RESPONSE_SERIALIZATION_META_KEY,
 } from '../constants/doc.constant';
+import { type IResponseDocOptions } from '../interfaces/doc.interface';
 
 export function DocPaginatedResponse<T>(
     options: IResponseDocOptions<T>
 ): MethodDecorator {
     const { serialization, messageKey, httpStatus } = options;
 
-    const schema: Record<string, any> = {
+    const schema: Record<string, unknown> = {
         allOf: [
             { $ref: getSchemaPath(ApiSuccessResponseDto) },
             {

@@ -4,7 +4,3 @@ export enum APP_ENVIRONMENT {
     DEVELOPMENT = 'development',
     LOCAL = 'local',
 }
-
-export enum APP_BULL_QUEUES {
-    EMAIL = 'email_queue',
-}

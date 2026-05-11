@@ -1,5 +1,3 @@
-import { ClassConstructor } from 'class-transformer';
-
 export interface IPaginationMetadata {
     currentPage: number;
     itemsPerPage: number;
@@ -33,15 +31,4 @@ export interface IApiErrorResponse extends IApiBaseResponse {
 export interface IGenericResponse {
     success: boolean;
     message: string;
-}
-
-export interface IResponseDocOptions<T> {
-    httpStatus: number;
-    messageKey: string;
-    serialization?: ClassConstructor<T>;
-}
-
-export interface IGenericResponseOptions {
-    httpStatus: number;
-    messageKey: string;
 }

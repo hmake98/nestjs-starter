@@ -5,16 +5,17 @@ import {
     Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from '@prisma/client';
+
+import { UserRole } from 'src/common/database/enums/role.enum';
 
 import { ROLES_DECORATOR_KEY } from '../constants/request.constant';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-    constructor(private reflector: Reflector) {}
+    constructor(private readonly reflector: Reflector) {}
 
     canActivate(context: ExecutionContext): boolean {
-        const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
+        const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
             ROLES_DECORATOR_KEY,
             [context.getHandler(), context.getClass()]
         );
@@ -22,16 +23,20 @@ export class RolesGuard implements CanActivate {
         if (!requiredRoles) {
             return true;
         }
-        const { user } = context.switchToHttp().getRequest();
 
-        if (!user || !user.role) {
+        const { user } = context.switchToHttp().getRequest<{
+            user?: { role?: UserRole | UserRole[] };
+        }>();
+
+        if (!user?.role) {
             throw new ForbiddenException('auth.error.userRoleNotDefined');
         }
 
-        const hasRole = requiredRoles.some(
-            role =>
-                user.role === role ||
-                (Array.isArray(user.role) && user.role.includes(role))
+        const userRole = user.role;
+        const hasRole = requiredRoles.some(role =>
+            Array.isArray(userRole)
+                ? userRole.includes(role)
+                : userRole === role
         );
 
         if (!hasRole) {

@@ -1,133 +1,421 @@
-# NestJS Starter - AI Coding Agent Instructions
+# NestJS Starter — GitHub Copilot Instructions
 
-## Architecture Overview
+Complete project context embedded below. Do not scan source files to re-derive what is already here.
 
-This is a production-ready NestJS API with a modular architecture following clean separation of concerns:
+## Stack
 
-- **Core Infrastructure** (`src/common/`): Shared services for database, auth, file storage, caching, logging, messaging
-- **Feature Modules** (`src/modules/`): Business logic (User, Post) - each with controllers, services, DTOs
-- **Background Workers** (`src/workers/`): Bull queue processors and schedulers for async tasks
-- **MCP Integration** (`src/common/mcp/`): Model Context Protocol tools, resources, and prompts for AI capabilities
+NestJS 11 · Prisma 7 + `@prisma/adapter-pg` (pg Pool, no binary engine) · PostgreSQL · Redis ioredis · BullMQ · JWT (passport-jwt + argon2) · nestjs-pino · nestjs-i18n · Sentry · Swagger (non-prod only) · TypeScript 6 · Node ≥20
 
-**Module Dependency Pattern**: Feature modules import `CommonModule` and specific helpers (e.g., `HelperModule`, `DatabaseModule`) but never import other feature modules directly. Cross-feature communication happens through services injected via module imports.
+## Directory Layout
 
-## Development Workflow
-
-### Essential Commands
-```bash
-yarn dev                  # Start with hot reload (http://localhost:3001)
-yarn build               # Production build
-yarn test                # Run Jest tests with SWC
-yarn migrate             # Apply Prisma migrations
-yarn generate            # Generate Prisma client after schema changes
-yarn seed:email          # Seed email templates via nestjs-command
-docker-compose up        # Start full stack (app, postgres, redis)
+```
+src/
+├── app/
+│   ├── app.module.ts              root module
+│   ├── config/                    registerAs() factories (index.ts barrel)
+│   │   ├── app.config.ts          'app.*'
+│   │   ├── auth.config.ts         'auth.accessToken.*' / 'auth.refreshToken.*'
+│   │   ├── redis.config.ts        'redis.*'
+│   │   ├── doc.config.ts          'doc.*'
+│   │   └── seed.config.ts         'seed.admin.*'
+│   ├── controllers/health.controller.ts
+│   └── enums/app.enum.ts
+├── common/
+│   ├── common.module.ts           imports all infra; exports DatabaseModule + CacheModule only
+│   ├── bullmq/bullmq.module.ts    shared BullMQ Redis connection
+│   ├── cache/services/cache.service.ts
+│   ├── database/
+│   │   ├── database.module.ts     provides+exports DatabaseService, UserRepository
+│   │   ├── services/database.service.ts
+│   │   ├── repositories/user.repository.ts
+│   │   ├── interfaces/user.interface.ts   UserEntity, CreateUserInput, UpdateUserInput
+│   │   └── enums/role.enum.ts            re-exports Prisma Role as UserRole
+│   ├── doc/decorators/
+│   │   └── doc.api-endpoint.decorator.ts  @ApiEndpoint (only decorator for controller methods)
+│   ├── request/
+│   │   ├── request.module.ts      registers ThrottlerGuard → JwtAccessGuard → RolesGuard
+│   │   ├── decorators/auth-user.decorator.ts    @AuthUser()
+│   │   ├── decorators/public.decorator.ts       @PublicRoute()
+│   │   ├── decorators/roles.decorator.ts        @AllowedRoles([...])
+│   │   ├── guards/jwt-access.guard.ts
+│   │   ├── guards/jwt-refresh.guard.ts
+│   │   └── interfaces/request.interface.ts      IAuthUser = { userId, role }
+│   └── response/
+│       ├── dtos/response.success.dto.ts    ApiSuccessResponseDto<T>
+│       ├── dtos/response.generic.dto.ts    ApiGenericResponseDto
+│       ├── filters/response.exception.filter.ts
+│       └── interceptors/response.interceptor.ts
+├── modules/
+│   ├── auth/                      public: login, signup, refresh
+│   └── user/                      public: profile CRUD; admin: delete
+└── workers/schedulers/            Cron schedulers (MidNightScheduleWorker)
 ```
 
-### Docker Setup
-Use `.env.docker` for containerized development. Services: `postgres` (5432), `redis` (6379), `server` (3001). The app waits for database health checks before starting.
+## Module Wiring Rules
 
-## Project-Specific Conventions
+**AppModule** imports: `ConfigModule.forRoot({ load: configs, isGlobal: true })`, `TerminusModule`, `CommonModule`, `WorkerModule`, `AuthModule`, `UserModule`.
 
-### 1. Authentication & Authorization
-- **Global Guards** (via `APP_GUARD` in `RequestModule`): `JwtAccessGuard`, `RolesGuard`, `ThrottlerGuard` apply to ALL routes
-- **Public Routes**: Use `@PublicRoute()` decorator to bypass JWT authentication (e.g., login, health checks)
-- **Role-Based Access**: Use `@Roles(Role.ADMIN, Role.DEVELOPER)` decorator from Prisma enums
-- **Token Strategy**: Access tokens (15m) + refresh tokens (7d) via Passport strategies in `src/common/auth/providers/`
+- Feature modules (`AuthModule`, `UserModule`) import `DatabaseModule` directly — never each other.
+- `CommonModule` is only imported by `AppModule`.
+- New feature module → import `DatabaseModule` + add to `AppModule` imports.
+- New repository → add to `DatabaseModule` providers AND exports.
 
-### 2. API Response Pattern
-All controller methods use `@DocResponse()` decorator with:
-- `serialization`: Response DTO class (auto-generates Swagger schema)
-- `httpStatus`: HTTP status code
-- `messageKey`: i18n key from `src/languages/en/` JSON files
+## Guard Order & Auth Decorators
 
-**Example**:
+Guards execute in this fixed order (all registered via `APP_GUARD` in `RequestModule`):
+1. `ThrottlerGuard` — 10 req / 60s (config: `app.throttle.ttl`, `app.throttle.limit`)
+2. `JwtAccessGuard` — JWT validation; bypassed when `@PublicRoute()` metadata present
+3. `RolesGuard` — role check; no-op when `@AllowedRoles` metadata absent
+
 ```typescript
-@DocResponse({
-    serialization: UserGetProfileResponseDto,
-    httpStatus: HttpStatus.OK,
-    messageKey: 'user.success.profile',
-})
+@PublicRoute()                    // bypass JWT entirely (login, signup, health)
+@AllowedRoles([UserRole.ADMIN])  // array required — never spread
+@AuthUser()                       // param decorator → IAuthUser = { userId: string, role: UserRole }
+@UseGuards(JwtRefreshGuard)       // only on GET /v1/auth/refresh-token
 ```
 
-Responses automatically wrap via `ResponseInterceptor` into:
-```json
-{
-    "statusCode": 200,
-    "message": "User profile fetched successfully",
-    "timestamp": "2025-11-17T...",
-    "data": { ... }
+**Existing route examples:**
+- `POST /v1/auth/login` — `@PublicRoute()` at class level, no auth
+- `GET /v1/auth/refresh-token` — `@UseGuards(JwtRefreshGuard)` + `@ApiBearerAuth('refreshToken')`
+- `GET /v1/user/profile` — JWT-protected, `@AuthUser()` extracts user
+- `DELETE /v1/admin/user/:id` — `@AllowedRoles([UserRole.ADMIN])` at class level
+- `GET /health` — `VERSION_NEUTRAL`, `@PublicRoute()`
+
+## Config Factory Pattern
+
+```typescript
+// src/app/config/auth.config.ts
+export default registerAs('auth', () => ({
+    accessToken: { secret: process.env.AUTH_ACCESS_TOKEN_SECRET, tokenExp: process.env.AUTH_ACCESS_TOKEN_EXP },
+    refreshToken: { secret: process.env.AUTH_REFRESH_TOKEN_SECRET, tokenExp: process.env.AUTH_REFRESH_TOKEN_EXP },
+}));
+
+// In service — ALWAYS getOrThrow, NEVER process.env:
+this.configService.getOrThrow<string>('auth.accessToken.secret')
+this.configService.getOrThrow<string>('app.http.port')
+```
+
+`process.env` is read **only** inside config factories. Everywhere else: `ConfigService.getOrThrow<T>('dot.path')`.
+
+## Repository Pattern
+
+```typescript
+@Injectable()
+export class PostRepository {
+    constructor(private readonly db: DatabaseService) {}
+
+    findById(id: string): Promise<PostEntity | null> {
+        return this.db.post.findUnique({ where: { id } });
+    }
+
+    async existsById(id: string): Promise<boolean> {
+        const found = await this.db.post.findUnique({ where: { id }, select: { id: true } });
+        return found !== null;                          // never count(), never findFirst()
+    }
+
+    create(data: CreatePostInput): Promise<PostEntity> {
+        return this.db.post.create({ data });
+    }
+
+    update(id: string, data: UpdatePostInput): Promise<PostEntity> {
+        return this.db.post.update({ where: { id }, data });
+    }
+
+    softDelete(id: string): Promise<PostEntity> {
+        return this.db.post.update({ where: { id }, data: { deletedAt: new Date() } });
+    }
+
+    async hardDeleteById(id: string): Promise<void> {  // test cleanup only
+        await this.db.post.delete({ where: { id } });
+    }
 }
 ```
 
-### 3. Database Patterns (Prisma)
-- **Service**: Inject `DatabaseService` (wrapper around `PrismaClient`) from `src/common/database/`
-- **Query Building**: Use `HelperPrismaQueryBuilderService` for complex pagination/filtering/sorting
-  - Configure allowed fields: `allowedSortFields`, `allowedFilterFields`, `allowedSearchFields`
-  - Returns `{ data, meta }` with pagination metadata
-- **Soft Deletes**: Models have `deletedAt` field; always filter `where: { deletedAt: null }`
-- **Migrations**: After schema changes, run `yarn generate && yarn migrate`
+## Service Pattern
 
-### 4. API Versioning & Structure
-- **Versioning**: URI-based (`/v1/`, `/v2/`) via `VersioningType.URI` in `main.ts`
-- **Controller Naming**:
-  - `*.public.controller.ts` → Public API routes (requires auth unless `@PublicRoute()`)
-  - `*.admin.controller.ts` → Admin-only routes (auto-applies role guards)
-- **Swagger Tags**: Use format `public.resource` or `admin.resource` (e.g., `@ApiTags('public.user')`)
+```typescript
+@Injectable()
+export class UserService {
+    constructor(private readonly userRepository: UserRepository) {}
+    // inject repositories — NOT DatabaseService directly
 
-### 5. Background Jobs
-- **Queue**: Bull with Redis (`APP_BULL_QUEUES` enum in `src/app/enums/app.enum.ts`)
-- **Processors**: In `src/workers/processors/`, decorated with `@Process(APP_BULL_QUEUES.EMAIL)`
-- **Scheduling**: Use `@nestjs/schedule` in `src/workers/schedulers/` with `@Cron()` decorators
-- **Registration**: Import `BullModule.registerQueue()` in feature modules that enqueue jobs
+    async getProfile(userId: string): Promise<UserGetProfileResponseDto> {
+        const user = await this.userRepository.findById(userId);
+        if (!user) throw new HttpException('user.error.userNotFound', HttpStatus.NOT_FOUND);
+        return user;  // typed DTO, not raw entity
+    }
 
-### 6. File Upload (AWS S3)
-- **Service**: `AwsS3Service` from `src/common/aws/` provides pre-signed URLs
-- **Pattern**: Frontend uploads directly to S3, backend stores only the S3 key
-- **Example**: `PostImage` model stores `key` field, related to Post via Prisma relation
+    async updateUser(userId: string, data: UserUpdateDto): Promise<UserUpdateProfileResponseDto> {
+        await this.assertExists(userId);  // use helper for repeated checks
+        return this.userRepository.update(userId, data);
+    }
 
-### 7. Testing
-- **Location**: Mirror `src/` structure in `test/` (e.g., `test/modules/post.service.spec.ts`)
-- **Mocking**: Use `test/mocks/faker.mock.ts` for fake data generation
-- **Config**: `test/jest.json` with SWC for fast compilation
-- **Run**: `yarn test` (runs with `--runInBand --passWithNoTests --forceExit`)
+    async deleteUser(userId: string): Promise<ApiGenericResponseDto> {
+        await this.assertExists(userId);
+        await this.userRepository.softDelete(userId);
+        return { success: true, message: 'user.success.userDeleted' };  // plain object, not new ApiGenericResponseDto()
+    }
 
-### 8. Internationalization
-- **Service**: `MessageService` translates via `nestjs-i18n`
-- **Files**: JSON in `src/languages/en/` (e.g., `user.json`, `auth.json`)
-- **Usage**: Return message keys in services, interceptor translates automatically
-- **Headers**: Accept `accept-language` header for language selection
+    private async assertExists(userId: string): Promise<void> {
+        const exists = await this.userRepository.existsById(userId);
+        if (!exists) throw new HttpException('user.error.userNotFound', HttpStatus.NOT_FOUND);
+    }
+}
+```
 
-### 9. Model Context Protocol (MCP)
-- **Location**: `src/common/mcp/` with separate services for tools, resources, prompts
-- **Decorators**: Use `@MCPTool()`, `@MCPResource()`, `@MCPPrompt()` from `@hmake98/nestjs-mcp`
-- **Config**: Auto-discovery enabled in `MCPCommonModule`
-- **Playground**: `/mcp/playground` endpoint for testing AI integrations
+Throw map: not-found → `HttpStatus.NOT_FOUND` · conflict → `HttpStatus.CONFLICT` · bad input → `HttpStatus.BAD_REQUEST` · unauthorized → `HttpStatus.UNAUTHORIZED` · forbidden → `HttpStatus.FORBIDDEN`
 
-## Critical File Locations
+Logger: `private readonly logger = new Logger(ClassName.name)` — only `logger.error(...)` for unexpected 5xx.
 
-- **Config**: `src/common/config/*.config.ts` (app, auth, AWS, Redis, etc.)
-- **Guards**: `src/common/request/guards/` (JWT, roles)
-- **Decorators**: `src/common/doc/decorators/`, `src/common/request/decorators/`
-- **Response DTOs**: Always in `dtos/response/` within feature modules
-- **Request DTOs**: Always in `dtos/request/` within feature modules
-- **Prisma Schema**: `prisma/schema.prisma` (PostgreSQL with snake_case DB columns)
+## Controller Pattern
+
+```typescript
+@ApiTags('public.user')
+@ApiBearerAuth('accessToken')
+@Controller({ path: '/user', version: '1' })
+export class UserPublicController {
+    constructor(private readonly userService: UserService) {}
+
+    @Get('profile')
+    @ApiEndpoint({ summary: 'Get profile', serialization: UserGetProfileResponseDto, messageKey: 'user.success.profile' })
+    getProfile(@AuthUser() user: IAuthUser): Promise<UserGetProfileResponseDto> {
+        return this.userService.getProfile(user.userId);  // return directly, no wrapping
+    }
+
+    @Put()
+    @ApiEndpoint({ summary: 'Update profile', serialization: UserUpdateProfileResponseDto, messageKey: 'user.success.updated' })
+    updateUser(@AuthUser() user: IAuthUser, @Body() payload: UserUpdateDto): Promise<UserUpdateProfileResponseDto> {
+        return this.userService.updateUser(user.userId, payload);
+    }
+}
+
+@ApiTags('admin.user')
+@ApiBearerAuth('accessToken')
+@AllowedRoles([UserRole.ADMIN])           // always array
+@Controller({ path: '/admin/user', version: '1' })
+export class UserAdminController {
+    @Delete(':id')
+    @ApiEndpoint({ summary: 'Delete user', messageKey: 'user.success.deleted' })
+    deleteUser(@Param('id') userId: string): Promise<ApiGenericResponseDto> {
+        return this.userService.deleteUser(userId);
+    }
+}
+```
+
+**`@ApiEndpoint` options:**
+
+| Option | Required | Notes |
+|---|---|---|
+| `summary` | Yes | Swagger operation summary |
+| `messageKey` | Yes | i18n key resolved by ResponseInterceptor |
+| `serialization` | No | DTO class; omit for `ApiGenericResponseDto` shape |
+| `paginated` | No | `true` + `serialization` for paginated envelope |
+| `httpStatus` | No | Default `HttpStatus.OK`; use `HttpStatus.CREATED` for POST |
+
+## DTO Patterns
+
+**Response DTOs:**
+```typescript
+export class UserResponseDto implements Omit<UserEntity, 'passwordHash'> {
+    @ApiProperty({ example: faker.string.uuid() }) @Expose() @IsUUID() id: string;
+    @ApiProperty({ example: faker.internet.email() }) @Expose() @IsEmail() email: string;
+    @ApiProperty({ example: faker.person.firstName(), required: false, nullable: true })
+    @Expose() @IsString() @IsOptional() firstName: string | null;
+    @ApiProperty({ enum: UserRole, example: faker.helpers.arrayElement(Object.values(UserRole)) })
+    @Expose() @IsEnum(UserRole) role: UserRole;
+    @ApiProperty({ example: faker.date.past().toISOString() }) @Expose() @IsDate() createdAt: Date;
+
+    @ApiHideProperty() @Exclude() passwordHash: string;  // sensitive: hide from Swagger + strip from response
+}
+export class UserGetProfileResponseDto extends UserResponseDto {}    // named variants extend base
+export class UserUpdateProfileResponseDto extends UserResponseDto {}
+```
+
+- Every included field: `@Expose()` + `@ApiProperty({ example: faker.* })`
+- Nullable/optional: `@ApiProperty({ required: false, nullable: true })`
+- Sensitive fields: `@ApiHideProperty()` + `@Exclude()`
+- `ResponseInterceptor` calls `plainToInstance(Dto, data, { excludeExtraneousValues: true })` — no `@Expose()` = stripped
+
+**Input/Request DTOs:**
+```typescript
+export class UserUpdateDto {
+    @ApiProperty({ example: faker.internet.email(), required: false })
+    @IsEmail() @IsOptional()                          // @IsOptional() FIRST for update DTOs
+    @Transform(({ value }) => value?.toLowerCase().trim())
+    email?: string;
+
+    @ApiProperty({ example: faker.person.firstName(), required: false })
+    @IsString() @IsOptional() @MinLength(2) @MaxLength(50)
+    @Transform(({ value }) => value?.trim())
+    firstName?: string;
+}
+```
+
+`ValidationPipe` global: `whitelist: true, forbidNonWhitelisted: true, transform: true` — extra body props = 400.
+
+## Response Envelope
+
+```json
+{ "statusCode": 200, "message": "User profile retrieved", "timestamp": "2026-...", "data": { ... } }
+{ "statusCode": 201, "message": "User created", "timestamp": "2026-...", "data": { ... } }
+{ "statusCode": 404, "message": "User not found", "timestamp": "2026-..." }
+```
+
+`ApiGenericResponseDto` (no-serialization shape):
+```json
+{ "success": true, "message": "user.success.userDeleted" }
+```
+
+## i18n Keys
+
+Files: `src/languages/en/<domain>.json`
+```json
+{ "success": { "profile": "User profile", "updated": "User updated" },
+  "error": { "userNotFound": "User not found", "userExists": "User already exists" } }
+```
+
+- Services throw keys: `'user.error.userNotFound'`, `'auth.error.invalidPassword'`
+- Controllers set: `messageKey: 'user.success.profile'`
+- Every new throw key + every new controller messageKey needs a matching entry in the JSON file
+
+## Prisma Schema Conventions
+
+```prisma
+model Post {
+  id        String    @id @default(uuid())
+  title     String
+  authorId  String    @map("author_id")           // camelCase → @map("snake_case")
+  published Boolean   @default(false)
+  createdAt DateTime  @default(now()) @map("created_at")  // required on every model
+  updatedAt DateTime  @updatedAt @map("updated_at")       // required on every model
+  deletedAt DateTime? @map("deleted_at")                  // soft-delete, required on every model
+
+  author    User      @relation(fields: [authorId], references: [id])
+
+  @@map("posts")  // plural_snake_case
+}
+```
+
+After any schema edit: `npm run db:generate` → `npm run db:migrate`
+
+Enum re-export pattern: `export { Role as UserRole } from '@prisma/client'` in `src/common/database/enums/role.enum.ts`
+
+## CacheService API
+
+```typescript
+// Inject: constructor(private readonly cacheService: CacheService) {}
+await cacheService.get<T>(key)              // T | null, auto-JSON-parse
+await cacheService.set(key, value, ttl?)    // ttl in seconds, optional
+await cacheService.del(...keys)
+await cacheService.exists(key)             // boolean
+await cacheService.hset(key, field, value) / hget<T> / hgetall<T> / hdel
+await cacheService.incr(key) / decr(key)   // atomic counter
+await cacheService.expire(key, ttl)
+await cacheService.ttl(key)                // -1=no expiry, -2=missing
+cacheService.isHealthy()                   // boolean (sync)
+cacheService.getClient()                   // raw ioredis Redis instance
+```
+
+## Testing Patterns
+
+```typescript
+// test/modules/post.service.spec.ts  (mirrors src/modules/post/services/post.service.ts)
+const mockPostRepository = { findById: jest.fn(), existsById: jest.fn(), create: jest.fn() };
+const mockConfigService = { getOrThrow: jest.fn((key: string) => ({ 'app.name': 'test' }[key])) };
+
+describe('PostService', () => {
+    let service: PostService;
+
+    beforeEach(async () => {  // NEVER call jest.clearAllMocks() here — clearMocks: true is global
+        const module = await Test.createTestingModule({
+            providers: [
+                PostService,
+                { provide: PostRepository, useValue: mockPostRepository },
+                { provide: ConfigService, useValue: mockConfigService },
+            ],
+        }).compile();
+        service = module.get(PostService);
+    });
+
+    describe('getPost', () => {
+        it('returns post when found', async () => {
+            mockPostRepository.findById.mockResolvedValue({ id: '1', title: 'Test' });
+            await expect(service.getPost('1')).resolves.toEqual({ id: '1', title: 'Test' });
+        });
+        it('throws NOT_FOUND when missing', async () => {
+            mockPostRepository.findById.mockResolvedValue(null);
+            await expect(service.getPost('1')).rejects.toThrow(HttpException);
+        });
+        it('propagates repository error', async () => {
+            mockPostRepository.findById.mockRejectedValue(new Error('DB down'));
+            await expect(service.getPost('1')).rejects.toThrow('DB down');
+        });
+    });
+});
+```
+
+Rules:
+- Plain object mocks `{ method: jest.fn() }` — never `jest.createMockFromModule`
+- `clearMocks: true` + `restoreMocks: true` global in `test/jest.json` — no manual reset needed
+- `@faker-js/faker` aliased to `test/mocks/faker.mock.ts` — deterministic
+- `src/` alias in imports — never `../../` relative paths
+- Coverage from: `*.service.ts`, `*.guard.ts`, `*.filter.ts`, `*.interceptor.ts`, `*.repository.ts`
+
+## File Naming
+
+Pattern: `<feature>.<type>.ts` — dot = type delimiter, kebab within segments.
+Never: `jwt.access.guard.ts` ❌ → `jwt-access.guard.ts` ✅
+
+| With feature prefix | Bare (already descriptive) |
+|---|---|
+| `auth.module.ts`, `user.service.ts` | `jwt-access.guard.ts`, `roles.guard.ts` |
+| `auth.public.controller.ts` | `public.decorator.ts`, `auth-user.decorator.ts` |
+| `auth.login.dto.ts`, `user.update.dto.ts` | `jwt-access.strategy.ts`, `midnight.scheduler.ts` |
+| `cache.constant.ts`, `app.config.ts` | `health.controller.ts` |
+
+## Dev Commands
+
+```bash
+npm run dev             # hot-reload watch
+npm run build           # compile → dist/
+npm test                # jest --coverage --runInBand
+npm run lint:fix        # eslint --fix
+npm run format          # prettier --write
+npm run db:generate     # regenerate Prisma client
+npm run db:migrate      # run migrations (dev)
+npm run seed:admin      # create default admin user
+```
+
+## Feature Spec Workflow
+
+Before generating any feature, check `docs/features/<name>.md`:
+
+- **Spec exists** → read it. It is authoritative for model, endpoints, business rules, DTO fields,
+  i18n keys, and test scenarios. Do not infer anything the spec already answers.
+- **No spec** → infer minimal CRUD from the feature name and remind the developer to write one
+  using the template at `docs/features/_template.md`.
+- **Open Questions section with unchecked items** → stop and list them. Do not generate until resolved.
+
+Available prompts (Copilot Chat):
+- `/scaffold-feature <name>` — end-to-end: schema → data layer → module → i18n → tests → lint
+- `/gen-module <name>` — feature module only (no schema, no tests)
+- `/gen-endpoint METHOD /path returns Dto` — single endpoint to existing controller
+- `/gen-prisma-model <Name>` — schema block + interface + repository
+- `/gen-test src/.../<file>.ts` — Jest spec for a service file
+- `/review <file>` — audit against full project checklist
+- `/debug <error>` — diagnose DI, Prisma, auth, validation errors
+
+---
 
 ## Common Pitfalls
 
-1. **Missing @PublicRoute()**: All routes require auth by default due to global `JwtAccessGuard`
-2. **Forgot Prisma Generate**: After schema changes, always run `yarn generate` before `yarn migrate`
-3. **Response Serialization**: Controller methods must return DTOs matching `@DocResponse()` serialization class
-4. **Module Imports**: Feature modules must import `DatabaseModule` or `HelperModule` explicitly
-5. **Environment Variables**: Use `ConfigService.get()`, never `process.env` directly
-6. **Enum Usage**: Import Prisma-generated enums (`Role`, `PostStatus`) from `@prisma/client`
-
-## Key Dependencies
-
-- **Framework**: NestJS 11.x (decorators, DI, modules)
-- **ORM**: Prisma 6.x (PostgreSQL)
-- **Queue**: Bull 4.x + Redis (background jobs)
-- **Auth**: Passport JWT strategies (access/refresh)
-- **Validation**: class-validator, class-transformer (auto-applied via global pipe)
-- **Logging**: Pino (structured JSON logs)
-- **API Docs**: Swagger/OpenAPI (auto-generated at `/docs`)
+1. Forgetting `@PublicRoute()` on login/health — `JwtAccessGuard` blocks them.
+2. Editing `schema.prisma` without `npm run db:generate`.
+3. `process.env` in services — use `ConfigService.getOrThrow`.
+4. No `@Expose()` on DTO field — `ResponseInterceptor` strips it.
+5. `@AllowedRoles(UserRole.ADMIN)` without array — `RolesGuard` expects `UserRole[]`.
+6. Non-nullable Prisma field without default — `db:generate` passes, `tsc` fails.
+7. `jest.clearAllMocks()` in `beforeEach` — redundant with global `clearMocks: true`.
+8. Returning Prisma entity without `@Exclude()` on `passwordHash` — leaks password hash.
+9. Importing `CommonModule` in a feature module — import `DatabaseModule` directly instead.
+10. Missing i18n JSON entry for a new error/success key — `MessageService` returns raw key as fallback.
