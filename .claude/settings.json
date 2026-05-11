@@ -1,0 +1,36 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(npm:*)",
+            "Bash(npx:*)",
+            "Bash(node:*)",
+            "Bash(find:*)",
+            "Bash(grep:*)",
+            "Bash(ls:*)",
+            "Bash(cat:*)",
+            "Bash(wc:*)",
+            "Bash(echo:*)",
+            "Bash(which:*)",
+            "Bash(git diff:*)",
+            "Bash(git log:*)",
+            "Bash(git status:*)",
+            "Bash(git show:*)",
+            "Bash(git branch:*)"
+        ],
+        "deny": []
+    },
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/post-edit.sh",
+                        "timeout": 60
+                    }
+                ]
+            }
+        ]
+    }
+}
