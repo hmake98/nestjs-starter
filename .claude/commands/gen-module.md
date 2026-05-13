@@ -2,21 +2,6 @@ Generate a complete NestJS feature module for: $ARGUMENTS
 
 ---
 
-## Step 0 — Read the feature spec (if it exists)
-
-Before reading any source file, check whether `docs/features/$ARGUMENTS.md` exists.
-
-- **If it exists:** read it. It is the authoritative source for this feature's model, endpoints,
-  business rules, DTO fields, i18n keys, and test scenarios. Prefer it over any inferences.
-- **If it does not exist:** infer a minimal CRUD structure from the feature name and proceed.
-  After generating, remind the developer to create a spec at `docs/features/$ARGUMENTS.md`
-  for future iterations.
-
-If the spec has an **Open Questions** section with unchecked items, stop and ask the developer
-to resolve them before continuing.
-
----
-
 ## Step 1 — Read codebase patterns
 
 Study these files to match existing conventions exactly:
@@ -33,7 +18,6 @@ Study these files to match existing conventions exactly:
 
 ## Step 2 — Generate all 8 files
 
-Use the spec (Step 0) for business logic, endpoints, validations, and i18n keys.
 Use the reference files (Step 1) for structure, decorators, and patterns.
 
 ### 1. `src/common/database/interfaces/<name>.interface.ts`

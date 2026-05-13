@@ -28,6 +28,12 @@ npm run remove:admin      # npm run cli -- remove:admin
 src/
 ├── app/
 │   ├── app.module.ts           ← root module (see Module Wiring below)
+│   ├── controllers/
+│   │   └── health.controller.ts
+│   └── enums/
+│       └── app.enum.ts         ← APP_ENVIRONMENT enum
+├── common/
+│   ├── common.module.ts        ← imports ConfigModule + all infra; exports DatabaseModule, CacheModule
 │   ├── config/                 ← registerAs() factories; never import elsewhere directly
 │   │   ├── index.ts            ← barrel: [AppConfig, AuthConfig, DocConfig, RedisConfig, SeedConfig]
 │   │   ├── app.config.ts       ← 'app.*' keys
@@ -35,12 +41,6 @@ src/
 │   │   ├── doc.config.ts       ← 'doc.*' keys
 │   │   ├── redis.config.ts     ← 'redis.*' keys
 │   │   └── seed.config.ts      ← 'seed.admin.*' keys
-│   ├── controllers/
-│   │   └── health.controller.ts
-│   └── enums/
-│       └── app.enum.ts         ← APP_ENVIRONMENT enum
-├── common/
-│   ├── common.module.ts        ← imports all infra; exports DatabaseModule, CacheModule
 │   ├── bullmq/                 ← BullMqModule (shared Redis connection)
 │   ├── cache/
 │   │   ├── cache.module.ts
@@ -169,7 +169,7 @@ UserModule        ← feature
 Config keys use dot-path notation mirroring `registerAs` nesting. Always `ConfigService.getOrThrow<T>(key)` — never `process.env` in services/controllers.
 
 ```typescript
-// src/app/config/auth.config.ts
+// src/common/config/auth.config.ts
 export default registerAs('auth', () => ({
     accessToken: {
         secret: process.env.AUTH_ACCESS_TOKEN_SECRET,
@@ -559,25 +559,6 @@ feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert
 ```
 Example: `feat(auth): add email verification flow`
 
-## Feature Spec Workflow
-
-Before scaffolding any feature, write a spec at `docs/features/<name>.md` (copy from
-`docs/features/_template.md`). The spec is the single source of truth for:
-
-- Prisma model (exact schema block)
-- Endpoints (method, path, auth, request/response DTOs)
-- Business rules (ownership checks, state transitions, guards)
-- DTO field validation (class-validator decorators)
-- i18n keys (all `messageKey` and `HttpException` key strings)
-- Test scenarios (maps directly to `it('should...')` blocks)
-
-**With a spec:** run `/scaffold-feature <name>` — Claude reads the spec, generates all files,
-runs tests and lint. No back-and-forth.
-
-**Without a spec:** Claude infers a minimal CRUD structure, then reminds you to write one.
-
-Open Questions in the spec (unchecked `- [ ]` items) make Claude stop and ask before generating.
-
 ---
 
 ## Claude Code Commands & Skills
@@ -591,8 +572,6 @@ Open Questions in the spec (unchecked `- [ ]` items) make Claude stop and ask be
 | `/debug UnknownExportException PostRepository in PostModule` | Diagnose DI/Prisma/auth/test errors |
 | `/explain how the response interceptor works` | Explain any codebase part with file:line refs |
 | `/review src/modules/post/services/post.service.ts` | Audit against full project checklist |
-| `/add-plugin stripe` | Install and wire third-party integration |
-
 Skills: `/scaffold-feature`, `/quality-gate`, `/db-migrate`, `/security-audit`
 
 ## Common Pitfalls

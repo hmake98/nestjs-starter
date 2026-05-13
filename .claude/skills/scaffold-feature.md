@@ -4,21 +4,7 @@ This is a multi-step workflow. Execute every step in order, pause only if a deci
 
 ---
 
-## Step 1 — Read the feature spec
-
-**Check `docs/features/$ARGUMENTS.md` first.**
-
-- **If it exists:** read it completely. It defines the model, endpoints, business rules, DTO fields,
-  i18n keys, and test scenarios. This is the ground truth — do not infer or invent anything the
-  spec already answers.
-- **If it does not exist:** read the codebase patterns below and infer a minimal CRUD structure
-  from the feature name. After scaffolding, remind the developer to write a spec at
-  `docs/features/$ARGUMENTS.md` for future changes to be driven by spec.
-
-If the spec has an **Open Questions** section with unchecked items — stop. List the questions
-and wait for the developer to answer them before proceeding.
-
-Then read these codebase reference files:
+## Step 1 — Read codebase reference files
 - `prisma/schema.prisma`
 - `src/common/database/interfaces/user.interface.ts`
 - `src/common/database/repositories/user.repository.ts`
@@ -122,4 +108,4 @@ Print a status table of every file created/updated.
 
 Then list remaining manual steps:
 - Migration: `npm run db:migrate -- --name add_<plural>_table`
-- Any open business logic decisions not covered by the spec
+- Any open business logic decisions

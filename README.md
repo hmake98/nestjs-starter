@@ -140,9 +140,6 @@ src/
 │   └── user/                   # User CRUD — profile, update, delete
 ├── workers/                    # Cron schedulers
 └── migration/                  # CLI seed commands
-docs/
-└── features/                   # Feature specs (source of truth for AI scaffolding)
-    └── _template.md            # Copy this to create a new spec
 ```
 
 ### Module dependency rules
@@ -150,48 +147,6 @@ docs/
 - Feature modules (`AuthModule`, `UserModule`) import `DatabaseModule` directly — they never import each other.
 - `CommonModule` aggregates infrastructure for `AppModule` only.
 - Global providers (guards, interceptors, filters) are registered via `APP_GUARD` / `APP_INTERCEPTOR` / `APP_FILTER`.
-
----
-
-## Feature Spec Workflow
-
-This project uses a **spec-driven development** model. Before writing or generating any feature code, you write a feature spec — a structured markdown file that serves as the single source of truth for every AI tool.
-
-### How it works
-
-1. **Copy the template**
-
-   ```bash
-   cp docs/features/_template.md docs/features/<name>.md
-   ```
-
-2. **Fill in the spec** — every section maps directly to generated code:
-
-   | Section | Used for |
-   |---|---|
-   | **Prisma Model** | Schema block added verbatim to `prisma/schema.prisma` |
-   | **Endpoints** | Which methods go in public vs admin controller |
-   | **Business Rules** | Service method logic and guards |
-   | **DTO Fields** | class-validator decorators and `@ApiProperty` examples |
-   | **i18n Keys** | `src/languages/en/<name>.json` content |
-   | **Test Scenarios** | `it('should...')` blocks in the Jest spec |
-   | **Open Questions** | AI stops and asks before generating if any are unchecked |
-
-3. **Run the scaffold command** (Claude Code or Copilot Chat):
-
-   ```
-   /scaffold-feature post
-   ```
-
-   The AI reads your spec and generates all files — schema, repository, DTOs, service, controllers, module, i18n JSON, and tests — without any back-and-forth.
-
-4. **Run the migration**
-
-   ```bash
-   npm run db:migrate -- --name add_posts_table
-   ```
-
-> **No spec?** The AI infers a minimal CRUD structure from the feature name and reminds you to write a spec afterward for future changes.
 
 ---
 
@@ -217,13 +172,12 @@ The CLAUDE.md file gives Claude Code complete project context. Claude reads it a
 | `/debug` | `/debug UnknownExportException PostRepository` | Diagnose DI, Prisma, auth, and test errors |
 | `/explain` | `/explain how the response interceptor works` | Explain any codebase part with file:line references |
 | `/review` | `/review src/modules/post/services/post.service.ts` | Audit a file against the full project checklist |
-| `/add-plugin` | `/add-plugin stripe` | Install and wire a third-party integration |
 
 #### Skills (multi-step workflows)
 
 | Skill | What it does |
 |---|---|
-| `/scaffold-feature` | Schema → repository → module → i18n → tests → lint — driven by `docs/features/<name>.md` |
+| `/scaffold-feature` | Schema → repository → module → i18n → tests → lint |
 | `/quality-gate` | Lint → format → typecheck → tests → build — fixes issues at each step |
 | `/db-migrate` | Validate schema → generate → typecheck → migrate → test |
 | `/security-audit` | Auth bypass, input validation, data exposure, dependency vulnerability scan |
@@ -259,7 +213,6 @@ These files in `.github/instructions/` are automatically applied when you edit m
 | `interfaces.instructions.md` | `src/**/interfaces/*.interface.ts` |
 | `prisma.instructions.md` | `prisma/schema.prisma` |
 | `test.instructions.md` | `test/**/*.spec.ts` |
-| `feature-specs.instructions.md` | `docs/features/*.md` |
 
 #### Prompt Files (Copilot Chat)
 
@@ -267,7 +220,7 @@ Type `/` in Copilot Chat to invoke these reusable prompts:
 
 | Prompt | What it does |
 |---|---|
-| `/scaffold-feature` | End-to-end feature scaffold — reads spec from `docs/features/` |
+| `/scaffold-feature` | End-to-end feature scaffold |
 | `/gen-module` | Generate all 8 feature module files |
 | `/gen-endpoint` | Add a single endpoint to an existing controller |
 | `/gen-prisma-model` | Add a Prisma model and wire the data layer |

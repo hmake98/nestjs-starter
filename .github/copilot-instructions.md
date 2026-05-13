@@ -386,16 +386,6 @@ npm run db:migrate      # run migrations (dev)
 npm run seed:admin      # create default admin user
 ```
 
-## Feature Spec Workflow
-
-Before generating any feature, check `docs/features/<name>.md`:
-
-- **Spec exists** → read it. It is authoritative for model, endpoints, business rules, DTO fields,
-  i18n keys, and test scenarios. Do not infer anything the spec already answers.
-- **No spec** → infer minimal CRUD from the feature name and remind the developer to write one
-  using the template at `docs/features/_template.md`.
-- **Open Questions section with unchecked items** → stop and list them. Do not generate until resolved.
-
 Available prompts (Copilot Chat):
 - `/scaffold-feature <name>` — end-to-end: schema → data layer → module → i18n → tests → lint
 - `/gen-module <name>` — feature module only (no schema, no tests)

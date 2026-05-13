@@ -2,21 +2,6 @@ Generate a complete NestJS feature module for: $input
 
 ---
 
-## Step 0 — Feature spec (read this first)
-
-Before anything else, check if `docs/features/$input.md` exists.
-
-- **If it exists:** attach it with `#file:docs/features/$input.md` and treat it as the
-  authoritative source for the model, endpoints, business rules, DTO fields, i18n keys,
-  and test scenarios. Do not infer anything the spec already answers.
-- **If it does not exist:** infer a minimal CRUD structure from the feature name and proceed.
-  After generating, remind the developer to create `docs/features/$input.md` using the
-  template at `docs/features/_template.md`.
-
-If the spec has an **Open Questions** section with unchecked items — stop and list them.
-
----
-
 ## Step 1 — Reference files
 
 Study these to match existing patterns exactly:

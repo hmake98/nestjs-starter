@@ -10,7 +10,6 @@ This directory contains the Claude Code configuration for the `nestjs-starter` p
 |---|---|---|---|
 | **Command** | `.claude/commands/*.md` | `/command-name <args>` | Single-task code generation or analysis |
 | **Skill** | `.claude/skills/*.md` | `/skill-name <args>` | Multi-step orchestrated workflows |
-| **Plugin spec** | `.claude/plugins/*.md` | `/add-plugin <name>` | Third-party integration scaffolding |
 
 All generated code follows the exact conventions of the existing codebase — same folder structure, same Logger/ConfigService patterns, same decorator placement. The commands read reference files before generating anything.
 
@@ -86,18 +85,6 @@ Generates a complete Jest unit test file for a service, guard, filter, or reposi
 ```
 
 **Follows project conventions:** mock dependencies with `{ methodName: jest.fn() }` objects, no `jest.clearAllMocks()` (set globally), happy path + error path for every public method.
-
----
-
-### `/add-plugin <name>`
-
-Installs and wires a third-party integration. See the [Plugin System](#plugin-system) section below.
-
-```
-/add-plugin aws
-/add-plugin temporal
-/add-plugin stripe
-```
 
 ---
 
@@ -189,84 +176,6 @@ Security review of the codebase.
 ```
 
 Checks: auth bypass risk, input validation gaps, sensitive data exposure, dependency vulnerabilities.
-
----
-
-## Plugin System
-
-Plugins are optional third-party integrations added on demand. Running `/add-plugin <name>` reads the spec from `.claude/plugins/<name>.md` and:
-
-1. Studies the existing codebase patterns (reads reference files first)
-2. Checks for conflicts
-3. Installs npm packages
-4. Creates a typed config factory in `src/app/config/`
-5. Creates the module and service(s) in `src/common/<plugin>/`
-6. Wires into `CommonModule`
-7. Updates `.env.example`
-8. Runs `tsc --noEmit` and fixes type errors
-9. Prints a summary with exact env vars needed
-
-To list available plugins without Claude:
-
-```bash
-npm run plugin:list
-```
-
-### Plugin catalogue
-
-| Plugin | Command | Provides |
-|---|---|---|
-| **AWS** | `/add-plugin aws` | S3 (storage + presigned URLs), SES (email), Secrets Manager — `fromNodeProviderChain()` credential chain, IAM roles in production |
-| **Azure** | `/add-plugin azure` | Blob Storage, ACS email, Key Vault — `DefaultAzureCredential` / Managed Identity, no static secrets |
-| **Temporal** | `/add-plugin temporal` | Durable workflows via `nestjs-temporal-core` — workflows, activities, task queues |
-| **RabbitMQ** | `/add-plugin rabbitmq` | AMQP pub/sub and work queues via `@golevelup/nestjs-rabbitmq` |
-| **gRPC** | `/add-plugin grpc` | gRPC microservice transport alongside HTTP (hybrid app) |
-| **Stripe** | `/add-plugin stripe` | Payment intents, subscriptions, webhook signature verification |
-| **SendGrid** | `/add-plugin sendgrid` | Transactional email, dynamic templates via `@sendgrid/mail` |
-| **Elasticsearch** | `/add-plugin elasticsearch` | Full-text search and analytics via `@nestjs/elasticsearch` |
-| **Twilio** | `/add-plugin twilio` | SMS, WhatsApp, OTP delivery |
-| **Firebase** | `/add-plugin firebase` | FCM push notifications, Firebase Auth token verification |
-
-### Adding a new plugin spec
-
-Create `.claude/plugins/<name>.md` with this structure:
-
-```markdown
-# <Name> Plugin
-
-One-line description of what this integration is for.
-
-## Packages
-npm install command
-
-## Environment Variables
-VAR=example  # description
-
-## Module Structure
-
-### `src/app/config/<name>.config.ts`
-registerAs shape
-
-### `src/common/<name>/<name>.module.ts`
-Module description and key options
-
-### `src/common/<name>/services/<name>.service.ts`
-Key methods and implementation details
-
-### `src/common/<name>/interfaces/<name>.interface.ts`
-Shared types
-
-## CommonModule Wiring
-How to import/export in common.module.ts
-
-## Usage Example
-Brief injection + usage code
-
-## Notes
-Gotchas, production considerations, local dev setup
-```
-
-The plugin is immediately available via `/add-plugin <name>` and will appear in `npm run plugin:list`.
 
 ---
 
