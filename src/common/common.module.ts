@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-
 import { BullMqModule } from './bullmq/bullmq.module';
 import { CacheModule } from './cache/cache.module';
 import configs from './config';
