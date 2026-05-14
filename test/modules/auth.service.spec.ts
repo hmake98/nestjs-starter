@@ -161,6 +161,29 @@ describe('AuthService', () => {
                 user: newUser,
             });
         });
+
+        it('sets firstName and lastName to null when not provided', async () => {
+            const newUser = {
+                id: '123',
+                email: 'new@example.com',
+                role: Role.MEMBER,
+            };
+            mockUserRepository.existsByEmail.mockResolvedValue(false);
+            (argon2.hash as jest.Mock).mockResolvedValue('hashed');
+            mockUserRepository.create.mockResolvedValue(newUser);
+            mockJwtService.signAsync
+                .mockResolvedValueOnce('access')
+                .mockResolvedValueOnce('refresh');
+
+            await service.signup({
+                email: 'new@example.com',
+                password: 'Password1!',
+            });
+
+            expect(mockUserRepository.create).toHaveBeenCalledWith(
+                expect.objectContaining({ firstName: null, lastName: null })
+            );
+        });
     });
 
     describe('refreshTokens', () => {

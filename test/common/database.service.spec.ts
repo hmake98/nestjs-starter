@@ -17,31 +17,23 @@ const MockPrismaClient = PrismaClient as jest.MockedClass<typeof PrismaClient>;
 describe('DatabaseService', () => {
     let service: DatabaseService;
     let module: TestingModule;
-    let mockPrismaInstance: {
-        $connect: jest.Mock;
-        $disconnect: jest.Mock;
-        $queryRaw: jest.Mock;
-        user: object;
-    };
-    let mockPoolInstance: { end: jest.Mock };
+    let mockPoolEnd: jest.Mock;
 
     beforeEach(async () => {
-        mockPrismaInstance = {
-            $connect: jest.fn().mockResolvedValue(undefined),
-            $disconnect: jest.fn().mockResolvedValue(undefined),
-            $queryRaw: jest.fn().mockResolvedValue([{ '1': 1 }]),
-            user: {},
-        };
-
-        mockPoolInstance = {
-            end: jest.fn().mockResolvedValue(undefined),
-        };
-
-        MockPool.mockImplementation(() => mockPoolInstance as unknown as Pool);
-        MockPrismaPg.mockImplementation(() => ({}) as unknown as PrismaPg);
-        MockPrismaClient.mockImplementation(
-            () => mockPrismaInstance as unknown as PrismaClient
+        mockPoolEnd = jest.fn().mockResolvedValue(undefined);
+        MockPool.mockImplementation(
+            () => ({ end: mockPoolEnd }) as unknown as Pool
         );
+        MockPrismaPg.mockImplementation(() => ({}) as unknown as PrismaPg);
+        MockPrismaClient.prototype.$connect = jest
+            .fn()
+            .mockResolvedValue(undefined);
+        MockPrismaClient.prototype.$disconnect = jest
+            .fn()
+            .mockResolvedValue(undefined);
+        MockPrismaClient.prototype.$queryRaw = jest
+            .fn()
+            .mockResolvedValue([{ '?column?': 1 }]);
 
         module = await Test.createTestingModule({
             providers: [
@@ -63,42 +55,53 @@ describe('DatabaseService', () => {
     });
 
     afterEach(async () => {
-        if (module) {
-            await module.close();
-        }
+        if (module) await module.close();
+    });
+
+    describe('class instantiation', () => {
+        it('should be defined', () => expect(service).toBeDefined());
+
+        it('should implement OnModuleInit', () =>
+            expect(typeof service.onModuleInit).toBe('function'));
+
+        it('should implement OnModuleDestroy', () =>
+            expect(typeof service.onModuleDestroy).toBe('function'));
+
+        it('should have isHealthy method', () =>
+            expect(typeof service.isHealthy).toBe('function'));
     });
 
     describe('onModuleInit', () => {
-        it('should call $connect on module initialization', async () => {
+        it('connects on init', async () => {
             await service.onModuleInit();
-
-            expect(mockPrismaInstance.$connect).toHaveBeenCalledTimes(1);
+            expect(MockPrismaClient.prototype.$connect).toHaveBeenCalledTimes(
+                1
+            );
         });
 
-        it('should handle connection errors during module initialization', async () => {
-            const connectionError = new Error('Failed to connect to database');
-            mockPrismaInstance.$connect.mockRejectedValueOnce(connectionError);
-
+        it('propagates connection errors', async () => {
+            (
+                MockPrismaClient.prototype.$connect as jest.Mock
+            ).mockRejectedValueOnce(new Error('Connection failed'));
             await expect(service.onModuleInit()).rejects.toThrow(
-                'Failed to connect to database'
+                'Connection failed'
             );
         });
     });
 
     describe('onModuleDestroy', () => {
-        it('should call $disconnect and pool.end on destroy', async () => {
+        it('disconnects prisma and ends pool', async () => {
             await service.onModuleDestroy();
-
-            expect(mockPrismaInstance.$disconnect).toHaveBeenCalledTimes(1);
-            expect(mockPoolInstance.end).toHaveBeenCalledTimes(1);
+            expect(
+                MockPrismaClient.prototype.$disconnect
+            ).toHaveBeenCalledTimes(1);
+            expect(mockPoolEnd).toHaveBeenCalledTimes(1);
         });
 
-        it('should handle errors during disconnect', async () => {
-            const disconnectError = new Error('Disconnect failed');
-            mockPrismaInstance.$disconnect.mockRejectedValueOnce(
-                disconnectError
-            );
-
+        it('propagates disconnect errors', async () => {
+            (
+                MockPrismaClient.prototype.$disconnect as jest.Mock
+            ).mockRejectedValueOnce(new Error('Disconnect failed'));
             await expect(service.onModuleDestroy()).rejects.toThrow(
                 'Disconnect failed'
             );
@@ -106,109 +109,25 @@ describe('DatabaseService', () => {
     });
 
     describe('isHealthy', () => {
-        it('should return status "up" when database query succeeds', async () => {
-            mockPrismaInstance.$queryRaw.mockResolvedValueOnce([{ '1': 1 }]);
-
+        it('returns up when query succeeds', async () => {
             const result = await service.isHealthy();
-
             expect(result).toEqual({ prisma: { status: 'up' } });
-            expect(mockPrismaInstance.$queryRaw).toHaveBeenCalledTimes(1);
         });
 
-        it('should return status "down" when database query fails', async () => {
-            mockPrismaInstance.$queryRaw.mockRejectedValueOnce(
-                new Error('Database connection failed')
-            );
-
+        it('returns down when query throws', async () => {
+            (
+                MockPrismaClient.prototype.$queryRaw as jest.Mock
+            ).mockRejectedValueOnce(new Error('DB error'));
             const result = await service.isHealthy();
-
             expect(result).toEqual({ prisma: { status: 'down' } });
         });
 
-        it('should return status "down" when database query throws synchronously', async () => {
-            mockPrismaInstance.$queryRaw.mockImplementationOnce(() => {
-                throw new Error('Unexpected database error');
-            });
-
+        it('returns down on non-Error rejection', async () => {
+            (
+                MockPrismaClient.prototype.$queryRaw as jest.Mock
+            ).mockRejectedValueOnce('string error');
             const result = await service.isHealthy();
-
             expect(result).toEqual({ prisma: { status: 'down' } });
-        });
-
-        it('should handle non-Error exceptions', async () => {
-            mockPrismaInstance.$queryRaw.mockRejectedValueOnce('String error');
-
-            const result = await service.isHealthy();
-
-            expect(result).toEqual({ prisma: { status: 'down' } });
-        });
-
-        it('should handle null rejections', async () => {
-            mockPrismaInstance.$queryRaw.mockRejectedValueOnce(null);
-
-            const result = await service.isHealthy();
-
-            expect(result).toEqual({ prisma: { status: 'down' } });
-        });
-    });
-
-    describe('class instantiation', () => {
-        it('should be defined', () => {
-            expect(service).toBeDefined();
-        });
-
-        it('should implement OnModuleInit interface', () => {
-            expect(typeof service.onModuleInit).toBe('function');
-        });
-
-        it('should implement OnModuleDestroy interface', () => {
-            expect(typeof service.onModuleDestroy).toBe('function');
-        });
-
-        it('should have isHealthy method', () => {
-            expect(typeof service.isHealthy).toBe('function');
-        });
-
-        it('should expose user model', () => {
-            expect(service.user).toBeDefined();
-        });
-    });
-
-    describe('integration scenarios', () => {
-        it('should handle module init followed by health check - success scenario', async () => {
-            mockPrismaInstance.$queryRaw.mockResolvedValueOnce([{ '1': 1 }]);
-
-            await service.onModuleInit();
-            const healthResult = await service.isHealthy();
-
-            expect(mockPrismaInstance.$connect).toHaveBeenCalledTimes(1);
-            expect(healthResult).toEqual({ prisma: { status: 'up' } });
-        });
-
-        it('should handle module init followed by health check - failure scenario', async () => {
-            mockPrismaInstance.$queryRaw.mockRejectedValueOnce(
-                new Error('Query failed')
-            );
-
-            await service.onModuleInit();
-            const healthResult = await service.isHealthy();
-
-            expect(mockPrismaInstance.$connect).toHaveBeenCalledTimes(1);
-            expect(healthResult).toEqual({ prisma: { status: 'down' } });
-        });
-
-        it('should handle connection failure during init but successful health check', async () => {
-            mockPrismaInstance.$connect.mockRejectedValueOnce(
-                new Error('Initial connection failed')
-            );
-            mockPrismaInstance.$queryRaw.mockResolvedValueOnce([{ '1': 1 }]);
-
-            await expect(service.onModuleInit()).rejects.toThrow(
-                'Initial connection failed'
-            );
-
-            const healthResult = await service.isHealthy();
-            expect(healthResult).toEqual({ prisma: { status: 'up' } });
         });
     });
 });

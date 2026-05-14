@@ -22,10 +22,10 @@
     "coverageReporters": ["text", "html", "lcov", "json-summary"],
     "coverageThreshold": {
         "global": {
-            "statements": 40,
-            "branches": 85,
-            "functions": 60,
-            "lines": 40
+            "statements": 100,
+            "branches": 100,
+            "functions": 100,
+            "lines": 100
         }
     },
     "coverageProvider": "v8",
