@@ -12,7 +12,7 @@ Everything you need to build a production API — auth, database, cache, queues,
 &nbsp;
 ![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 &nbsp;
-![Statements](https://img.shields.io/badge/coverage-100%25-brightgreen.svg?style=flat)
+![Statements](https://img.shields.io/badge/statements-100%25-brightgreen.svg?style=flat)
 
 </div>
 
