@@ -4,10 +4,10 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { CommandModule, CommandService } from 'nestjs-command';
 
-import { MigrationModule } from './migration/migration.module';
+import { ScriptsModule } from './scripts/scripts.module';
 
 async function bootstrap(): Promise<void> {
-    const app = await NestFactory.createApplicationContext(MigrationModule, {
+    const app = await NestFactory.createApplicationContext(ScriptsModule, {
         logger: ['error', 'warn', 'log'],
     });
 

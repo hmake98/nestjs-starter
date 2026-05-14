@@ -1,7 +1,7 @@
 import { type CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { registerAs } from '@nestjs/config';
 
-import { APP_ENVIRONMENT } from '../enums/app.enum';
+import { APP_ENVIRONMENT } from 'src/app/enums/app.enum';
 
 export default registerAs('app', () => {
     const corsOrigins = process.env.APP_CORS_ORIGINS

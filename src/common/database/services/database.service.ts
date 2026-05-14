@@ -6,31 +6,32 @@ import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 
 @Injectable()
-export class DatabaseService implements OnModuleInit, OnModuleDestroy {
-    private readonly prisma: PrismaClient;
+export class DatabaseService
+    extends PrismaClient
+    implements OnModuleInit, OnModuleDestroy
+{
     private readonly pool: Pool;
-    readonly user: PrismaClient['user'];
 
     constructor(configService: ConfigService) {
-        this.pool = new Pool({
+        const pool = new Pool({
             connectionString: configService.getOrThrow<string>('DATABASE_URL'),
         });
-        this.prisma = new PrismaClient({ adapter: new PrismaPg(this.pool) });
-        this.user = this.prisma.user;
+        super({ adapter: new PrismaPg(pool) });
+        this.pool = pool;
     }
 
     async onModuleInit() {
-        await this.prisma.$connect();
+        await this.$connect();
     }
 
     async onModuleDestroy() {
-        await this.prisma.$disconnect();
+        await this.$disconnect();
         await this.pool.end();
     }
 
     async isHealthy(): Promise<HealthIndicatorResult> {
         try {
-            await this.prisma.$queryRaw`SELECT 1`;
+            await this.$queryRaw`SELECT 1`;
             return { prisma: { status: 'up' } };
         } catch {
             return { prisma: { status: 'down' } };

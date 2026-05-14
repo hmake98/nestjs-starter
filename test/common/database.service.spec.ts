@@ -12,7 +12,7 @@ jest.mock('@prisma/client');
 
 const MockPool = Pool as jest.MockedClass<typeof Pool>;
 const MockPrismaPg = PrismaPg as jest.MockedClass<typeof PrismaPg>;
-const MockPrismaClient = PrismaClient;
+const MockPrismaClient = PrismaClient as jest.MockedClass<typeof PrismaClient>;
 
 describe('DatabaseService', () => {
     let service: DatabaseService;
