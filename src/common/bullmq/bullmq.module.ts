@@ -8,7 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
                 connection: {
-                    url: configService.getOrThrow<string>('REDIS_URL'),
+                    url: configService.getOrThrow<string>('redis.url'),
                 },
             }),
             inject: [ConfigService],
