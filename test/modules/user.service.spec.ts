@@ -1,5 +1,11 @@
 import { HttpException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
+import {
+    CACHE_SERVICE,
+    CachePlugin,
+    type ICacheService,
+} from '@nestjs-redisx/cache';
+import { RedisTestingModule } from '@nestjs-redisx/testing';
 
 import { UserRepository } from 'src/common/database/repositories/user.repository';
 import { type UserUpdateDto } from 'src/modules/user/dtos/user.update.dto';
@@ -7,6 +13,7 @@ import { UserService } from 'src/modules/user/services/user.service';
 
 describe('UserService', () => {
     let service: UserService;
+    let cacheService: ICacheService;
 
     const mockUserRepository = {
         findById: jest.fn(),
@@ -21,13 +28,20 @@ describe('UserService', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                RedisTestingModule.forRoot({ plugins: [new CachePlugin()] }),
+            ],
             providers: [
                 UserService,
                 { provide: UserRepository, useValue: mockUserRepository },
             ],
         }).compile();
 
+        await module.init();
+
         service = module.get<UserService>(UserService);
+        cacheService = module.get<ICacheService>(CACHE_SERVICE);
+        await cacheService.clear();
     });
 
     it('should be defined', () => {
@@ -47,6 +61,15 @@ describe('UserService', () => {
             mockUserRepository.findById.mockResolvedValue(user);
 
             await expect(service.getProfile('1')).resolves.toEqual(user);
+        });
+
+        it('serves the second lookup from cache', async () => {
+            const user = { id: '1', firstName: 'John' };
+            mockUserRepository.findById.mockResolvedValue(user);
+
+            await service.getProfile('1');
+            await expect(service.getProfile('1')).resolves.toEqual(user);
+            expect(mockUserRepository.findById).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -69,6 +92,22 @@ describe('UserService', () => {
                 updated
             );
             expect(mockUserRepository.update).toHaveBeenCalledWith('1', dto);
+        });
+
+        it('invalidates the cached profile', async () => {
+            const user = { id: '1', firstName: 'John' };
+            mockUserRepository.findById.mockResolvedValue(user);
+            mockUserRepository.existsById.mockResolvedValue(true);
+            mockUserRepository.update.mockResolvedValue({
+                id: '1',
+                firstName: 'Jane',
+            });
+
+            await service.getProfile('1');
+            await service.updateUser('1', { firstName: 'Jane' });
+            await service.getProfile('1');
+
+            expect(mockUserRepository.findById).toHaveBeenCalledTimes(2);
         });
     });
 
