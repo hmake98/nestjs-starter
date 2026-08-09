@@ -23,13 +23,13 @@ Everything you need to build a production API — auth, database, cache, queues,
 ```
 Auth          JWT access + refresh tokens · argon2 hashing · RBAC
 Database      PostgreSQL · Prisma 7 · pg Pool adapter (no binary engine)
-Cache         Redis · ioredis · typed CacheService wrapper
+Cache         Redis · nestjs-redisx · L1 memory + L2 Redis · tags · stampede protection
 Queues        BullMQ with shared Redis connection
 Logging       Structured JSON via nestjs-pino · request correlation IDs
 API Docs      Swagger / OpenAPI — dev and staging only
 i18n          Multi-language support via nestjs-i18n
 Validation    class-validator · whitelist · forbidNonWhitelisted
-Rate Limiting Per-route throttling via @nestjs/throttler
+Rate Limiting Distributed sliding window via nestjs-redisx · shared across instances
 Health        /health endpoint via @nestjs/terminus
 Error Tracking Sentry integration for 5xx errors
 Testing       Jest · SWC · 100% coverage enforced
@@ -73,13 +73,13 @@ src/
 ├── app/                  root module, health check
 ├── common/
 │   ├── bullmq/           queue module
-│   ├── cache/            Redis CacheService
 │   ├── config/           typed config factories
 │   ├── database/         DatabaseService, repositories
 │   ├── doc/              @ApiEndpoint decorator
 │   ├── logger/           Pino setup
 │   ├── message/          i18n resolution
-│   ├── request/          guards, decorators, throttler
+│   ├── redisx/           Redis root module, cache, rate limit, health
+│   ├── request/          guards, decorators, rate limit
 │   └── response/         interceptor, filter, serializer
 ├── modules/
 │   ├── auth/             login · signup · refresh
@@ -107,6 +107,36 @@ prisma/schema.prisma
 | `DELETE` | `/v1/admin/user/:id` | JWT + ADMIN | Soft-delete a user |
 
 Swagger UI is available at `/docs` in non-production environments.
+
+---
+
+## Caching and rate limiting
+
+Both are powered by [nestjs-redisx](https://github.com/nestjs-redisx/nestjs-redisx) and share the connection built from `REDIS_URL`.
+
+Cache any service method and drop the entry when the data changes:
+
+```typescript
+@Cached({ key: 'user:profile:{0}', ttl: 60, tags: userTags })
+private async findById(userId: string): Promise<UserEntity | null> {
+    return this.userRepository.findById(userId);
+}
+
+@InvalidateTags({ tags: userTags })
+async updateUser(userId: string, data: UserUpdateDto) { ... }
+```
+
+Reads hit an in-process L1 cache first and Redis second. Concurrent misses on the same key run the loader once instead of stampeding the database.
+
+`RateLimitGuard` is registered globally and applies `app.throttle` (10 requests per 60 seconds) with a sliding window shared by every instance. Rejections return `429` with `X-RateLimit-*` headers. Tighten a single route with the decorator:
+
+```typescript
+@RateLimit({ points: 5, duration: 60 })
+@Post('login')
+login() { ... }
+```
+
+If Redis is unreachable the limiter fails open and the API keeps serving traffic.
 
 ---
 

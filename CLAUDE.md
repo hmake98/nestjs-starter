@@ -4,7 +4,7 @@ This file gives Claude Code complete context to work in this repository without 
 
 ## Stack
 
-NestJS 11 · Prisma 7 + `@prisma/adapter-pg` (pg Pool, no Prisma binary engine) · PostgreSQL · Redis (ioredis via `CacheService`) · BullMQ · JWT (passport-jwt, argon2) · nestjs-pino · nestjs-i18n · Sentry · Swagger (non-production only) · TypeScript 6 · Node ≥20
+NestJS 11 · Prisma 7 + `@prisma/adapter-pg` (pg Pool, no Prisma binary engine) · PostgreSQL · Redis (nestjs-redisx: cache + rate limit) · BullMQ · JWT (passport-jwt, argon2) · nestjs-pino · nestjs-i18n · Sentry · Swagger (non-production only) · TypeScript 6 · Node ≥20
 
 ## Commands
 
@@ -42,10 +42,9 @@ src/
 │   │   ├── redis.config.ts     ← 'redis.*' keys
 │   │   └── seed.config.ts      ← 'seed.admin.*' keys
 │   ├── bullmq/                 ← BullMqModule (shared Redis connection)
-│   ├── cache/
-│   │   ├── cache.module.ts
-│   │   ├── constants/cache.constant.ts   ← REDIS_CLIENT token
-│   │   └── services/cache.service.ts     ← CacheService (ioredis wrapper)
+│   ├── redisx/
+│   │   ├── redisx.module.ts              ← RedisModule.forRootAsync + Cache/RateLimit plugins
+│   │   └── services/redisx.health.service.ts  ← RedisXHealthService (terminus indicator)
 │   ├── database/
 │   │   ├── database.module.ts            ← provides + exports DatabaseService, UserRepository
 │   │   ├── services/database.service.ts  ← PrismaClient via PrismaPg adapter
@@ -142,7 +141,7 @@ UserModule        ← feature
 ## Guard Order & Auth Decorators
 
 `RequestModule` registers guards in this exact order via `APP_GUARD`:
-1. `ThrottlerGuard` — rate limiting (config: `app.throttle.ttl` = 60s, `app.throttle.limit` = 10 req)
+1. `RateLimitGuard` — distributed rate limiting (config: `app.throttle.ttl` = 60s, `app.throttle.limit` = 10 req)
 2. `JwtAccessGuard` — JWT validation; skipped when `@PublicRoute()` metadata is present
 3. `RolesGuard` — role check; skipped when no `@AllowedRoles` metadata
 
@@ -435,27 +434,41 @@ model Post {
 - Enums: define in schema, re-export from `src/common/database/enums/<name>.enum.ts` as `export { Role as UserRole } from '@prisma/client'`
 - After any change: `npm run db:generate` then `npm run db:migrate`
 
-## CacheService API
+## Cache API
 
-Inject via constructor: `constructor(private readonly cacheService: CacheService) {}`
+Preferred: declarative decorators from `@nestjs-redisx/cache`. No constructor injection needed.
 
 ```typescript
-cacheService.get<T>(key)               // T | null; auto-JSON-deserialises
-cacheService.set(key, value, ttlSec?)  // persist or with TTL
-cacheService.del(...keys)              // delete one or more keys
-cacheService.exists(key)               // boolean
-cacheService.keys(pattern)             // glob match, avoid on large datasets
-cacheService.hset(key, field, value)   // hash set
-cacheService.hget<T>(key, field)       // T | null
-cacheService.hgetall<T>(key)           // T | null
-cacheService.hdel(key, ...fields)
-cacheService.incr(key) / decr(key)    // atomic counter
-cacheService.expire(key, ttlSec)
-cacheService.ttl(key)                  // -1=no expiry, -2=missing
-cacheService.flush()                   // flushdb — use with caution
-cacheService.isHealthy()               // boolean
-cacheService.getClient()               // raw ioredis client
+const userTags = (...args: unknown[]): string[] => [`user:${args[0] as string}`];
+
+@Cached({ key: 'user:profile:{0}', ttl: 60, tags: userTags })
+private async findById(userId: string): Promise<UserEntity | null> {
+    return this.userRepository.findById(userId);
+}
+
+@InvalidateTags({ tags: userTags })
+async updateUser(userId: string, data: UserUpdateDto) { ... }
 ```
+
+Imperative access when a decorator does not fit:
+
+```typescript
+constructor(@Inject(CACHE_SERVICE) private readonly cacheService: ICacheService) {}
+
+cacheService.get<T>(key)                        // T | null
+cacheService.set(key, value, { ttl, tags })     // write through L1 + L2
+cacheService.getOrSet(key, loader, { ttl })     // stampede-protected read
+cacheService.delete(key) / deleteMany(keys)
+cacheService.invalidateTag(tag) / invalidateTags(tags)
+cacheService.ttl(key)                           // -1=no expiry, -2=missing
+cacheService.clear()                            // L1 + L2, use with caution
+```
+
+Raw commands go through `RedisService` from `@nestjs-redisx/core`.
+
+Rules:
+- Cache the data lookup, not the HTTP behaviour. A method that throws `HttpException` must not be wrapped in `@Cached`, otherwise every 404 is logged as a cache loader error and the method runs twice
+- Tag templates (`user:{0}`) only work in `key`; for tags use the function form
 
 ## Cron Scheduler Pattern
 
