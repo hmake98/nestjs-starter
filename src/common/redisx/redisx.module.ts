@@ -4,6 +4,8 @@ import { CachePlugin } from '@nestjs-redisx/cache';
 import { RedisModule } from '@nestjs-redisx/core';
 import { RateLimitPlugin } from '@nestjs-redisx/rate-limit';
 
+import { RedisXHealthService } from './services/redisx.health.service';
+
 @Module({
     imports: [
         RedisModule.forRootAsync({
@@ -41,5 +43,7 @@ import { RateLimitPlugin } from '@nestjs-redisx/rate-limit';
             inject: [ConfigService],
         }),
     ],
+    providers: [RedisXHealthService],
+    exports: [RedisXHealthService],
 })
 export class RedisXModule {}

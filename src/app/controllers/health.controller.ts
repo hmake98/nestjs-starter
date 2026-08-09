@@ -7,6 +7,7 @@ import {
 } from '@nestjs/terminus';
 
 import { DatabaseService } from 'src/common/database/services/database.service';
+import { RedisXHealthService } from 'src/common/redisx/services/redisx.health.service';
 import { PublicRoute } from 'src/common/request/decorators/public.decorator';
 
 @ApiTags('health')
@@ -15,7 +16,8 @@ import { PublicRoute } from 'src/common/request/decorators/public.decorator';
 export class HealthController {
     constructor(
         private readonly healthCheckService: HealthCheckService,
-        private readonly databaseService: DatabaseService
+        private readonly databaseService: DatabaseService,
+        private readonly redisHealthService: RedisXHealthService
     ) {}
 
     @Get()
@@ -23,6 +25,7 @@ export class HealthController {
     getHealth(): Promise<HealthCheckResult> {
         return this.healthCheckService.check([
             () => this.databaseService.isHealthy(),
+            () => this.redisHealthService.isHealthy(),
         ]);
     }
 }
